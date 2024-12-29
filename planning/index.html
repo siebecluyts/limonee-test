@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Limonee - planning</title>
+        <link rel="stylesheet" href="../styles.css">
+        <meta charset="UTF-8">
+        <meta name="description" content="Drink de beste Limonee!">
+        <meta name="keywords" content="Limonade, limonee">
+        <meta name="author" content="limonee">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/image/favicon-16x16.png">
+<link rel="manifest" href="/site.webmanifest">
+    </head>
+    <body>
+        <div class="heading">
+        <a href="/"><img src="https://cdn.glitch.global/638bdc36-d676-479e-8f39-ff81bc2e3bb1/contact%2Fimages%2Flogo.png?v=1735472051762" alt="limonee"width="500" sizes="50"></a>
+        <ul>
+            <li><a href="/limonade/">Limonade</a></li>
+            <li><a href="/about/">Over ons</a></li>
+            <li><a href="/contact/">Contact</a></li>
+        </ul>
+        <div class="agenda-container">
+            <p>Bekijk hieronder op welke zondagen wij open zijn:</p>
+            <ul class="agenda" id="agenda-list">
+                <!-- Dynamische datums komen hier -->
+            </ul>
+        </div>
+        <script>// script.js
+            const openDays = [
+                '04 06 2025',
+                // Voeg hier meer datums toe
+            ];
+            
+            const agendaList = document.getElementById("agenda-list");
+            // Functie om de lijst van open dagen dynamisch weer te geven
+            function generateAgenda() {
+                // Zorg ervoor dat de lijst eerst leeg is om duplicaten te voorkomen
+                agendaList.innerHTML = "";
+            
+                openDays.forEach(dateStr => {
+                    const date = new Date(dateStr);
+                    const listItem = document.createElement("li");
+            
+                    // Converteer de datum naar een leesbaar formaat
+                    listItem.textContent = `${date.toLocaleDateString("nl-NL", { 
+                        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
+                    })} - Wij zijn open van 14:15 tot 16:30 in kortenaken krawaatstraat`;
+            
+                    listItem.classList.add("open");
+                    agendaList.appendChild(listItem);
+                });
+            }
+            
+            // Genereer de agenda
+            generateAgenda();
+            </script>
+            <br>
+            <br>
+            <br>
+    </body>
+    <footer>
+        <div class="footer">
+          <p>&#169;2024 Limonee</p>
+        </div>
+    </footer>
+</html>
