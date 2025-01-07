@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Limonee - spelletje</title>
-        <link rel="stylesheet" href="../styles.css">
+        <title>Limonee - contacts</title>
+        <link rel="stylesheet" href="../../styles.css">
         <meta charset="UTF-8">
         <meta name="description" content="Drink de beste Limonee!">
         <meta name="keywords" content="Limonade, limonee, limone, lekker, zoet, fris">
@@ -22,18 +22,57 @@
             <li><a href="/limonade/">Limonade</a></li>
             <li><a id="about" href="/about/">Over ons</a></li>
             <li><a href="/contact/">Contact</a></li>
-                      <li><a href="/game/">Spelletje</a></li>
+                                <li><a href="/game/">Spelletje</a></li>
                   <li><a href="/planning/">Planning</a></li>
         </ul>
-<h2>
-  Spelletje
-          </h2>
-          <iframe src="/game.html" width="500" height="500">
-            
-          </iframe>
-          <br>
-          <br>
+        <h2>
+            Contacts
+        </h2>
+        <h3 id="h33-1">
+            Stuur ons een bericht
+        </h3>
+        <p id="par3-2">Stuur ons : </p>
+        <div class="container">
+<form
+  action="https://formspree.io/f/myzzbvba"
+  method="POST"
+      onsubmit="handleSubmit(event)"
+>
+  <label>
+    Email:
+    <input type="email" name="email">
+  </label>
+  <label>
+    Naam:
+    <textarea name="name"></textarea>
+  </label>
+          <label for="aantal">Aantal bekers:</label>
+        <input type="number" id="aantal" name="aantal" min="1" required>
+          <input type="hidden" id="willekeurigeCode" name="willekeurigeCode">
+  <!-- your other form fields go here -->
+  <button type="submit">Send</button>
+</form>
+
+        </div>
+      </div>
+      <br>
+      <br>
+      <br>
+      <br>
       <script src="script.js"></script>
+          <script>
+        function generateRandomCode() {
+            // Genereer een willekeurige code (bijvoorbeeld een 6-cijferige code)
+            const randomCode = Math.floor(100000 + Math.random() * 900000);
+            document.getElementById('willekeurigeCode').value = randomCode;
+        }
+
+        function handleSubmit(event) {
+            // Genereer een nieuwe willekeurige code voordat het formulier wordt verzonden
+            generateRandomCode();
+        }
+    </script>
+
     </body>
     <footer>
       <div class="footer">
