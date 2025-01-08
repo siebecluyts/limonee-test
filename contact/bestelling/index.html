@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Limonee - contacts</title>
+        <title>Limonee - bestelling</title>
         <link rel="stylesheet" href="../../styles.css">
         <meta charset="UTF-8">
         <meta name="description" content="Drink de beste Limonee!">
@@ -46,9 +46,15 @@
     Naam:
     <input name="name" required>
   </label>
-          <label for="aantal">Aantal bekers:</label>
-        <input type="number" id="aantal" name="aantal" min="1" required>
+          <label for="aantal">Aantal liters(1 liter = 4 bekers):</label>
+        <input type="number" id="aantal" name="aantal" min="1" max="50" required>
           <input type="hidden" id="willekeurigeCode" name="willekeurigeCode">
+  <label for="datum">Dag dat u het komt halen:</label>
+          <select id="datum" name="datum" required>
+    <option value="6 april 2025">6 april 2025</option>
+  </select>
+    <label for="aantal">Extra bericht(optioneel):</label>
+  <textarea  id="bericht" name="bericht"></textarea>
   <!-- your other form fields go here -->
   <button type="submit">Send</button>
 </form>
@@ -57,6 +63,9 @@
       </div>
       <p>
         Als de bestelling word doorgegeven zal u een bericht krijgen met uw unieke code. Deze kan u ingeven bij het kraampje. 
+      </p>
+            <p>
+       Voor een bestelling moet u zelf flessen meenemen.
       </p>
       <br>
       <br>
