@@ -6,6 +6,13 @@
     action: "https://formspree.io/f/xwppbanv",
     title: "Hoe kunnen we helpen?",
     fields: [
+            { 
+        type: "text", 
+        label: "Naam:", 
+        name: "name",
+        required: true,
+        placeholder: "jouw naam"
+      },
       { 
         type: "email", 
         label: "Email:", 
