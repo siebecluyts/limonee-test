@@ -41,16 +41,19 @@
                     <table>
                         <thead>
                             <tr>
-                                <th>Dag</th>
-                                <th>Werknemers(als /h>
+                              <th>Mensen die willen komen (als je al een formulier met deze naam hebt ingestuurd zal het worden gezien als dat je niet komt. als je dan nog eens antwoord zit je er terug op)</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
                                 <td>6 april 2025</td>
-                                <td><input type="text" name="6 spril 2025_werknemers" placeholder="Namen invullen" required></td>
+                                <td><input type="text" name="6 spril 2025_werknemers" placeholder="Naam invullen" required></td>
                             </tr>
                         </tbody>
+                                                <tr><th>Mensen die al komen</th></tr>
+                      <p>
+                        Siebe Cluyts, Tijl Cluyts, Arnt Janssens, Reindert Janssens.
+                      </p>
                     </table>
                 </section>
 
@@ -61,6 +64,10 @@
                     <select id="datum" name="voorraad_datum" required>
                         <option value="6 april 2025">6 april 2025</option>
                     </select>
+                  <p>
+                    Aantal liters : 0 liters
+                  </p>
+                  <label>Veranderen:</label>
                     <label for="liters">Hoeveel liters limonade beschikbaar?</label>
                     <input type="number" id="liters" name="liters" value="100" required>
                 </section>
@@ -68,8 +75,9 @@
                 <!-- Bestellingen -->
                 <section>
                     <h2>Bestellingen</h2>
-                    <label for="bestellingen">Opmerkingen over bestellingen</label>
-                    <textarea id="bestellingen" name="bestellingen" rows="4" placeholder="Details invullen..."></textarea>
+                    <p>
+                      Er zijn nog geen bestellingen toegevoegd.
+                  </p>
                 </section>
 
                 <button type="submit">Formulier Verzenden</button>
