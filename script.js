@@ -37,3 +37,36 @@
       }
     }
   });
+// Openingsdagen opslaan
+document.getElementById('saveOpeningsdagen').addEventListener('click', () => {
+    const date = document.getElementById('openingsdag').value;
+    if (date) {
+        alert(`De openingsdag ${date} is opgeslagen.`);
+    } else {
+        alert('Selecteer een datum voordat je opslaat.');
+    }
+});
+
+// Werknemersplanning opslaan
+document.getElementById('saveWerknemers').addEventListener('click', () => {
+    alert('De werknemersplanning is opgeslagen.');
+});
+
+// Voorraad opslaan
+document.getElementById('saveVoorraad').addEventListener('click', () => {
+    const liters = document.getElementById('liters').value;
+    alert(`${liters} liters limonade is opgeslagen.`);
+});
+
+// Bestellingen bijwerken
+document.getElementById('updateBestellingen').addEventListener('click', () => {
+    const bestellingen = ['Bestelling 1', 'Bestelling 2', 'Bestelling 3'];
+    const list = document.getElementById('bestellingenList');
+    list.innerHTML = ''; // Leeg de lijst
+    bestellingen.forEach(bestelling => {
+        const li = document.createElement('li');
+        li.textContent = bestelling;
+        list.appendChild(li);
+    });
+    alert('De bestellingen zijn bijgewerkt.');
+});

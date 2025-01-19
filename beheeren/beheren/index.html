@@ -1,43 +1,45 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <title>Limonee - beheren</title>
-        <link rel="stylesheet" href="../../styles.css">
-        <meta charset="UTF-8">
-        <meta name="description" content="Drink de beste Limonee!">
-        <meta name="keywords" content="Limonade, limonee, limone, lekker, zoet, fris">
-        <meta name="author" content="limonee">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="apple-touch-icon" sizes="180x180" href="https://cdn.glitch.global/638bdc36-d676-479e-8f39-ff81bc2e3bb1/contact%2Fimages%2Fapple-touch-icon.png?v=1735472049644">
-<link rel="icon" type="image/png" sizes="32x32" href="https://cdn.glitch.global/638bdc36-d676-479e-8f39-ff81bc2e3bb1/contact%2Fimages%2Ffavicon-32x32.png?v=1735472050279">
-<link rel="icon" type="image/png" sizes="16x16" href="https://cdn.glitch.global/638bdc36-d676-479e-8f39-ff81bc2e3bb1/contact%2Fimages%2Ffavicon-16x16.png?v=1735472049971">
-<link rel="manifest" href="/site.webmanifest">
-    </head>
-    <body>
-        <div class="heading">
-        <a href="/"> 
-          
-           <img src="https://cdn.glitch.global/638bdc36-d676-479e-8f39-ff81bc2e3bb1/contact%2Fimages%2Flogo.png?v=1735472051762" alt="limonee"width="500" sizes="50">
-          
-          </a>
-        <ul>
-            <li><a href="/limonade/">Limonade</a></li>
-            <li><a id="about" href="/about/">Over ons</a></li>
-            <li><a href="/contact/">Contact</a></li>
-                                <li><a href="/game/">Spelletje</a></li>
-                  <li><a href="/planning/">Planning</a></li>
-        </ul>
-        <h2>
-            Beheerpanel
-                    </h2>
-    <section>
-        <h2>Openingsdagen</h2>
-<input type="date">
-        <button>Opslaan</button>
-    </section>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Drink de beste Limonee!">
+    <meta name="keywords" content="Limonade, limonee, limone, lekker, zoet, fris">
+    <meta name="author" content="limonee">
+    <title>Limonee - Beheren</title>
+    <link rel="stylesheet" href="../../styles.css">
+    <link rel="apple-touch-icon" sizes="180x180" href="https://cdn.glitch.global/638bdc36-d676-479e-8f39-ff81bc2e3bb1/contact%2Fimages%2Fapple-touch-icon.png?v=1735472049644">
+    <link rel="icon" type="image/png" sizes="32x32" href="https://cdn.glitch.global/638bdc36-d676-479e-8f39-ff81bc2e3bb1/contact%2Fimages%2Ffavicon-32x32.png?v=1735472050279">
+    <link rel="icon" type="image/png" sizes="16x16" href="https://cdn.glitch.global/638bdc36-d676-479e-8f39-ff81bc2e3bb1/contact%2Fimages%2Ffavicon-16x16.png?v=1735472049971">
+</head>
+<body>
+    <div class="heading">
+        <a href="/">
+            <img src="https://cdn.glitch.global/638bdc36-d676-479e-8f39-ff81bc2e3bb1/contact%2Fimages%2Flogo.png?v=1735472051762" alt="Limonee" width="500">
+        </a>
+        <nav>
+            <ul>
+                <li><a href="/limonade/">Limonade</a></li>
+                <li><a id="about" href="/about/">Over ons</a></li>
+                <li><a href="/contact/">Contact</a></li>
+                <li><a href="/game/">Spelletje</a></li>
+                <li><a href="/planning/">Planning</a></li>
+            </ul>
+        </nav>
+    </div>
+    <main>
+        <h2>Beheerpanel</h2>
 
-    <section>
-        <h2>Werknemersplanning</h2>
+        <section>
+            <h2>Openingsdagen</h2>
+            <label for="openingsdag">Selecteer een datum:</label>
+            <input type="date" id="openingsdag">
+            <button id="saveOpeningsdagen">Opslaan</button>
+        </section>
+
+<section>
+    <h2>Werknemersplanning</h2>
+    <form action="https://formspree.io/f/JE_FORMSPREE_ID" method="POST">
         <table>
             <thead>
                 <tr>
@@ -47,49 +49,40 @@
             </thead>
             <tbody>
                 <tr>
-                    <td>Maandag</td>
-                    <td><input type="text" placeholder="Namen invullen"></td>
+                    <td>6 april 2025</td>
+                    <td><input type="text" name="werknemers-6-april-2025" placeholder="Namen invullen"></td>
                 </tr>
-                <tr>
-                    <td>Dinsdag</td>
-                    <td><input type="text" placeholder="Namen invullen"></td>
-                </tr>
+              
             </tbody>
         </table>
-        <button>Opslaan</button>
-    </section>
+        <button type="submit">Planning verzenden</button>
+    </form>
+</section>
 
-    <section>
-        <h2>Voorraden</h2>
-      <label type="day">Dag</label>
-<select id="datum" name="datum" required>
-    <option value="6 april 2025">6 april 2025</option>
-  </select>
-        <label for="liters">Hoeveel liters limonade beschikbaar?</label>
-        <input type="number" id="liters" value="100">
-        <button>Opslaan</button>
-    </section>
+        <section>
+            <h2>Voorraden</h2>
+            <label for="datum">Dag</label>
+            <select id="datum" name="datum" required>
+                <option value="6 april 2025">6 april 2025</option>
+            </select>
+            <label for="liters">Hoeveel liters limonade beschikbaar?</label>
+            <input type="number" id="liters" value="100">
+            <button id="saveVoorraad">Opslaan</button>
+        </section>
 
-    <section>
-        <h2>Bestellingen</h2>
-        <ul>
-
-        </ul>
-        <button>Bijwerken</button>
-    </section>   
-      <script src="../../script.js"></script>
-      <script src="https://formspree.io/js/formbutton-v1.min.js" defer></script>
-      </div>
-      <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-    </body>
+        <section>
+            <h2>Bestellingen</h2>
+            <ul id="bestellingenList">
+                <!-- Bestellingen worden hier dynamisch toegevoegd -->
+            </ul>
+            <button id="updateBestellingen">Bijwerken</button>
+        </section>
+    </main>
     <footer>
-      <div class="footer">
-        <p>&#169;2025 Limonee</p>
-      </div>
-  </footer>
+        <div class="footer">
+            <p>&#169;2025 Limonee</p>
+        </div>
+    </footer>
+    <script src="../../script.js"></script>
+</body>
 </html>
