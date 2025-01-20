@@ -30,10 +30,10 @@
     ],
     styles: {
       title: {
-        backgroundColor: "gray"
+        backgroundColor: "yellow"
       },
       button: {
-        backgroundColor: "gray"
+        backgroundColor: "yellow"
       }
     }
   });
