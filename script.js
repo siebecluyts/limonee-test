@@ -78,12 +78,3 @@ function displayMessage(message, type) {
     messageDiv.textContent = message;
     messageDiv.className = type; // You can style messages based on type
 }
-<script>
-    window.addEventListener('load', function() {
-        const path = window.location.pathname;
-        // Check if the path is not the root and does not match any existing files
-        if (path !== '/' && !path.includes('.html')) {
-            window.location.href = '/404.html';
-        }
-    });
-</script>
