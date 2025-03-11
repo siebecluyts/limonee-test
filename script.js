@@ -37,44 +37,29 @@
       }
     }
   });
-const users = []; // This will hold user data temporarily
 
-document.getElementById('registerForm').addEventListener('submit', function(event) {
-    event.preventDefault();
-    
-    const username = document.getElementById('regUsername').value;
-    const password = document.getElementById('regPassword').value;
+        window.addEventListener("load", function () {
+          const path = window.location.pathname;
+          const validPaths = [
+            "/about/",
+            "/contact/",
+            "/planning/",
+            "/limonade/",
+            "/game",
+            "/about/personen/",
+            "/contact/bestelling",
+            "/game/1.html",
+            "/game/1.html",
+            "/about/personen/ArntJanssens/",
+            "/about/personen/ReindertJanssens",
+            "/about/personen/SiebeCluyts",
+            "/about/personen/LodewijkVandueren",
+            "/about/personen/TijlCluyts",
+            "/",
+          ]; // Add all valid paths here
 
-    // Check if the user already exists
-    const existingUser = users.find(user => user.username === username);
-    if (existingUser) {
-        displayMessage('User already exists!', 'error');
-        return;
-    }
-
-    // Register the new user
-    users.push({ username, password });
-    displayMessage('Registration successful!', 'success');
-    this.reset();
-});
-
-document.getElementById('loginForm').addEventListener('submit', function(event) {
-    event.preventDefault();
-    
-    const username = document.getElementById('loginUsername').value;
-    const password = document.getElementById('loginPassword').value;
-
-    // Check if the user exists and the password matches
-    const user = users.find(user => user.username === username && user.password === password);
-    if (user) {
-        displayMessage('Login successful!', 'success');
-    } else {
-        displayMessage('Invalid username or password!', 'error');
-    }
-});
-
-function displayMessage(message, type) {
-    const messageDiv = document.getElementById('message');
-    messageDiv.textContent = message;
-    messageDiv.className = type; // You can style messages based on type
-}
+          // Check if the path is not valid
+          if (!validPaths.includes(path) && !path.endsWith("/404.html")) {
+            window.location.href = "/404.html";
+          }
+        });
