@@ -38,28 +38,3 @@
     }
   });
 
-        window.addEventListener("load", function () {
-          const path = window.location.pathname;
-          const validPaths = [
-            "/about/",
-            "/contact/",
-            "/planning/",
-            "/limonade/",
-            "/game",
-            "/about/personen/",
-            "/contact/bestelling",
-            "/game/1.html",
-            "/game/1.html",
-            "/about/personen/ArntJanssens/",
-            "/about/personen/ReindertJanssens",
-            "/about/personen/SiebeCluyts",
-            "/about/personen/LodewijkVandueren",
-            "/about/personen/TijlCluyts",
-            "/",
-          ]; // Add all valid paths here
-
-          // Check if the path is not valid
-          if (!validPaths.includes(path) && !path.endsWith("/404.html")) {
-            window.location.href = "/404.html";
-          }
-        });
