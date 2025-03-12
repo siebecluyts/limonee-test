@@ -37,6 +37,7 @@
       }
     }
   });
+
 // Function for filtering reviews by username and rating
 function filterReviews() {
     const usernameSearch = document.getElementById('search-username').value.toLowerCase();

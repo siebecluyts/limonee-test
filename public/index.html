@@ -68,14 +68,41 @@
 
 <br>
       <h2>
-        revieuws
+        Revieuws
       </h2>
-    <!-- Reviews container -->
-    <div id="reviews"></div>
+    <div id="reviews-list">
+        <!-- Reviews will be displayed here -->
+        <div id="review-container">
+            <!-- Display first 3 reviews here -->
+        </div>
+    </div>
 
-    <!-- See All button (only visible when there are more than 3 reviews) -->
-    <button id="see-all-btn" onclick="location.href='/all-reviews';">See All Reviews</button>
+    <button id="show-all-reviews-btn">Zie alle reviews</button>
 
+    <script>
+        // Fetch the first 3 reviews and display them
+        fetch('/reviews/product')  // Assuming product ID is 'product'
+            .then(response => response.json())
+            .then(reviews => {
+                const reviewContainer = document.getElementById('review-container');
+                reviews.slice(0, 3).forEach(review => {
+                    const reviewElement = document.createElement('div');
+                    reviewElement.classList.add('review-item');
+                    reviewElement.innerHTML = `
+                        <strong>${review.username}</strong>
+                        <p>Rating: ${review.rating}</p>
+                        <p>${review.comment}</p>
+                    `;
+                    reviewContainer.appendChild(reviewElement);
+                });
+            })
+            .catch(err => console.error('Error fetching reviews:', err));
+
+        // Redirect to the all-reviews page when the button is clicked
+        document.getElementById('show-all-reviews-btn').addEventListener('click', () => {
+            window.location.href = '/all-reviews';
+        });
+    </script>
     <!-- Review Form -->
     <h2>Stuur een revieuw</h2>
     <form id="review-form">
