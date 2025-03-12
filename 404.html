@@ -41,6 +41,14 @@
   method="POST"
                   onsubmit="handleSubmit(event)">
         <input type="hidden" id="fout" name="fout">
+                     <div class="col">
+                  <input type="text" name="name" class="form-control" placeholder="Naam" required>
+                </div>
+                <div class="col">
+                  <input type="email" name="email" class="form-control" placeholder="Email Address" required>
+                </div>
+        <textarea placeholder="Beschrijf het pobleem" class="form-control" name="message" rows="10" required></textarea>
+        <br>
           <button type="submit">Probleem melden</button>
       </form>
         <script src="script.js"></script>
@@ -49,7 +57,7 @@
         function generateErrorCode() {
             // Genereer een willekeurige code (bijvoorbeeld een 6-cijferige code)
             const randomCode = 404;
-            document.getElementById('willekeurigeCode').value = randomCode;
+            document.getElementById('fout').value = randomCode;
         }
 
         function handleSubmit(event) {
@@ -57,6 +65,10 @@
             generateErrorCode();
         }
     </script>
+      <br>
+      <br>
+      <br>
+      <br>
     </body>
     <footer>
         <div class="footer">
