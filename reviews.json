@@ -1,14 +1,5 @@
 {
   "product": [
-    {
-      "username": "John Doe",
-      "rating": 5,
-      "comment": "This is a fantastic product! Highly recommend."
-    },
-    {
-      "username": "Jane Smith",
-      "rating": 4,
-      "comment": "Great product, but could be improved in some areas."
-    }
+    
   ]
 }
