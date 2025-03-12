@@ -2,7 +2,7 @@
 <html>
   <head>
     <title>Limonee</title>
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="https://limonee.glitch.me/styles.css" />
     <meta charset="UTF-8" />
     <meta name="description" content="Drink de beste Limonee!" />
     <meta
@@ -67,35 +67,24 @@
     </div>
 
     <script>
-        // Fetch all reviews
-        fetch('/reviews')
+        // JavaScript code om de reviews op te halen
+        fetch('/all-reviews')
             .then(response => response.json())
             .then(reviews => {
-                const reviewsContainer = document.getElementById('reviews-list');
-                
+                const reviewsContainer = document.getElementById('reviews-container');
                 reviews.forEach(review => {
                     const reviewElement = document.createElement('div');
                     reviewElement.innerHTML = `
-                        <p><strong>${review.username}</strong> - Rating: ${review.rating}</p>
+                        <h3>${review.username}</h3>
+                        <p>Beoordeling: ${review.rating}</p>
                         <p>${review.comment}</p>
                     `;
                     reviewsContainer.appendChild(reviewElement);
                 });
+            })
+            .catch(error => {
+                console.error('Er is een fout opgetreden bij het ophalen van de reviews:', error);
             });
-
-        function filterReviews() {
-            const searchTerm = document.getElementById('search').value.toLowerCase();
-            const reviewsList = document.querySelectorAll('#reviews-list div');
-            
-            reviewsList.forEach(review => {
-                const username = review.querySelector('strong').innerText.toLowerCase();
-                if (username.includes(searchTerm)) {
-                    review.style.display = '';
-                } else {
-                    review.style.display = 'none';
-                }
-            });
-        }
     </script>
     <br>
     <br>

@@ -37,28 +37,82 @@
       }
     }
   });
+const stars = document.querySelectorAll(".star");
+const rating = document.getElementById("rating");
+const reviewText = document.getElementById("review");
+const submitBtn = document.getElementById("submit");
+const reviewsContainer = document.getElementById("reviews");
 
-// Function for filtering reviews by username and rating
-function filterReviews() {
-    const usernameSearch = document.getElementById('search-username').value.toLowerCase();
-    const ratingFilter = document.getElementById('filter-rating').value;
+stars.forEach((star) => {
+	star.addEventListener("click", () => {
+		const value = parseInt(star.getAttribute("data-value"));
+		rating.innerText = value;
 
-    const reviews = document.querySelectorAll('.review-item');
-    reviews.forEach((review) => {
-        const username = review.querySelector('strong').textContent.toLowerCase();
-        const rating = review.querySelector('p').textContent.replace('Rating: ', '');
+		// Remove all existing classes from stars
+		stars.forEach((s) => s.classList.remove("one", 
+												"two", 
+												"three", 
+												"four", 
+												"five"));
 
-        let matchesUsername = username.includes(usernameSearch);
-        let matchesRating = !ratingFilter || rating === ratingFilter;
+		// Add the appropriate class to 
+		// each star based on the selected star's value
+		stars.forEach((s, index) => {
+			if (index < value) {
+				s.classList.add(getStarColorClass(value));
+			}
+		});
 
-        if (matchesUsername && matchesRating) {
-            review.style.display = 'block';
-        } else {
-            review.style.display = 'none';
-        }
-    });
+		// Remove "selected" class from all stars
+		stars.forEach((s) => s.classList.remove("selected"));
+		// Add "selected" class to the clicked star
+		star.classList.add("selected");
+	});
+});
+
+submitBtn.addEventListener("click", () => {
+	const review = reviewText.value;
+	const userRating = parseInt(rating.innerText);
+
+	if (!userRating || !review) {
+		alert(
+"Please select a rating and provide a review before submitting."
+			);
+		return;
+	}
+
+	if (userRating > 0) {
+		const reviewElement = document.createElement("div");
+		reviewElement.classList.add("review");
+		reviewElement.innerHTML = 
+`<p><strong>Rating: ${userRating}/5</strong></p><p>${review}</p>`;
+		reviewsContainer.appendChild(reviewElement);
+
+		// Reset styles after submitting
+		reviewText.value = "";
+		rating.innerText = "0";
+		stars.forEach((s) => s.classList.remove("one", 
+												"two", 
+												"three", 
+												"four", 
+												"five", 
+												"selected"));
+	}
+});
+
+function getStarColorClass(value) {
+	switch (value) {
+		case 1:
+			return "one";
+		case 2:
+			return "two";
+		case 3:
+			return "three";
+		case 4:
+			return "four";
+		case 5:
+			return "five";
+		default:
+			return "";
+	}
 }
-
-// Event listeners for filtering reviews
-document.getElementById('search-username').addEventListener('input', filterReviews);
-document.getElementById('filter-rating').addEventListener('change', filterReviews);

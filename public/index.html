@@ -2,7 +2,7 @@
 <html>
   <head>
     <title>Limonee</title>
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="style.css" />
     <meta charset="UTF-8" />
     <meta name="description" content="Drink de beste Limonee!" />
     <meta
@@ -67,71 +67,26 @@
       </p>
 
 <br>
-      <h2>
-        Revieuws
-      </h2>
-        <div id="reviews">
-            <!-- Reviews will be injected by JavaScript -->
-        </div>
-    </div>
+	
+		<h2>revieuws</h2>
+		<div class="rating">
+			<span id="rating">0</span>/5
+		</div>
+		<div class="stars" id="stars">
+			<span class="star" data-value="1">★</span>
+			<span class="star" data-value="2">★</span>
+			<span class="star" data-value="3">★</span>
+			<span class="star" data-value="4">★</span>
+			<span class="star" data-value="5">★</span>
+		</div>
+		<p>Share your review:</p>
+		<textarea id="review"
+				placeholder="Write your review here">
+		</textarea>
+		<button id="submit">Submit</button>
+		<div class="reviews" id="reviews">
+		</div>
 
-    <a href="/all-reviews">Zie alle reviews</a>
-
-    <!-- Review submission form -->
-    <form id="review-form">
-        <input type="text" id="username" placeholder="naam" required />
-        <input type="number" id="rating" placeholder="Rating (1-5)" min="1" max="5" required />
-        <textarea id="comment" placeholder="Schrijf een revieuw..." required></textarea>
-        <button type="submit">Stuur</button>
-    </form>
-
-    <script>
-        // Fetch and display the first 3 reviews
-        fetch('/reviews')
-            .then(response => response.json())
-            .then(reviews => {
-                const reviewsContainer = document.getElementById('reviews');
-                const firstThreeReviews = reviews.slice(0, 3);
-
-                firstThreeReviews.forEach(review => {
-                    const reviewElement = document.createElement('div');
-                    reviewElement.innerHTML = `
-                        <p><strong>${review.username}</strong> - Rating: ${review.rating}</p>
-                        <p>${review.comment}</p>
-                    `;
-                    reviewsContainer.appendChild(reviewElement);
-                });
-            });
-
-        // Handle the review form submission
-        document.getElementById('review-form').addEventListener('submit', function(event) {
-            event.preventDefault();
-
-            const username = document.getElementById('username').value;
-            const rating = document.getElementById('rating').value;
-            const comment = document.getElementById('comment').value;
-
-            fetch('/submit-review', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    username: username,
-                    rating: rating,
-                    comment: comment
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                alert(data.message);
-                document.getElementById('review-form').reset(); // Reset the form
-            })
-            .catch(error => console.error('Error submitting review:', error));
-        });
-    </script>
-
-    </div>
     <br>
     <br>
     <br>
