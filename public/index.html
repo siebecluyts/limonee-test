@@ -2,7 +2,7 @@
 <html>
   <head>
     <title>Limonee</title>
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="styles.css" />
     <meta charset="UTF-8" />
     <meta name="description" content="Drink de beste Limonee!" />
     <meta
@@ -36,7 +36,7 @@
     <meta name="msvalidate.01" content="DB1FB07C10E03B70BA6544D54607890A" />
   </head>
   <body>
-    <div class="heading">
+
       <a href="/"
         ><img
           src="https://cdn.glitch.global/638bdc36-d676-479e-8f39-ff81bc2e3bb1/contact%2Fimages%2Flogo.png?v=1735472051762"
@@ -67,30 +67,30 @@
       </p>
 
 <br>
-	
-		<h2>revieuws</h2>
-		<div class="rating">
-			<span id="rating">0</span>/5
-		</div>
-		<div class="stars" id="stars">
-			<span class="star" data-value="1">★</span>
-			<span class="star" data-value="2">★</span>
-			<span class="star" data-value="3">★</span>
-			<span class="star" data-value="4">★</span>
-			<span class="star" data-value="5">★</span>
-		</div>
-		<p>Share your review:</p>
-		<textarea id="review"
-				placeholder="Write your review here">
-		</textarea>
-		<button id="submit">Submit</button>
-		<div class="reviews" id="reviews">
-		</div>
+<h2>
+  Revieuw
+    </h2>
+    <form
+  action="https://formspree.io/f/xgvaedve"
+  method="POST"
+>
+      <input type="text" name="name" placeholder="name">
+            <input type="email" name="email" placeholder="email">
+      <select id="rating" placeholder="rating">
+  <option value="1" name="1">1</option>
+  <option value="2" name="2">2</option>
+  <option value="3" name="3">3</option>
+  <option value="4" name="4">4</option>
+  <option value="5" name="5">5</option>
+</select>
+      <textarea name="revieuw" placeholder="Revieuw"></textarea>
+        <button type="submit">Stuur</button>
+    </form>
+    <br>
+    <br>
+    <br>
+<br>    
 
-    <br>
-    <br>
-    <br>
-<br>
     <script src="script.js"></script>
     <script src="https://formspree.io/js/formbutton-v1.min.js" defer></script>
   </body>
