@@ -1,51 +1,76 @@
 const express = require('express');
 const path = require('path');
-const mongoose = require('mongoose');
+const fs = require('fs');
+const WebSocket = require('ws');
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// 🔹 Connect to MongoDB (Replace 'your_mongodb_url' with your real connection string)
-mongoose.connect('your_mongodb_url', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-}).then(() => console.log('✅ MongoDB connected'))
-  .catch(err => console.error('❌ MongoDB connection error:', err));
-
-// Middleware
 app.use(express.json());
 app.use(express.static('public'));
-
 // 🔹 Handle 404 errors
 app.use((req, res, next) => {
     res.status(404).sendFile(path.join(__dirname, '404.html'));
 });
 
-// Start the server
-app.listen(PORT, () => {
-    console.log(`🚀 Server is running on port ${PORT}`);
-});
 
-// 🔹 Import Review model
-const Review = require('./models/review');
+// 🔹 Load reviews from file
+const reviewsFile = 'reviews.json';
+const loadReviews = () => {
+    if (!fs.existsSync(reviewsFile)) return [];
+    return JSON.parse(fs.readFileSync(reviewsFile, 'utf8'));
+};
+const saveReviews = (reviews) => {
+    fs.writeFileSync(reviewsFile, JSON.stringify(reviews, null, 2));
+};
 
-// 🔹 API to Submit a Review
-app.post('/submit-review', async (req, res) => {
-  try {
+// 🔹 Submit a review
+app.post('/submit-review', (req, res) => {
     const { productId, username, rating, comment } = req.body;
-    const newReview = new Review({ productId, username, rating, comment });
-    await newReview.save();
+    if (!productId || !username || !rating) {
+        return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    const reviews = loadReviews();
+    reviews.push({ productId, username, rating, comment, date: new Date() });
+    saveReviews(reviews);
+
     res.json({ message: '✅ Review submitted successfully!' });
-  } catch (error) {
-    res.status(500).json({ error: '❌ Failed to submit review' });
-  }
 });
 
-// 🔹 API to Get Reviews
-app.get('/reviews/:productId', async (req, res) => {
-  try {
-    const reviews = await Review.find({ productId: req.params.productId });
+// 🔹 Get reviews for a product
+app.get('/reviews/:productId', (req, res) => {
+    const productId = req.params.productId;
+    const reviews = loadReviews().filter(r => r.productId === productId);
     res.json(reviews);
-  } catch (error) {
-    res.status(500).json({ error: '❌ Failed to get reviews' });
-  }
+});
+
+// 🔹 Theme Mode Handling
+app.post('/set-theme', (req, res) => {
+    const { theme } = req.body;
+    fs.writeFileSync('theme.json', JSON.stringify({ theme }));
+    res.json({ message: '✅ Theme updated!' });
+});
+app.get('/get-theme', (req, res) => {
+    if (!fs.existsSync('theme.json')) return res.json({ theme: 'light' });
+    const data = JSON.parse(fs.readFileSync('theme.json', 'utf8'));
+    res.json(data);
+});
+
+// 🔹 WebSocket for Live Support Chat
+const server = app.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+});
+const wss = new WebSocket.Server({ server });
+
+wss.on('connection', ws => {
+    console.log('🔹 A user connected to live support');
+    ws.on('message', message => {
+        console.log('📩 Received:', message);
+        wss.clients.forEach(client => {
+            if (client !== ws && client.readyState === WebSocket.OPEN) {
+                client.send(message);
+            }
+        });
+    });
 });
