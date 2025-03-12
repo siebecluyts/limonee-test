@@ -67,24 +67,31 @@
       </p>
 
 <br>
-    <h2>Submit a Review</h2>
+        <!-- Reviews Section -->
+        <div id="reviews-section">
+            <h2>Revieuws</h2>
+            <div id="reviews"></div>
+        </div>
+        
+        <!-- Review Form Section -->
+        <h2>Schrijf een revieuw</h2>
         <form id="review-form">
-            <input type="text" id="username" placeholder="Your Name" required>
+            <input type="text" id="username" placeholder="naam" required>
             <select id="rating" required>
                 <option value="1">1 - slecht</option>
                 <option value="2">2 - niet heel goed</option>
-                <option value="3">3 - ok</option>
-                <option value="4">4 - goed</option>
-                <option value="5">5 - Excellent</option>
+                <option value="3">3 - Goed</option>
+                <option value="4">4 - heel goed</option>
+                <option value="5">5 - perfect</option>
             </select>
-            <textarea id="comment" placeholder="Your Review" required></textarea>
-            <button type="submit">Submit Review</button>
+            <textarea id="comment" placeholder="Jou bericht" required></textarea>
+            <button type="submit">Stuur</button>
         </form>
-    <br>
-    <br>
-    <br>
-    <br>
     </div>
+    <br>
+    <br>
+    <br>
+<br>
     <script src="script.js"></script>
     <script src="https://formspree.io/js/formbutton-v1.min.js" defer></script>
   </body>

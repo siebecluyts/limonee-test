@@ -37,52 +37,79 @@
       }
     }
   });
+const productId = 'product'; // The ID of the only product
 
-document.addEventListener('DOMContentLoaded', () => {
-    loadReviews('product1');
-});
-// 📝 Submit Review
-function submitReview() {
+// Function to load reviews
+const loadReviews = (showAll = false) => {
+    fetch(`/reviews/${productId}`)
+        .then(response => response.json())
+        .then(reviews => {
+            const reviewsContainer = document.getElementById('reviews');
+            reviewsContainer.innerHTML = ''; // Clear any existing reviews
+
+            // Filter reviews if there's a search term
+            const searchTerm = document.getElementById('search').value.toLowerCase();
+            const filteredReviews = reviews.filter(review => 
+                review.username.toLowerCase().includes(searchTerm) ||
+                review.comment.toLowerCase().includes(searchTerm)
+            );
+
+            // Show only the first 3 reviews unless showAll is true
+            const reviewsToShow = showAll ? filteredReviews : filteredReviews.slice(0, 3);
+
+            // Loop through the reviews and append each one
+            reviewsToShow.forEach(review => {
+                const reviewElement = document.createElement('div');
+                reviewElement.classList.add('review');
+                reviewElement.innerHTML = `
+                    <h3>${review.username} - ${review.rating}⭐</h3>
+                    <p>${review.comment}</p>
+                `;
+                reviewsContainer.appendChild(reviewElement);
+            });
+
+            // Toggle visibility of 'See All' button
+            document.getElementById('see-all-btn').style.display = filteredReviews.length > 3 && !showAll ? 'block' : 'none';
+        })
+        .catch(error => console.error('Error loading reviews:', error));
+};
+
+// Function to submit a review
+const submitReview = (event) => {
+    event.preventDefault();
+
     const username = document.getElementById('username').value;
     const rating = document.getElementById('rating').value;
     const comment = document.getElementById('comment').value;
 
+    const review = { productId, username, rating, comment };
+
     fetch('/submit-review', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ productId: 'product1', username, rating, comment })
-    }).then(() => {
-        loadReviews('product1');
-        closeReviewForm();
-    });
-}
-
-// 📄 Load Reviews
-function loadReviews(productId) {
-    fetch(`/reviews/${productId}`)
-        .then(res => res.json())
-        .then(reviews => {
-            const container = document.getElementById(`reviews-${productId}`);
-            container.innerHTML = reviews.map(r => `<p><strong>${r.username}:</strong> ⭐ ${r.rating} - ${r.comment}</p>`).join('');
-        });
-}
-
-// 📝 Review Form
-function showReviewForm(productId) {
-    document.getElementById('review-form').style.display = 'block';
-}
-function closeReviewForm() {
-    document.getElementById('review-form').style.display = 'none';
-}
-
-// 💬 Live Chat (WebSockets)
-const ws = new WebSocket(`ws://${window.location.host}`);
-ws.onmessage = (event) => {
-    const chatBox = document.getElementById('chat-box');
-    chatBox.innerHTML += `<p>${event.data}</p>`;
+        body: JSON.stringify(review)
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(data.message);
+        loadReviews(); // Reload reviews after submitting
+        document.getElementById('review-form').reset();
+    })
+    .catch(error => console.error('Error submitting review:', error));
 };
-function sendMessage() {
-    const message = document.getElementById('chat-input').value;
-    ws.send(message);
-    document.getElementById('chat-input').value = '';
-}
+
+// Event listener for form submission
+document.getElementById('review-form').addEventListener('submit', submitReview);
+
+// Event listener for the 'See All' button
+document.getElementById('see-all-btn').addEventListener('click', () => {
+    loadReviews(true);
+});
+
+// Event listener for search input
+document.getElementById('search').addEventListener('input', () => {
+    loadReviews();
+});
+
+// Load reviews when the page loads
+loadReviews();
