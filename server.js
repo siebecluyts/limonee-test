@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -8,88 +9,74 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(express.static('public'));
 
-// Store reviews in a JSON file
-const REVIEWS_FILE = 'reviews.json';
+// File where reviews are stored
+const REVIEWS_FILE = path.join(__dirname, 'public', 'reviews.json');  // public map
 
-// 🔹 Get Reviews for Display
-app.get('/reviews/:productId', (req, res) => {
+
+// Serve the main page (display first 3 reviews)
+app.get('/', (req, res) => {
     fs.readFile(REVIEWS_FILE, (err, data) => {
-        if (err) return res.json([]);
-        const reviews = JSON.parse(data);
-        res.json(reviews[req.params.productId] || []);
+        let reviews = {};
+        if (!err) {
+            reviews = JSON.parse(data); // If file exists, parse it
+        }
+
+        // Get the first 3 reviews
+        const productReviews = reviews.product || [];
+        const firstThreeReviews = productReviews.slice(0, 3);
+
+        // Send reviews to the main page
+        res.sendFile(path.join(__dirname, 'public', 'index.html'));
     });
 });
 
-// 🔹 Submit Review
+// Serve the all-reviews page
+// Route voor het ophalen van alle reviews
+app.get('/all-reviews', (req, res) => {
+      res.sendFile(path.join(__dirname, 'all-reviews.html'));
+    fs.readFile(REVIEWS_FILE, (err, data) => {
+        if (err) {
+            console.error('Error reading reviews:', err);
+            return res.status(500).json({ message: 'Fout bij het ophalen van reviews' });
+        }
+        const reviews = JSON.parse(data);
+        res.json(reviews.product || []); // Zorg ervoor dat we de juiste data versturen
+    });
+});
+
+// Submit a review
 app.post('/submit-review', (req, res) => {
-    const { productId, username, rating, comment } = req.body;
+    const { username, rating, comment } = req.body;
+
     const newReview = { username, rating, comment };
 
     fs.readFile(REVIEWS_FILE, (err, data) => {
         let reviews = {};
-        if (!err) reviews = JSON.parse(data);
-        if (!reviews[productId]) reviews[productId] = [];
-        reviews[productId].push(newReview);
+        if (!err) {
+            reviews = JSON.parse(data); // If file exists, parse it
+        }
 
-        fs.writeFile(REVIEWS_FILE, JSON.stringify(reviews), () => {
+        // If there's no product reviews, create an empty array
+        if (!reviews.product) {
+            reviews.product = [];
+        }
+
+        // Add the new review to the product reviews
+        reviews.product.push(newReview);
+
+        // Save the updated reviews to the file
+        fs.writeFile(REVIEWS_FILE, JSON.stringify(reviews), (err) => {
+            if (err) return res.status(500).send("Error saving review.");
             res.json({ message: '✅ Review submitted!' });
         });
     });
 });
-
-// 🔹 Show Reviews on the Main Page (Only 3 Reviews)
-app.get('/', (req, res) => {
-    fs.readFile(REVIEWS_FILE, (err, data) => {
-        if (err) return res.status(500).send("Error loading reviews.");
-        
-        const reviews = JSON.parse(data);
-        const productReviews = reviews.product || [];
-        const firstThreeReviews = productReviews.slice(0, 3);
-        
-        // Send the reviews as a JSON object to the main page
-        res.sendFile(path.join(__dirname, 'index.html')); // Serve the main HTML page
-    });
-});
-
-// 🔹 Show All Reviews Page
-app.get('/all-reviews', (req, res) => {
-    fs.readFile(REVIEWS_FILE, (err, data) => {
-        if (err) return res.status(500).send("Error loading reviews.");
-        
-        const reviews = JSON.parse(data);
-        const productReviews = reviews.product || [];
-        
-        // Serve the all-reviews.html page with the reviews passed
-        let reviewsHtml = productReviews.map(review => {
-            return `
-                <div class="review-item">
-                    <strong>${review.username}</strong>
-                    <p>Rating: ${review.rating}</p>
-                    <p>${review.comment}</p>
-                </div>
-            `;
-        }).join('');
-        
-        // Send the reviews to the all-reviews.html page
-        res.send(`
-            <html>
-                <head>
-                    <title>All Reviews</title>
-                    <link rel="stylesheet" href="/styles.css">
-                </head>
-                <body>
-                    <h1>All Reviews</h1>
-                    <div>${reviewsHtml}</div>
-                </body>
-            </html>
-        `);
-    });
-});
-
-// 🔹 Handle 404 errors
+// 404 handler voor onbekende routes
 app.use((req, res, next) => {
-    res.status(404).sendFile(path.join(__dirname, '404.html'));
+    res.status(404).sendFile(path.join(__dirname, '/404.html'));
 });
 
-// Start Server
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+// Start the server
+app.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+});

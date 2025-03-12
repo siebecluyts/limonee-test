@@ -70,47 +70,66 @@
       <h2>
         Revieuws
       </h2>
-    <div id="reviews-list">
-        <!-- Reviews will be displayed here -->
-        <div id="review-container">
-            <!-- Display first 3 reviews here -->
+        <div id="reviews">
+            <!-- Reviews will be injected by JavaScript -->
         </div>
     </div>
 
-    <button id="show-all-reviews-btn">Zie alle reviews</button>
+    <a href="/all-reviews">Zie alle reviews</a>
 
-    <script>
-        // Fetch the first 3 reviews and display them
-        fetch('/reviews/product')  // Assuming product ID is 'product'
-            .then(response => response.json())
-            .then(reviews => {
-                const reviewContainer = document.getElementById('review-container');
-                reviews.slice(0, 3).forEach(review => {
-                    const reviewElement = document.createElement('div');
-                    reviewElement.classList.add('review-item');
-                    reviewElement.innerHTML = `
-                        <strong>${review.username}</strong>
-                        <p>Rating: ${review.rating}</p>
-                        <p>${review.comment}</p>
-                    `;
-                    reviewContainer.appendChild(reviewElement);
-                });
-            })
-            .catch(err => console.error('Error fetching reviews:', err));
-
-        // Redirect to the all-reviews page when the button is clicked
-        document.getElementById('show-all-reviews-btn').addEventListener('click', () => {
-            window.location.href = '/all-reviews';
-        });
-    </script>
-    <!-- Review Form -->
-    <h2>Stuur een revieuw</h2>
+    <!-- Review submission form -->
     <form id="review-form">
         <input type="text" id="username" placeholder="naam" required />
-        <input type="number" id="rating" min="1" max="5" placeholder="Rating (1-5)" required />
-        <textarea id="comment" placeholder="Jou bericht" required></textarea>
+        <input type="number" id="rating" placeholder="Rating (1-5)" min="1" max="5" required />
+        <textarea id="comment" placeholder="Schrijf een revieuw..." required></textarea>
         <button type="submit">Stuur</button>
     </form>
+
+    <script>
+        // Fetch and display the first 3 reviews
+        fetch('/reviews')
+            .then(response => response.json())
+            .then(reviews => {
+                const reviewsContainer = document.getElementById('reviews');
+                const firstThreeReviews = reviews.slice(0, 3);
+
+                firstThreeReviews.forEach(review => {
+                    const reviewElement = document.createElement('div');
+                    reviewElement.innerHTML = `
+                        <p><strong>${review.username}</strong> - Rating: ${review.rating}</p>
+                        <p>${review.comment}</p>
+                    `;
+                    reviewsContainer.appendChild(reviewElement);
+                });
+            });
+
+        // Handle the review form submission
+        document.getElementById('review-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const username = document.getElementById('username').value;
+            const rating = document.getElementById('rating').value;
+            const comment = document.getElementById('comment').value;
+
+            fetch('/submit-review', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    username: username,
+                    rating: rating,
+                    comment: comment
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                document.getElementById('review-form').reset(); // Reset the form
+            })
+            .catch(error => console.error('Error submitting review:', error));
+        });
+    </script>
 
     </div>
     <br>

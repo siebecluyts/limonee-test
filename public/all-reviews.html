@@ -36,7 +36,7 @@
     <meta name="msvalidate.01" content="DB1FB07C10E03B70BA6544D54607890A" />
   </head>
   <body>
-    <div class="heading">
+
       <a href="/"
         ><img
           src="https://cdn.glitch.global/638bdc36-d676-479e-8f39-ff81bc2e3bb1/contact%2Fimages%2Flogo.png?v=1735472051762"
@@ -54,59 +54,53 @@
         <li><a href="/planning/">Planning</a></li>
         <li><a href="/contact/bestelling/">Bestellen</a></li>
       </ul>
-      <h2>
-        alle revieuws
-      </h2>
-    <div>
-        <label for="search-username">Zoek bij naam:</label>
-        <input type="text" id="search-username" placeholder="Search by Username">
-        
-        <label for="filter-rating">Filter bij rating:</label>
-        <select id="filter-rating">
-            <option value="">Alle Ratings</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-        </select>
+    <h2>
+      Alle revieuws
+    </h2>
+   <div>
+        <input type="text" id="search" placeholder="Zoek bij naam" />
+        <button onclick="filterReviews()">Zoek</button>
     </div>
-    
-    <ul id="reviews-list">
-        <% reviews.product.forEach((review, index) => { %>
-            <li class="review-item">
-                <p><strong><%= review.username %></strong></p>
-                <p>Rating: <%= review.rating %></p>
-                <p><%= review.comment %></p>
-            </li>
-        <% }) %>
-    </ul>
-    
+
+    <div id="reviews-list">
+        <!-- Reviews will be injected by JavaScript -->
+    </div>
+
     <script>
-        // Search and filter functionality
-        document.getElementById('search-username').addEventListener('input', filterReviews);
-        document.getElementById('filter-rating').addEventListener('change', filterReviews);
+        // Fetch all reviews
+        fetch('/reviews')
+            .then(response => response.json())
+            .then(reviews => {
+                const reviewsContainer = document.getElementById('reviews-list');
+                
+                reviews.forEach(review => {
+                    const reviewElement = document.createElement('div');
+                    reviewElement.innerHTML = `
+                        <p><strong>${review.username}</strong> - Rating: ${review.rating}</p>
+                        <p>${review.comment}</p>
+                    `;
+                    reviewsContainer.appendChild(reviewElement);
+                });
+            });
 
         function filterReviews() {
-            const usernameSearch = document.getElementById('search-username').value.toLowerCase();
-            const ratingFilter = document.getElementById('filter-rating').value;
+            const searchTerm = document.getElementById('search').value.toLowerCase();
+            const reviewsList = document.querySelectorAll('#reviews-list div');
             
-            const reviews = document.querySelectorAll('.review-item');
-            reviews.forEach((review) => {
-                const username = review.querySelector('strong').textContent.toLowerCase();
-                const rating = review.querySelector('p').textContent.replace('Rating: ', '');
-                
-                let matchesUsername = username.includes(usernameSearch);
-                let matchesRating = !ratingFilter || rating === ratingFilter;
-
-                if (matchesUsername && matchesRating) {
-                    review.style.display = 'block';
+            reviewsList.forEach(review => {
+                const username = review.querySelector('strong').innerText.toLowerCase();
+                if (username.includes(searchTerm)) {
+                    review.style.display = '';
                 } else {
                     review.style.display = 'none';
                 }
             });
         }
     </script>
+    <br>
+    <br>
+    <br>
+<br>
     <script src="script.js"></script>
     <script src="https://formspree.io/js/formbutton-v1.min.js" defer></script>
   </body>
