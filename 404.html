@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Limonee</title>
+        <title>Limonee - 404</title>
         <link rel="stylesheet" href="/styles.css">
         <meta charset="UTF-8">
         <meta name="description" content="Drink de beste Limonee!">
@@ -29,16 +29,34 @@
                     <li><a href="/contact/bestelling/">Bestellen</a></li>
         </ul>
         <h2>
-            Limonee
-        </h2>
-        <h3 id="h3-home">
             Oei!
-        </h3>
+        </h2>
         <p id="par1-1">
           Deze pagina is niet gevonden! <a href="/">Ga terug naar de main pagina.</a>
           </p>
+      <p>
+         Is het een fout? Klik op deze knop om het te verzenden:
+      </p>
+      <form   action="https://formspree.io/f/xdkeopwa"
+  method="POST"
+                  onsubmit="handleSubmit(event)">
+        <input type="hidden" id="fout" name="fout">
+          <button type="submit">Probleem melden</button>
+      </form>
         <script src="script.js"></script>
       <script src="https://formspree.io/js/formbutton-v1.min.js" defer></script>
+                <script>
+        function generateErrorCode() {
+            // Genereer een willekeurige code (bijvoorbeeld een 6-cijferige code)
+            const randomCode = 404;
+            document.getElementById('willekeurigeCode').value = randomCode;
+        }
+
+        function handleSubmit(event) {
+            // Genereer een nieuwe willekeurige code voordat het formulier wordt verzonden
+            generateErrorCode();
+        }
+    </script>
     </body>
     <footer>
         <div class="footer">
