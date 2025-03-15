@@ -105,6 +105,28 @@
                   <li><a href="/planning/">Planning</a></li>
                     <li><a href="/contact/bestelling/">Bestellen</a></li>
         </ul>
+              <button id="openPopup">Abboneer</button>
+
+    <!-- Popup Form -->
+    <div id="popup" class="popup">
+        <div class="popup-content">
+            <span id="closePopup" class="close">&times;</span>
+            <h2>Abboneer op ons newsletter!</h2>
+            <form action="https://formspree.io/f/manenqdz" method="POST">
+              <input type="naam" name="naam" placeholder="Naam" required>
+                <input type="email" name="email" placeholder="Email addres" required>
+              <p>Selecteer waar je berichten van wilt krijgen:</p>
+                <label>
+                    <input type="checkbox" name="interests" value="dagen open"> Nieuwe dagen open
+                </label><br>
+                <label>
+                    <input type="checkbox" name="interests" value="new taste"> Nieuwe smaken
+                </label><br>
+
+                <button type="submit">Abboneer!</button>
+            </form>
+        </div>
+    </div>
         <h2>
             Contacts
         </h2>
