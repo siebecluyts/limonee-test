@@ -37,3 +37,24 @@
       }
     }
   });
+// Get elements
+const popup = document.getElementById("popup");
+const openPopup = document.getElementById("openPopup");
+const closePopup = document.getElementById("closePopup");
+
+// Show popup when button is clicked
+openPopup.addEventListener("click", () => {
+    popup.style.display = "flex";
+});
+
+// Hide popup when close button is clicked
+closePopup.addEventListener("click", () => {
+    popup.style.display = "none";
+});
+
+// Hide popup when clicking outside of it
+window.addEventListener("click", (e) => {
+    if (e.target === popup) {
+        popup.style.display = "none";
+    }
+});
