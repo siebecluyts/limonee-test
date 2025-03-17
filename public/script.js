@@ -58,3 +58,8 @@ window.addEventListener("click", (e) => {
         popup.style.display = "none";
     }
 });
+    const poop = new URLSearchParams(window.location.search);
+    const landfrom = poop.get('landfrom');
+    if (landfrom === 'limonee.be') {
+      window.alert("Onze excuses voor het probleempje met de domain name. Er wordt aan gewerkt.");
+    }
