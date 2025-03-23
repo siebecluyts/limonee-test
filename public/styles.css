@@ -164,9 +164,9 @@ text-align: center;
 }
 
 #fruit {
-    background: url('fruit.jpg') center/cover fixed;
+    background: url('https://cdn.glitch.global/638bdc36-d676-479e-8f39-ff81bc2e3bb1/fruit.png?v=1742719804775') center/cover fixed;
 }
 
 #ice {
-    background: url('ice.jpg') center/cover fixed;
+    background: url('https://cdn.glitch.global/638bdc36-d676-479e-8f39-ff81bc2e3bb1/ijs.png?v=1742719781575') center/cover fixed;
 }
