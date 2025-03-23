@@ -68,3 +68,20 @@ window.addEventListener('scroll', function() {
     document.getElementById('fruit').style.backgroundPositionY = -(scrolled * 0.3) + 'px';
     document.getElementById('ice').style.backgroundPositionY = -(scrolled * 0.5) + 'px';
 });
+        // Selecteer het menu
+        const menu = document.getElementById("custom-menu");
+
+        // Voorkom standaard rechtermuisknop menu en toon eigen menu
+        document.addEventListener("contextmenu", function (event) {
+            event.preventDefault(); // Voorkomt standaard menu
+
+            // Positioneer het aangepaste menu
+            menu.style.display = "block";
+            menu.style.left = `${event.pageX}px`;
+            menu.style.top = `${event.pageY}px`;
+        });
+
+        // Verberg het menu bij klikken ergens anders
+        document.addEventListener("click", function () {
+            menu.style.display = "none";
+        });

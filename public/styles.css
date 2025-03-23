@@ -170,3 +170,27 @@ text-align: center;
 #ice {
     background: url('https://cdn.glitch.global/638bdc36-d676-479e-8f39-ff81bc2e3bb1/ijs.png?v=1742719781575') center/cover fixed;
 }
+        #custom-menu {
+            position: absolute;
+            display: none;
+            background: white;
+            border: 1px solid #ccc;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        #custom-menu ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        #custom-menu ul li {
+            padding: 8px 12px;
+            cursor: pointer;
+        }
+
+        #custom-menu ul li:hover {
+            background: #f0f0f0;
+        }
