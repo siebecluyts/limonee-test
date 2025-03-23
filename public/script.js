@@ -63,3 +63,8 @@ window.addEventListener("click", (e) => {
     if (landfrom === 'limonee.be') {
       window.alert("Onze excuses voor het probleempje met de domain name. Er wordt aan gewerkt.");
     }
+window.addEventListener('scroll', function() {
+    let scrolled = window.scrollY;
+    document.getElementById('fruit').style.backgroundPositionY = -(scrolled * 0.3) + 'px';
+    document.getElementById('ice').style.backgroundPositionY = -(scrolled * 0.5) + 'px';
+});
