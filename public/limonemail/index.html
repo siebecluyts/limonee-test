@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Limonee - bestelling</title>
-        <link rel="stylesheet" href="../../styles.css">
+        <title>Limonee - limoneMail</title>
+        <link rel="stylesheet" href="../styles.css">
         <meta charset="UTF-8">
         <meta name="description" content="Drink de beste Limonee!">
         <meta name="keywords" content="Limonade, limonee, limone, lekker, zoet, fris">
@@ -14,10 +14,13 @@
 <link rel="manifest" href="/site.webmanifest">
     </head>
     <body>
+          <div id="custom-menu">
+        <ul>
+            <li onclick="location.href='/';">Home</li>
+        </ul>
+    </div>
         <div class="heading">
-        <a href="/"> 
-          <img src="https://cdn.glitch.global/638bdc36-d676-479e-8f39-ff81bc2e3bb1/contact%2Fimages%2Flogo.png?v=1735472051762" alt="limonee"width="500" sizes="50">
-          </a>
+        <a href="/"><img src="https://cdn.glitch.global/638bdc36-d676-479e-8f39-ff81bc2e3bb1/contact%2Fimages%2Flogo.png?v=1735472051762"width="500" alt="limonee" sizes="50"></a>
         <ul>
             <li><a href="/limonade/">Limonade</a></li>
             <li><a id="about" href="/about/">Over ons</a></li>
@@ -46,84 +49,24 @@
                     <input type="checkbox" name="interests" value="news"> Nieuws
                 </label><br>
 
-                <button type="submit">Aboneer!</button>
+                <button type="submit">Abonneer!</button>
               <a href="/limonemail/">Meer info.</a>
             </form>
-              <div id="custom-menu">
-        <ul>
-            <li onclick="location.href='/';">Home</li>
-        </ul>
-    </div>
         </div>
     </div>
         <h2>
-            Bestellingen
+            De LimoneMail
         </h2>
-        <h3 id="h33-1">
-            Bestel limonade
-        </h3>
-        <p id="par3-2">Bestel : </p>
-        <div class="container">
-<form
-  action="https://formspree.io/f/xanewllw"
-  method="POST"
-      onsubmit="handleSubmit(event)"
->
-  <label>
-    Email:
-    <input type="email" name="email" required>
-  </label>
-  <label>
-    Naam:
-    <input name="name" required>
-  </label>
-          <label for="aantal">Aantal liters(1 liter = 4 bekers):</label>
-        <input type="number" id="aantal" name="aantal" min="1" max="50" required>
-          <input type="hidden" id="willekeurigeCode" name="willekeurigeCode">
-  <label for="datum">Dag dat u het komt halen:</label>
-          <select id="datum" name="datum" required>
-    <option value="6 april 2025">6 april 2025</option>
-  </select>
-    <label for="aantal">Extra bericht(optioneel):</label>
-  <textarea  id="bericht" name="bericht"></textarea>
-
-  <!-- your other form fields go here -->
-  <button type="submit">Send</button>
-</form>
-
+                <p>
+                  De LimoneMail is een email die wordt gestuurd naar iedereen die zich heeft ge-aboneerd op de LimoneMail. 
+          </p>
         </div>
-      </div>
-      <p>
-        Als de bestelling word doorgegeven zal u een bericht krijgen met uw unieke code. Deze kan u ingeven bij het kraampje. 
-      </p>
-            <p>
-              <strong>
-       Voor een bestelling moet u zelf flessen meenemen.
-                </strong>
-      </p>
-      <br>
-      <br>
-      <br>
-      <br>
-      <script src="../../script.js"></script>
-          <script>
-        function generateRandomCode() {
-            // Genereer een willekeurige code (bijvoorbeeld een 6-cijferige code)
-            const randomCode = Math.floor(100000 + Math.random() * 900000);
-            document.getElementById('willekeurigeCode').value = randomCode;
-        }
-
-        function handleSubmit(event) {
-            // Genereer een nieuwe willekeurige code voordat het formulier wordt verzonden
-            generateRandomCode();
-        }
-    </script>
+        <script src="../script.js"></script>
       <script src="https://formspree.io/js/formbutton-v1.min.js" defer></script>
-
     </body>
     <footer>
-      <div class="footer">
-        <p>&#169;2025 Limonee</p>
-      </div>
-  </footer>
+        <div class="footer">
+          <p>&#169;2025 Limonee</p>
+        </div>
+    </footer>
 </html>
