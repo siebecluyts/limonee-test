@@ -54,7 +54,7 @@
             <li onclick="location.href='/';">Home</li>
         </ul>
     </div>
-        <div class="agenda-container">
+        <div class="agenda-container" id="agenda">
             <p>Bekijk hieronder op welke dagen wij open zijn:</p>
             <ul class="agenda" id="agenda-list">
                 <!-- Dynamische datums komen hier -->
@@ -95,6 +95,13 @@
             
             // Genereer de agenda
             generateAgenda();
+              const params = new URLSearchParams(window.location.search);
+    const smaak = params.get('smaak');
+
+    // Change the image based on the language parameter
+    if (smaak === 'vlierbloesem') {
+      document.getElementById('myImage').src = 'image_fr.jpg'; // French image
+    }
             </script>
           <script src="https://formspree.io/js/formbutton-v1.min.js" defer></script>
           <script src="../script.js"></script>
