@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-    <title>Limonee - Vlierbloesem</title>
+    <title>Limonee - Fris</title>
     <link rel="stylesheet" href="../../styles.css">
     <meta charset="UTF-8">
     <meta name="description" content="Drink de beste Limonee!">
@@ -49,19 +49,13 @@
     </div>
 
     <div id="content">
-        <h2>Vlierbloesem Limonade</h2>
+        <h2>Frisse Limonade</h2>
         <h3>Wat?</h3>
-        <p>Vlierbloesem limonade is limonade met vlierbloesem erbij. Het kan duur zijn en is moeilijk zelf te maken. Bij ons kun je 25 cl kopen voor €1,50.</p>
+        <p>Frisse limonade is de limonade die je het meeste ziet. Deze kost €1.00 per 25 cl</p>
         
         <h3>Wanneer?</h3>
-        <p>Omdat de vlierbloesem niet veel bloeit, is de limonade ook niet veel te koop.</p>
+        <p>Frisse limonade zal <strong>altijd</strong> te koop zijn!</p>
         
-        <div class="agenda-container" id="agenda">
-            <p id="agenda-header">Bekijk hieronder op welke dagen wij vlierbloesem limonade verkopen:</p>
-            <ul class="agenda" id="agenda-list">
-                <!-- Dynamische datums komen hier -->
-            </ul>
-        </div>
     </div>
 <br>
   <br>
@@ -70,34 +64,7 @@
     <script src="../../script.js"></script>
     <script src="https://formspree.io/js/formbutton-v1.min.js" defer></script>
     
-    <script>
-        const openDays = ['04 06 2025']; // Formaat: DD MM JJJJ
-
-        const agendaList = document.getElementById("agenda-list");
-
-        function generateAgenda() {
-            agendaList.innerHTML = ""; // Eerst lijst leegmaken
-
-            openDays.forEach(dateStr => {
-                const dateParts = dateStr.split(" "); // Opsplitsen
-                const date = new Date(`${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`); // JJJJ-MM-DD formaat
-
-                if (!isNaN(date.getTime())) { // Check of de datum geldig is
-                    const listItem = document.createElement("li");
-                    listItem.textContent = `${date.toLocaleDateString("nl-NL", { 
-                        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
-                    })} - Wij zijn open van 14:15 tot 16:30 in Kortenaken, Krawatenstraat 21`;
-
-                    listItem.classList.add("open");
-                    agendaList.appendChild(listItem);
-                } else {
-                    console.error("Ongeldige datum:", dateStr);
-                }
-            });
-        }
-
-        generateAgenda();
-    </script>
+   
 
     <footer>
         <div class="footer">
