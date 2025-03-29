@@ -1,33 +1,34 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <title>Limonee - bestelling</title>
-        <link rel="stylesheet" href="../../styles.css">
-        <meta charset="UTF-8">
-        <meta name="description" content="Drink de beste Limonee!">
-        <meta name="keywords" content="Limonade, limonee, limone, lekker, zoet, fris">
-        <meta name="author" content="limonee">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="apple-touch-icon" sizes="180x180" href="https://cdn.glitch.global/638bdc36-d676-479e-8f39-ff81bc2e3bb1/contact%2Fimages%2Fapple-touch-icon.png?v=1735472049644">
-<link rel="icon" type="image/png" sizes="32x32" href="https://cdn.glitch.global/638bdc36-d676-479e-8f39-ff81bc2e3bb1/contact%2Fimages%2Ffavicon-32x32.png?v=1735472050279">
-<link rel="icon" type="image/png" sizes="16x16" href="https://cdn.glitch.global/638bdc36-d676-479e-8f39-ff81bc2e3bb1/contact%2Fimages%2Ffavicon-16x16.png?v=1735472049971">
-<link rel="manifest" href="/site.webmanifest">
-    </head>
-    <body>
-        <div class="heading">
+<html lang="nl">
+<head>
+    <title>Limonee - Vlierbloesem</title>
+    <link rel="stylesheet" href="../../styles.css">
+    <meta charset="UTF-8">
+    <meta name="description" content="Drink de beste Limonee!">
+    <meta name="keywords" content="Limonade, limonee, limone, lekker, zoet, fris">
+    <meta name="author" content="limonee">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="apple-touch-icon" sizes="180x180" href="https://cdn.glitch.global/638bdc36-d676-479e-8f39-ff81bc2e3bb1/contact%2Fimages%2Fapple-touch-icon.png?v=1735472049644">
+    <link rel="icon" type="image/png" sizes="32x32" href="https://cdn.glitch.global/638bdc36-d676-479e-8f39-ff81bc2e3bb1/contact%2Fimages%2Ffavicon-32x32.png?v=1735472050279">
+    <link rel="icon" type="image/png" sizes="16x16" href="https://cdn.glitch.global/638bdc36-d676-479e-8f39-ff81bc2e3bb1/contact%2Fimages%2Ffavicon-16x16.png?v=1735472049971">
+    <link rel="manifest" href="/site.webmanifest">
+</head>
+<body>
+    <div class="heading">
         <a href="/"> 
-          <img src="https://cdn.glitch.global/638bdc36-d676-479e-8f39-ff81bc2e3bb1/contact%2Fimages%2Flogo.png?v=1735472051762" alt="limonee"width="500" sizes="50">
-          </a>
+            <img src="https://cdn.glitch.global/638bdc36-d676-479e-8f39-ff81bc2e3bb1/contact%2Fimages%2Flogo.png?v=1735472051762" alt="limonee" width="500">
+        </a>
         <ul>
             <li><a href="/limonade/">Limonade</a></li>
             <li><a id="about" href="/about/">Over ons</a></li>
             <li><a href="/contact/">Contact</a></li>
-                                <li><a href="/game/">Spelletje</a></li>
-                  <li><a href="/planning/">Planning</a></li>
-                    <li><a href="/contact/bestelling/">Bestellen</a></li>
-                                                 <li><a href="/smaken/">Onze smaken</a></li>
+            <li><a href="/game/">Spelletje</a></li>
+            <li><a href="/planning/">Planning</a></li>
+            <li><a href="/contact/bestelling/">Bestellen</a></li>
+            <li><a href="/smaken/">Onze smaken</a></li>
         </ul>
-              <button id="openPopup">Abonneer</button>
+        <button id="openPopup">Abonneer</button>
+    </div>
 
     <!-- Popup Form -->
     <div id="popup" class="popup">
@@ -35,54 +36,73 @@
             <span id="closePopup" class="close">&times;</span>
             <h2>Abonneer op de LimoneMail!</h2>
             <form action="https://formspree.io/f/manenqdz" method="POST">
-              <input type="naam" name="naam" placeholder="Naam" required>
-                <input type="email" name="email" placeholder="Email addres" required>
-              <p>Selecteer waar je berichten van wilt krijgen:</p>
-                <label>
-                    <input type="checkbox" name="interests" value="dagen open"> Nieuwe dagen open
-                </label><br>
-                <label>
-                    <input type="checkbox" name="interests" value="new taste"> Nieuwe smaken
-                </label><br>                              <label>
-                    <input type="checkbox" name="interests" value="news"> Nieuws
-                </label><br>
-              
+                <input type="text" name="naam" placeholder="Naam" required>
+                <input type="email" name="email" placeholder="Emailadres" required>
+                <p>Selecteer waar je berichten van wilt krijgen:</p>
+                <label><input type="checkbox" name="interests" value="dagen open"> Nieuwe dagen open</label><br>
+                <label><input type="checkbox" name="interests" value="new taste"> Nieuwe smaken</label><br>
+                <label><input type="checkbox" name="interests" value="news"> Nieuws</label><br>
                 <button type="submit">Abonneer!</button>
-              <a href="/limonemail/">Meer info.</a>
+                <a href="/limonemail/">Meer info.</a>
             </form>
-              <div id="custom-menu">
-        <ul>
-            <li onclick="location.href='/';">Home</li>
-        </ul>
+        </div>
     </div>
-  
-        <h2>
-            Vlier bloesem limonade.
-        </h2>
-          <h3>
-            Wat?
-          </h3>
-          <p>
-            Vlier bloesem limonade is limonade met vlierbloesem erbij. Vlier bloesem limonade kan duur zijn en is moeilijk zelf te maken. Bij ons kan je voor €1.50 25 cl kopen.          </p>
-          <h3>
-            Wanneer?
-          </h3>
-          <p>
-            Omdat de vlier bloesem niet veel bloeit, is de limonade ook niet veel te koop. <a href="/smaken/vlierbloesem/#planning">Kijk hieronder wanneer het te koop is.</a>
-          </p>
-      <br>
-      <br>
-      <br>
-      <br>
-      <script src="../../script.js"></script>
-      <script src="https://formspree.io/js/formbutton-v1.min.js" defer></script>
-      </div>
-          </div>
-      </div>
-    </body>
+
+    <div id="content">
+        <h2>Vlierbloesem Limonade</h2>
+        <h3>Wat?</h3>
+        <p>Vlierbloesem limonade is limonade met vlierbloesem erbij. Het kan duur zijn en is moeilijk zelf te maken. Bij ons kun je 25 cl kopen voor €1,50.</p>
+        
+        <h3>Wanneer?</h3>
+        <p>Omdat de vlierbloesem niet veel bloeit, is de limonade ook niet veel te koop. <a href="/smaken/vlierbloesem/#planning">Kijk hieronder wanneer het te koop is.</a></p>
+        
+        <div class="agenda-container" id="agenda">
+            <p id="agenda-header">Bekijk hieronder op welke dagen wij vlierbloesem limonade verkopen:</p>
+            <ul class="agenda" id="agenda-list">
+                <!-- Dynamische datums komen hier -->
+            </ul>
+        </div>
+    </div>
+<br>
+  <br>
+  <br>
+  <br>
+    <script src="../../script.js"></script>
+    <script src="https://formspree.io/js/formbutton-v1.min.js" defer></script>
+    
+    <script>
+        const openDays = ['04 06 2025']; // Formaat: DD MM JJJJ
+
+        const agendaList = document.getElementById("agenda-list");
+
+        function generateAgenda() {
+            agendaList.innerHTML = ""; // Eerst lijst leegmaken
+
+            openDays.forEach(dateStr => {
+                const dateParts = dateStr.split(" "); // Opsplitsen
+                const date = new Date(`${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`); // JJJJ-MM-DD formaat
+
+                if (!isNaN(date.getTime())) { // Check of de datum geldig is
+                    const listItem = document.createElement("li");
+                    listItem.textContent = `${date.toLocaleDateString("nl-NL", { 
+                        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
+                    })} - Wij zijn open van 14:15 tot 16:30 in Kortenaken, Krawatenstraat 21`;
+
+                    listItem.classList.add("open");
+                    agendaList.appendChild(listItem);
+                } else {
+                    console.error("Ongeldige datum:", dateStr);
+                }
+            });
+        }
+
+        generateAgenda();
+    </script>
+
     <footer>
-      <div class="footer">
-        <p>&#169;2025 Limonee</p>
-      </div>
-  </footer>
+        <div class="footer">
+            <p>&#169; 2025 Limonee</p>
+        </div>
+    </footer>
+</body>
 </html>
