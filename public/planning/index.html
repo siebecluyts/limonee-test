@@ -23,6 +23,7 @@
                                 <li><a href="/game/">Spelletje</a></li>
                   <li><a href="/planning/">Planning</a></li>
                     <li><a href="/contact/bestelling/">Bestellen</a></li>
+                              <li><a href="/smaken/">Onze smaken</a></li>
         </ul>
               <button id="openPopup">Abonneer</button>
 
@@ -55,7 +56,7 @@
         </ul>
     </div>
         <div class="agenda-container" id="agenda">
-            <p>Bekijk hieronder op welke dagen wij open zijn:</p>
+            <p id="agenda-header">Bekijk hieronder op welke dagen wij open zijn:</p>
             <ul class="agenda" id="agenda-list">
                 <!-- Dynamische datums komen hier -->
             </ul>
@@ -63,6 +64,12 @@
         <script>// script.js
             const openDays = [
                 '04 06 2025',
+
+                // Voeg hier meer datums toe
+            ];
+                      const vlierbloesem = [
+                '04 06 2025',
+                '11 06 2025',
 
                 // Voeg hier meer datums toe
             ];
@@ -95,12 +102,31 @@
             
             // Genereer de agenda
             generateAgenda();
-              const params = new URLSearchParams(window.location.search);
-    const smaak = params.get('smaak');
+              const query = new URLSearchParams(window.location.search);
+    const smaak = query.get('filter');
 
     // Change the image based on the language parameter
     if (smaak === 'vlierbloesem') {
-      document.getElementById('myImage').src = 'image_fr.jpg'; // French image
+      document.getElementById('agenda-header').textContent = 'Bekijk hier wanneer we vlier bloesem limonade verkopen:'; // French image
+                  const agendaList = document.getElementById("agenda-list");
+            // Functie om de lijst van open dagen dynamisch weer te geven
+            function generateAgenda() {
+                // Zorg ervoor dat de lijst eerst leeg is om duplicaten te voorkomen
+                agendaList.innerHTML = "";
+            
+                vlierbloesem.forEach(dateStr => {
+                    const date = new Date(dateStr);
+                    const listItem = document.createElement("li");
+            
+                    // Converteer de datum naar een leesbaar formaat
+                    listItem.textContent = `${date.toLocaleDateString("nl-NL", { 
+                        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
+                    })} - Wij zijn open van 14:15 tot 16:30 in Kortenaken krawatenstraat 21`;
+            
+                    listItem.classList.add("open");
+                    agendaList.appendChild(listItem);
+                });
+            }
     }
             </script>
           <script src="https://formspree.io/js/formbutton-v1.min.js" defer></script>
