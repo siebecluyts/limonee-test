@@ -59,38 +59,41 @@
             <p id="agenda-header">Bekijk hieronder op welke dagen wij open zijn:</p>
             <ul class="agenda" id="agenda-list">
                 <!-- Dynamische datums komen hier -->
+              
             </ul>
         </div>
         <script>// script.js
-            const openDays = [
-                '04 06 2025',
-                '05 04 2025',
+const openDays = [
+  //YYYY-MM-DD
+    { date: '2025-04-06', location: 'Kortenaken, Krawatenstraat 21', time: '14:15 - 16:30' },
+  { date: '2025-05-04', location: 'Grote Markt, Diest', time: '14:00 - 17:00' },
 
-                // Voeg hier meer datums toe
-            ];
-                      
-            const agendaList = document.getElementById("agenda-list");
-            // Functie om de lijst van open dagen dynamisch weer te geven
-            function generateAgenda() {
-                // Zorg ervoor dat de lijst eerst leeg is om duplicaten te voorkomen
-                agendaList.innerHTML = "";
-            
-                openDays.forEach(dateStr => {
-                    const date = new Date(dateStr);
-                    const listItem = document.createElement("li");
-            
-                    // Converteer de datum naar een leesbaar formaat
-                    listItem.textContent = `${date.toLocaleDateString("nl-NL", { 
-                        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
-                    })} - Wij zijn open van 14:15 tot 16:30 in Kortenaken krawatenstraat 21`;
-            
-                    listItem.classList.add("open");
-                    agendaList.appendChild(listItem);
-                });
-            }
-            
-            // Genereer de agenda
-            generateAgenda();
+];
+
+const agendaList = document.getElementById("agenda-list");
+
+// Functie om de lijst van open dagen dynamisch weer te geven
+function generateAgenda() {
+    // Zorg ervoor dat de lijst eerst leeg is om duplicaten te voorkomen
+    agendaList.innerHTML = "";
+
+    openDays.forEach(entry => {
+        const date = new Date(entry.date);
+        const listItem = document.createElement("li");
+
+        // Converteer de datum naar een leesbaar formaat
+        listItem.textContent = `${date.toLocaleDateString("nl-NL", { 
+            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
+        })} - Wij zijn open van ${entry.time} in ${entry.location}`;
+
+        listItem.classList.add("open");
+        agendaList.appendChild(listItem);
+    });
+}
+
+// Genereer de agenda
+generateAgenda();
+
               const query = new URLSearchParams(window.location.search);
     const smaak = query.get('filter');
 
