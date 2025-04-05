@@ -1,13 +1,26 @@
+/* Reset and Base Styles */
+body {
+    margin: 0;
+    color: rgb(0, 0, 0);
+    background-color: rgba(255, 203, 70, 1);
+    text-align: center;
+    font-family: Arial, sans-serif;
+}
+
+h1, h2, h3, p {
+    margin: 0;
+    text-align: center;
+}
+
+/* Navigation Bar */
 ul {
     list-style-type: none;
     padding: 0;
     margin: 0;
     overflow: hidden;
     text-align: center;
-    
 }
 
-/* Menu items */
 li {
     float: left;
     position: relative;
@@ -19,111 +32,33 @@ li a {
     color: rgb(0, 0, 0);
     padding: 14px 20px;
     text-decoration: none;
-    text-align: center;
 }
 
 li a:hover {
-    text-align: center;
+    background-color: rgba(255, 255, 255, 0.3);
 }
 
-p {
-text-align: center;}
-body {margin: 0%;
-    color: rgb(0, 0, 0);
-background-color: rgba(255,203,70,255);
-text-align: center;
-align-content: center;}
-h1 {
-    margin: 0%;
-     text-align: center;}
-h2 {text-align: center;}
-h3 {text-align: center;}
-.heading {align-content: center; margin: 0%}
-.footer { position: fixed;
-    left: 0;
-    bottom: 0;
-    width: 100%;
-    background-color: rgb(83, 83, 83);
-    color: white;
-    text-align: center;}
-    .agenda-container {
-        text-align: center;
-        max-width: 600px;
-        margin: auto;
-        padding: 20px;
-        background-color: #fef4e8;
-        border: 2px solid #f9d7a6;
-        border-radius: 10px;
-    }
-
-    ul.agenda {
-        list-style: none;
-        padding: 0;
-    }
-    
-    ul.agenda li {
-        background-color: #ffebcd;
-        margin: 10px 0;
-        padding: 15px;
-        border-radius: 8px;
-        border: 1px solid #f9d7a6;
-    }
-    
-    ul.agenda li.open {
-        background-color: #d4edda;
-        border-color: #c3e6cb;
-        color: #155724;
-    }
-    
-    ul.agenda li.closed {
-        background-color: #f8d7da;
-        border-color: #f5c6cb;
-        color: #721c24;
-    }
-button {    padding: 10px 20px;
+/* Buttons */
+button, #openPopup {
+    padding: 10px 20px;
     font-size: 16px;
     cursor: pointer;
     background-color: #007bff;
     color: white;
     border: none;
     border-radius: 5px;
-    transition: background-color 0.3s;}
-button:hover{    background-color: #0056b3;}
-.ButtonLang {float: right;}
-.personen { 
-text-align: center;
-align-content: center;
-
-    margin: 0%;
-     text-align: center;
-text-align: center;
-text-align: center;
-}
-.revieuws {
-    border: 2px solid black;
-  border-radius: 12px;
-  padding: 5px;
-  text-align: center;
-    width: 300px;
-  height: 170px;
-}
-margin: 0%;
-    color: rgb(0, 0, 0);
-background-color: rgba(255,203,70,255);
-text-align: center;
-
-/* Subscribe Button */
-#openPopup {
-    padding: 10px 20px;
-    font-size: 18px;
-    background: blue;
-    color: white;
-    border: none;
-    cursor: pointer;
-    border-radius: 5px;
+    transition: background-color 0.3s;
 }
 
-/* Popup Background */
+button:hover, #openPopup:hover {
+    background-color: #0056b3;
+}
+
+.ButtonLang {
+    float: right;
+}
+
+/* Popup */
 .popup {
     display: none;
     position: fixed;
@@ -136,7 +71,6 @@ text-align: center;
     align-items: center;
 }
 
-/* Popup Box */
 .popup-content {
     background: white;
     padding: 20px;
@@ -145,12 +79,75 @@ text-align: center;
     width: 300px;
 }
 
-/* Close Button */
 .close {
     float: right;
     font-size: 24px;
     cursor: pointer;
 }
+
+/* Footer */
+.footer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    background-color: rgb(83, 83, 83);
+    color: white;
+    text-align: center;
+}
+
+/* Agenda */
+.agenda-container {
+    text-align: center;
+    max-width: 600px;
+    margin: auto;
+    padding: 20px;
+    background-color: #fef4e8;
+    border: 2px solid #f9d7a6;
+    border-radius: 10px;
+}
+
+ul.agenda {
+    list-style: none;
+    padding: 0;
+}
+
+ul.agenda li {
+    background-color: #ffebcd;
+    margin: 10px 0;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #f9d7a6;
+}
+
+ul.agenda li.open {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+}
+
+ul.agenda li.closed {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+}
+
+/* Personen / Reviews */
+.personen {
+    text-align: center;
+    margin: 0;
+}
+
+.reviews {
+    border: 2px solid black;
+    border-radius: 12px;
+    padding: 5px;
+    text-align: center;
+    width: 300px;
+    height: 170px;
+}
+
+/* Parallax Backgrounds */
 .parallax {
     position: relative;
     height: 300px;
@@ -170,27 +167,29 @@ text-align: center;
 #ice {
     background: url('https://cdn.glitch.global/638bdc36-d676-479e-8f39-ff81bc2e3bb1/ijs.png?v=1742719781575') center/cover fixed;
 }
-        #custom-menu {
-            position: absolute;
-            display: none;
-            background: white;
-            border: 1px solid #ccc;
-            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
-            padding: 10px;
-            border-radius: 5px;
-        }
 
-        #custom-menu ul {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-        }
+/* Custom Context Menu */
+#custom-menu {
+    position: absolute;
+    display: none;
+    background: white;
+    border: 1px solid #ccc;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    padding: 10px;
+    border-radius: 5px;
+}
 
-        #custom-menu ul li {
-            padding: 8px 12px;
-            cursor: pointer;
-        }
+#custom-menu ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
 
-        #custom-menu ul li:hover {
-            background: #f0f0f0;
-        }
+#custom-menu ul li {
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+#custom-menu ul li:hover {
+    background: #f0f0f0;
+}
