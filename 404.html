@@ -57,7 +57,7 @@
             Oei!
         </h2>
         <p id="par1-1">
-          Deze pagina is niet gevonden! <a href="/">Ga terug naar de main pagina.</a>
+          Deze pagina is niet gevonden! <a href="#" onclick="goBack()">Ga terug.</a>
           </p>
       <p>
          Is het een fout? Klik op deze knop om het te verzenden:
@@ -90,6 +90,11 @@
             generateErrorCode();
         }
     </script>
+      <script>
+  function goBack() {
+    window.history.back();
+  }
+</script>
       <br>
       <br>
       <br>
