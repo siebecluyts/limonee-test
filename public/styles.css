@@ -193,3 +193,17 @@ ul.agenda li.closed {
 #custom-menu ul li:hover {
     background: #f0f0f0;
 }
+/* Default style (for desktop and larger screens) */
+.responsive-image {
+  width: auto;
+  height: auto;
+  max-width: 100%; /* Ensure it doesn't overflow */
+}
+
+/* Media query for mobile screens (up to 768px wide) */
+@media (max-width: 768px) {
+  .responsive-image {
+    width: 50%; /* Reduce image size to 80% on smaller screens */
+    height: auto; /* Maintain aspect ratio */
+  }
+}
