@@ -109,15 +109,23 @@
       <script>const searchInput = document.getElementById('searchInput');
 const contentList = document.getElementById('contentList');
 const listItems = contentList.getElementsByTagName('div');
+const noResults = document.getElementById('noResults');
 
 searchInput.addEventListener('input', function () {
   const searchTerm = searchInput.value.toLowerCase();
-  
+  let found = false;
+
   Array.from(listItems).forEach(item => {
     const text = item.textContent.toLowerCase();
-    item.style.display = text.includes(searchTerm) ? '' : 'none';
+    const match = text.includes(searchTerm);
+    item.style.display = match ? '' : 'none';
+    if (match) found = true;
   });
+
+  // Show or hide "Nothing found"
+  noResults.style.display = found ? 'none' : 'block';
 });
+
 </script>
         <script src="../script.js"></script>
       <script src="https://formspree.io/js/formbutton-v1.min.js" defer></script>
