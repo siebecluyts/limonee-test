@@ -67,9 +67,12 @@
         <h2>
             Smaken
         </h2>
+          <input type="text" id="searchInput" placeholder="Zoek smaken..." />
+          <p id="noResults" style="display: none; color: red;">Nothing found.</p>
                 <p>
                   Wij hebben verschillende smaken voor onze limonade. Onze smaken zijn:
           </p>
+          <div id="contentList">
           <a href="/smaken/fris/">
           <div class="smaken" id="fris">
             <h3>
@@ -97,10 +100,25 @@
           </div>
             </a>
         </div>
+                      
+          </div>
       <br>
       <br>
       <br>
       <br>
+      <script>const searchInput = document.getElementById('searchInput');
+const contentList = document.getElementById('contentList');
+const listItems = contentList.getElementsByTagName('div');
+
+searchInput.addEventListener('input', function () {
+  const searchTerm = searchInput.value.toLowerCase();
+  
+  Array.from(listItems).forEach(item => {
+    const text = item.textContent.toLowerCase();
+    item.style.display = text.includes(searchTerm) ? '' : 'none';
+  });
+});
+</script>
         <script src="../script.js"></script>
       <script src="https://formspree.io/js/formbutton-v1.min.js" defer></script>
     </body>
