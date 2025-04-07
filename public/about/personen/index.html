@@ -75,6 +75,8 @@
         </div>
     </div>
       <h2>Personen in ons team</h2>
+                <input type="text" id="searchInput" placeholder="Zoek personen..." />
+          <p id="noResults" style="display: none; color: red;">Niks gevonden.</p>
       <div class="personen"></div>
       <a href="/about/personen/ReindertJanssens/">
         <h3 id="h34-1">
@@ -103,7 +105,7 @@
         <a href="/about/personen/ReindertJanssens/">Lees meer.</a>
       </p>
       <br />
-      <a href="/about/personen/SiebeCluyts/">
+      <a class="Persoon" href="/about/personen/SiebeCluyts/">
         <h3>
           <img
             src="https://cdn.glitch.global/638bdc36-d676-479e-8f39-ff81bc2e3bb1/1708256244.jpg?v=1735589691930"
@@ -120,7 +122,7 @@
         voor de website. <a href="/about/personen/SiebeCluyts/">Lees meer.</a>
       </p>
       <br />
-      <a href="/about/personen/LodewijkVandueren/">
+      <a class="Persoon" href="/about/personen/LodewijkVandueren/">
         <h3>
           <img
             src="https://cdn.glitch.global/638bdc36-d676-479e-8f39-ff81bc2e3bb1/imgpsh_fullsize_anim.png?v=1735631749397"
@@ -138,7 +140,7 @@
         <a href="/about/personen/LodewijkVandueren/">Lees meer.</a>
       </p>
       <br />
-      <a href="/about/personen/TijlCluyts/">
+      <a class="Persoon" href="/about/personen/TijlCluyts/">
         <h3>
           <img
             src="https://cdn.glitch.global/638bdc36-d676-479e-8f39-ff81bc2e3bb1/TijlCluyts.jpeg?v=1736075033031"
@@ -180,7 +182,27 @@
 
     <script src="../../script.js"></script>
     <script src="https://formspree.io/js/formbutton-v1.min.js" defer></script>
+      <script>const searchInput = document.getElementById('searchInput');
+const contentList = document.getElementById('contentList');
+const listItems = contentList.getElementsByTagName('div');
+const noResults = document.getElementById('noResults');
 
+searchInput.addEventListener('input', function () {
+  const searchTerm = searchInput.value.toLowerCase();
+  let found = false;
+
+  Array.from(listItems).forEach(item => {
+    const text = item.textContent.toLowerCase();
+    const match = text.includes(searchTerm);
+    item.style.display = match ? '' : 'none';
+    if (match) found = true;
+  });
+
+  // Show or hide "Nothing found"
+  noResults.style.display = found ? 'none' : 'block';
+});
+
+</script>
   </body>
   <footer>
     <div class="footer">
