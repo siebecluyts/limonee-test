@@ -75,10 +75,8 @@
         </div>
     </div>
       <h2>Personen in ons team</h2>
-                <input type="text" id="searchInput" placeholder="Zoek personen..." />
-          <p id="noResults" style="display: none; color: red;">Niks gevonden.</p>
       <div class="personen"></div>
-      <a href="/about/personen/ReindertJanssens/">
+      <a class="Persoon1" href="/about/personen/ReindertJanssens/">
         <h3 id="h34-1">
           <img
             height="100"
@@ -158,7 +156,7 @@
         >
       </p>
       <br />
-      <a href="/about/personen/ArntJanssens/">
+      <a class="Persoon" href="/about/personen/ArntJanssens/">
         <h3>
           <img
             src="https://cdn.glitch.global/638bdc36-d676-479e-8f39-ff81bc2e3bb1/ArntJanssens.jpeg?v=1737142535027"
@@ -182,27 +180,39 @@
 
     <script src="../../script.js"></script>
     <script src="https://formspree.io/js/formbutton-v1.min.js" defer></script>
-      <script>const searchInput = document.getElementById('searchInput');
-const contentList = document.getElementById('contentList');
-const listItems = contentList.getElementsByTagName('div');
-const noResults = document.getElementById('noResults');
+<script>
+  const searchInput = document.getElementById("searchInput");
+  const personen = document.querySelectorAll(".personen > .Persoon");
 
-searchInput.addEventListener('input', function () {
-  const searchTerm = searchInput.value.toLowerCase();
-  let found = false;
+  searchInput.addEventListener("input", function () {
+    const filter = this.value.toLowerCase();
+    let found = false;
 
-  Array.from(listItems).forEach(item => {
-    const text = item.textContent.toLowerCase();
-    const match = text.includes(searchTerm);
-    item.style.display = match ? '' : 'none';
-    if (match) found = true;
+    personen.forEach(persoon => {
+      const naam = persoon.textContent.toLowerCase();
+      const beschrijving = persoon.nextElementSibling;
+
+      if (naam.includes(filter)) {
+        persoon.style.display = "";
+        if (beschrijving && beschrijving.tagName === "P") {
+          beschrijving.style.display = "";
+        }
+        found = true;
+      } else {
+        persoon.style.display = "none";
+        if (beschrijving && beschrijving.tagName === "P") {
+          beschrijving.style.display = "none";
+        }
+      }
+    });
+
+    const noResults = document.getElementById("noResults");
+    if (noResults) {
+      noResults.style.display = found ? "none" : "block";
+    }
   });
-
-  // Show or hide "Nothing found"
-  noResults.style.display = found ? 'none' : 'block';
-});
-
 </script>
+
   </body>
   <footer>
     <div class="footer">
