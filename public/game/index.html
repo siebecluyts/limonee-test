@@ -97,11 +97,9 @@
         Maak je eigen beker!
       </h3>
         <div class="container">
-    <h1>Design Your Lemonade Cup!</h1>
+    <h1>Maak je eigen beker!</h1>
     <div class="cup">
-      <div id="cup" class="cup-image">
-        <!-- The cup will be shown here with designs -->
-      </div>
+      <div id="cup" class="cup-image"></div>
     </div>
 
     <div class="tools">
@@ -114,10 +112,26 @@
     </div>
 
     <div class="actions">
-      <button onclick="downloadCup()">Download je Ontwerp</button>
       <button onclick="shareDesign()">Deel je Ontwerp</button>
     </div>
   </div>
+
+  <!-- Popup for sharing -->
+  <div id="share-popup" class="popup-cu[]">
+    <div class="popup-content-cup">
+      <h2>Deel je Limonade Ontwerp!</h2>
+      <p>Klik op de link of gebruik de sociale media knoppen om te delen:</p>
+      <a href="https://jouw-website.nl" target="_blank" class="share-link">Bekijk mijn ontwerp op mijn website</a>
+      <div class="social-media">
+        <button class="social-button" onclick="shareOnFacebook()">Facebook</button>
+        <button class="social-button" onclick="shareOnTwitter()">Twitter</button>
+        <button class="social-button" onclick="shareOnInstagram()">Instagram</button>
+      </div>
+      <button onclick="downloadImage()" class="download-button">Download mijn Ontwerp</button>
+      <button onclick="closePopupCup()" class="close-button">Sluiten</button>
+    </div>
+  </div>
+
 <p>
   In dit spel mag je je eigen beker maken en publiceren.
       </p>
