@@ -64,3 +64,6 @@ window.addEventListener('scroll', function() {
     document.getElementById('fruit').style.backgroundPositionY = -(scrolled * 0.3) + 'px';
     document.getElementById('ice').style.backgroundPositionY = -(scrolled * 0.5) + 'px';
 });
+function startOrder() {
+  alert("Let's get your lemonade order started!");
+}
