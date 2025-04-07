@@ -237,36 +237,64 @@ ul.agenda li.closed {
     }
 }
 
-.slide-in-container {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.slide-in-box {
-  width: 80%;
-  max-width: 600px;
+.notification {
+  position: fixed;
+  top: 20px; /* Positioned at the top-right corner */
+  right: -300px; /* Start off-screen to the right */
   background-color: #ffea00;
-  padding: 20px;
-  text-align: center;
+  padding: 10px 20px;
   border-radius: 10px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-  position: relative;
-  opacity: 0;
-  transform: translateX(100%); /* Starts from the right side */
-  animation: slideIn 1s ease-out forwards; /* Slide in from the side */
+  animation: slideInRight 1s ease-out forwards; /* Slide in from the right */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  width: 250px;
 }
 
-@keyframes slideIn {
+.notification p {
+  margin: 0;
+}
+
+.notification button {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: 5px;
+  margin-top: 10px;
+  transition: background-color 0.3s;
+}
+
+.notification button:hover {
+  background-color: #45a049;
+}
+
+.notification button:last-child {
+  background-color: red; /* Change color for close button */
+}
+
+.notification button:last-child:hover {
+  background-color: #d43f00;
+}
+
+@keyframes slideInRight {
   0% {
-    transform: translateX(100%); /* Start off-screen */
-    opacity: 0;
+    right: -300px; /* Start off-screen */
   }
   100% {
-    transform: translateX(0); /* End in the normal position */
-    opacity: 1;
+    right: 20px; /* End in the top-right corner */
+  }
+}
+
+@keyframes slideOutRight {
+  0% {
+    right: 20px; /* Current position */
+  }
+  100% {
+    right: -300px; /* Slide out to the right */
   }
 }

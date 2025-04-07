@@ -64,6 +64,18 @@ window.addEventListener('scroll', function() {
     document.getElementById('fruit').style.backgroundPositionY = -(scrolled * 0.3) + 'px';
     document.getElementById('ice').style.backgroundPositionY = -(scrolled * 0.5) + 'px';
 });
-function startOrder() {
-  alert("Let's get your lemonade order started!");
+function goToPage() {
+  window.location.href = "/contact/bestelling/"; // Replace with the URL you want to redirect to
+}
+
+function closeNotification() {
+  const notification = document.querySelector('.notification');
+  
+  // Trigger slide-out animation
+  notification.style.animation = 'slideOutRight 1s ease-out forwards';
+  
+  // Remove the notification from the screen after animation ends
+  notification.addEventListener('animationend', () => {
+    notification.style.display = 'none';
+  });
 }
