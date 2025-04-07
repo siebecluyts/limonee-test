@@ -83,13 +83,23 @@ function closeNotification() {
 let cupElement = document.getElementById("cup");
 let textFont = "Arial";
 
-// Change color of the cup
+// Parameters voor de cup
+let cupData = {
+  color: "yellow",
+  text: "",
+  font: "Arial",
+  stickers: []
+};
+
+// Verandert de kleur van de cup
 function changeColor(color) {
+  cupData.color = color;
   cupElement.style.backgroundColor = color;
 }
 
-// Add stickers (straw, lemon)
+// Voeg stickers toe
 function addSticker(sticker) {
+  cupData.stickers.push(sticker);
   if (sticker === "straw") {
     let straw = document.createElement("div");
     straw.classList.add("straw");
@@ -101,9 +111,10 @@ function addSticker(sticker) {
   }
 }
 
-// Add custom text
+// Voeg tekst toe
 function addText() {
   let text = prompt("Voer je tekst in voor de cup:");
+  cupData.text = text;
   let textElement = document.createElement("div");
   textElement.style.position = "absolute";
   textElement.style.bottom = "20px";
@@ -116,7 +127,7 @@ function addText() {
   cupElement.appendChild(textElement);
 }
 
-// Change font of the text
+// Verander lettertype
 function changeFont() {
   let fonts = ["Arial", "Verdana", "Courier New", "Comic Sans MS"];
   let currentIndex = fonts.indexOf(textFont);
@@ -124,17 +135,39 @@ function changeFont() {
   alert("Het lettertype is veranderd naar " + textFont);
 }
 
-// Show the share popup
+// Deel ontwerp via een popup
 function shareDesign() {
+  const shareUrl = generateDesignUrl();
+  const shareLink = document.getElementById("share-link");
+  shareLink.value = shareUrl; // De link naar de nieuwe pagina
   document.getElementById("share-popup").style.display = "flex";
 }
 
-// Close the share popup
+// Kopieer de link
+function copyLink() {
+  const shareLink = document.getElementById("share-link");
+  shareLink.select();
+  document.execCommand("copy");
+  alert("Link gekopieerd!");
+}
+
+// Genereer een unieke URL voor het ontwerp
+function generateDesignUrl() {
+  const url = new URL(window.location.href);
+  url.pathname = "/design/"; // Nieuwe pagina voor elk ontwerp
+  url.searchParams.set("color", cupData.color);
+  url.searchParams.set("text", cupData.text);
+  url.searchParams.set("font", cupData.font);
+  url.searchParams.set("stickers", cupData.stickers.join(","));
+  return url.toString();
+}
+
+// Sluit de popup
 function closePopupCup() {
   document.getElementById("share-popup").style.display = "none";
 }
 
-// Download the cup design as an image
+// Download het ontwerp als afbeelding
 function downloadImage() {
   let canvas = document.createElement("canvas");
   let ctx = canvas.getContext("2d");
@@ -143,16 +176,15 @@ function downloadImage() {
   ctx.fillStyle = cupElement.style.backgroundColor;
   ctx.fillRect(0, 0, 200, 300);
 
-  // Add text if present
-  let textElement = cupElement.querySelector("div");
-  if (textElement) {
-    ctx.font = "16px " + textFont;
+  // Voeg tekst toe
+  if (cupData.text) {
+    ctx.font = "16px " + cupData.font;
     ctx.fillStyle = "#000";
-    ctx.fillText(textElement.innerHTML, 50, 260);
+    ctx.fillText(cupData.text, 50, 260);
   }
 
-  // Add straw if present
-  if (cupElement.querySelector(".straw")) {
+  // Voeg stickers toe
+  if (cupData.stickers.includes("straw")) {
     ctx.fillStyle = "#e74c3c";
     ctx.fillRect(95, 0, 10, 50);
     ctx.beginPath();
@@ -160,32 +192,16 @@ function downloadImage() {
     ctx.fill();
   }
 
-  // Add lemon if present
-  if (cupElement.querySelector(".lemon")) {
+  if (cupData.stickers.includes("lemon")) {
     ctx.beginPath();
     ctx.arc(100, 50, 20, 0, Math.PI * 2, true);
     ctx.fillStyle = "yellow";
     ctx.fill();
   }
 
-  // Download the image
+  // Download het ontwerp
   let link = document.createElement("a");
   link.download = "limonade-cup-ontwerp.png";
-  link.href = canvas.toDataURL();
+  link.href = canvas.toDataURL("image/png");
   link.click();
-}
-
-// Share on social media
-function shareOnFacebook() {
-  let url = "https://www.facebook.com/sharer/sharer.php?u=https://jouw-website.nl";
-  window.open(url, "_blank");
-}
-
-function shareOnTwitter() {
-  let url = "https://twitter.com/intent/tweet?url=https://jouw-website.nl&text=Bekijk mijn limonade ontwerp!";
-  window.open(url, "_blank");
-}
-
-function shareOnInstagram() {
-  alert("Instagram delen wordt niet ondersteund via deze browser.");
 }

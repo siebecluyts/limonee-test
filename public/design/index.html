@@ -1,8 +1,69 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Limonee - spelletje</title>
+    <title>Limonee - jouw ontwerp</title>
     <link rel="stylesheet" href="../styles.css" />
+    <style>
+
+.container {
+  padding: 20px;
+}
+
+.cup-image {
+  width: 200px;
+  height: 300px;
+  margin: 20px auto;
+  position: relative;
+  border-radius: 10px;
+}
+
+.straw {
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  width: 5px;
+  height: 50px;
+  background-color: #e74c3c;
+  transform: translateX(-50%);
+}
+
+.straw::after {
+  content: " ";
+  position: absolute;
+  top: -5px;
+  left: 50%;
+  width: 10px;
+  height: 10px;
+  background-color: #e74c3c;
+  border-radius: 50%;
+}
+
+.lemon {
+  position: absolute;
+  top: 50px;
+  left: 50%;
+  width: 40px;
+  height: 40px;
+  background-color: yellow;
+  border-radius: 50%;
+  transform: translateX(-50%);
+}
+
+
+.share {
+  margin-top: 20px;
+}
+
+#shared-link {
+  color: #3498db;
+  text-decoration: none;
+}
+
+
+.actions {
+  margin-top: 20px;
+}
+</style>
     <meta charset="UTF-8" />
     <meta name="description" content="Drink de beste Limonee!" />
     <meta
@@ -80,72 +141,24 @@
             </form>
         </div>
     </div>
-      <h2>Spelletje</h2>
-      <h3>Vang de ingedriënten!</h3>
-      <iframe src="/game/1.html" width="500" height="500"> </iframe>
-      <p>
-        In dit spel moet je proberen de ingedriënten van de limonade (Suiker,
-        citroen en limoene) te pakken en de donut niet te pakken. Je kan ook het
-        winkelmandje pakken om van alles 1 meer te krijgen. Als je van elk van
-        de ingedriënten minstens 1 hebt, kan je die wisselen voor vier glazen.
-        Als je bijvoorbeeld van alles minstens 2 hebt kan je acht glazen
-        krijgen. Deze glazen kan je verkopen voor een munt per glas. Met de
-        munten kan je uitbreidingen kopen.
-      </p>
-      <br />
-      <h3>
-        Maak je eigen beker!
-      </h3>
-        <div class="container">
-    <h1>Maak je eigen beker!</h1>
+  <div class="container">
+    <h2>Jouw Limonade Cup Ontwerp</h2>
     <div class="cup">
       <div id="cup" class="cup-image"></div>
     </div>
-
-    <div class="tools">
-      <button onclick="changeColor('yellow')">Geel (Lemon)</button>
-      <button onclick="changeColor('blue')">Blauw</button>
-      <button onclick="addSticker('straw')">Voeg een Rietje Toe</button>
-      <button onclick="addSticker('lemon')">Voeg een Citroen Toe</button>
-      <button onclick="addText()">Voeg Tekst Toe</button>
-      <button onclick="changeFont()">Verander het Lettertype</button>
-    </div>
-
+    
     <div class="actions">
-      <button onclick="shareDesign()">Deel je Ontwerp</button>
+      <button onclick="goBack()">Ga Terug naar het Ontwerp</button>
+      <button onclick="downloadImage()">Download Mijn Ontwerp</button>
     </div>
-  </div>
 
-  <!-- Popup for sharing -->
-  <div id="share-popup" class="popupCup">
-    <div class="popup-content-cup">
-      <h2>Deel je Limonade Ontwerp!</h2>
-      <p>Klik op de link of gebruik de sociale media knoppen om te delen:</p>
-      <input type="text" id="share-link" value="" readonly>
+    <div class="share">
+      <p>Deel deze link: <span id="shared-link"></span></p>
       <button onclick="copyLink()">Kopieer Link</button>
-      <div class="social-media">
-        <button class="social-button" onclick="shareOnFacebook()">Facebook</button>
-        <button class="social-button" onclick="shareOnTwitter()">Twitter</button>
-        <button class="social-button" onclick="shareOnInstagram()">Instagram</button>
-      </div>
-      <button onclick="downloadImage()" class="download-button">Download mijn Ontwerp</button>
-      <button onclick="closePopupCup()" class="close-button">Sluiten</button>
     </div>
-  </div>
-
-<p>
-  In dit spel mag je je eigen beker maken en publiceren.
-      </p>
-      <br />
-      <br />
-      <br />
-      <br />
-  <div class="notification">
-    <p>Lekkere frisse limonade!</p>
-    <button onclick="goToPage()">Betsel hier!</button>
-    <button onclick="closeNotification()">X</button>
   </div>
       <script src="../script.js"></script>
+      <script src="script.js"></script>
       <script src="https://formspree.io/js/formbutton-v1.min.js" defer></script>
     </div>
   </body>

@@ -299,7 +299,6 @@ ul.agenda li.closed {
   }
 }
 
-
 .container {
   padding: 20px;
 }
@@ -354,7 +353,7 @@ ul.agenda li.closed {
 }
 
 /* Popup styles */
-.popup-cup {
+.popupCup {
   display: none;
   position: fixed;
   top: 0;
@@ -372,6 +371,13 @@ ul.agenda li.closed {
   border-radius: 10px;
   text-align: center;
   width: 300px;
+}
+
+input {
+  width: 80%;
+  margin-top: 10px;
+  padding: 8px;
+  font-size: 14px;
 }
 
 .share-link {
