@@ -318,3 +318,9 @@ ul.agenda li.closed {
   pointer-events: none;
   animation: starFollow 1s linear infinite;
 }
+.review {
+  border: 2px solid blue;
+  border-radius: 12px;
+  padding: 5px;
+  background-color: 
+}
