@@ -90,40 +90,40 @@
 <h2>
   Jouw beker!
     </h2>
-  <div id="cup">
-    <div class="sticker lemon"></div>
-    <div class="sticker straw"></div>
-  </div>
-      <style>
-       #cup {
-      width: 200px;
-      height: 300px;
-      margin: auto;
-      border-radius: 20px;
-      background: #ffe066;
-      border: 5px solid #f1c40f;
-      position: relative;
+  <div id="cup" class="cup"></div>
+
+  <script>
+    function showDesign(data) {
+      const cup = document.getElementById('cup');
+      cup.style.background = data.kleur;
+
+      data.stickers.forEach(s => {
+        const el = document.createElement('div');
+        el.classList.add('sticker');
+        el.textContent = s.emoji;
+        el.style.left = s.x + 'px';
+        el.style.top = s.y + 'px';
+        cup.appendChild(el);
+      });
+
+      data.teksten.forEach(t => {
+        const el = document.createElement('div');
+        el.classList.add('tekst');
+        el.textContent = t.text;
+        el.style.left = t.x + 'px';
+        el.style.top = t.y + 'px';
+        cup.appendChild(el);
+      });
     }
 
-    .sticker {
-      width: 40px;
-      height: 40px;
-      background-size: cover;
-      position: absolute;
-    }
+    const params = new URLSearchParams(location.search);
+    const id = params.get('id');
 
-    .lemon {
-      background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Lemon_icon.png/600px-Lemon_icon.png');
-      top: 20px;
-      left: 20px;
-    }
-
-    .straw {
-      background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/4/42/Straw_icon.svg/1024px-Straw_icon.svg.png');
-      top: 20px;
-      right: 20px;
-    }
-  </style>
+    fetch(`/design/${id}`)
+      .then(res => res.json())
+      .then(showDesign)
+      .catch(() => alert("Design niet gevonden"));
+  </script>
     <br>
     <br>
     <br>

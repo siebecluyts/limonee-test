@@ -98,99 +98,84 @@
       </h3>
         <div class="container">
     <h1>Maak je eigen beker!</h1>
-  <label for="colorPicker">Kies kleur:</label>
-  <input type="color" id="colorPicker" value="#ffe066">
+  <input type="color" id="colorPicker" value="#ffeb3b">
+  <button onclick="wijzigKleur()">Kleur Beker</button>
+  <br><br>
 
-  <select id="stickerSelect">
-    <option value="">Sticker kiezen</option>
-    <option value="🍋">Citroen</option>
-    <option value="🌞">Zon</option>
-    <option value="🍓">Aardbei</option>
-    <option value="🧊">IJsblok</option>
-  </select>
+  <button onclick="voegStickerToe('🍓')">🍓</button>
+  <button onclick="voegStickerToe('🍋')">🍋</button>
+  <button onclick="voegStickerToe('🌞')">🌞</button>
+  <button onclick="voegTekstToe()">📝 Voeg Tekst toe</button>
+  <br><br>
 
-  <input type="text" id="tekstInput" placeholder="Voeg tekst toe">
-  <button onclick="addText()">➕ Voeg tekst toe</button>
+  <div id="cup" class="cup"></div>
   <br>
+  <button onclick="opslaan()">💾 Opslaan & Delen</button>
 
-  <div id="cup"></div>
-
-  <button onclick="delen()">📤 Delen</button>
-
-  <!-- SHARE POPUP -->
-  <div id="overlay" onclick="sluitPopup()"></div>
-  <div id="sharePopup">
-    <h3>Deel deze beker</h3>
-    <input id="shareLink" readonly style="width: 90%; padding: 5px">
-    <button onclick="kopieerLink()">Kopieer link</button>
-    <div class="social-buttons">
-      <a target="_blank" id="fb"><button>Facebook</button></a>
-      <a target="_blank" id="tw"><button>Twitter</button></a>
-      <a target="_blank" id="wa"><button>WhatsApp</button></a>
-    </div>
-    <button onclick="sluitPopup()">Sluiten</button>
+  <!-- Delen popup -->
+  <div id="popup" style="display:none; background:#fff3cd; padding:20px; border-radius:10px; margin:20px auto; width:300px;">
+    <p><strong>Jouw deelbare link:</strong></p>
+    <input type="text" id="shareLink" readonly style="width:100%; padding:5px;">
+    <button onclick="kopieer()">📋 Kopieer Link</button>
+    <br><br>
+    <a id="fb" target="_blank">🔵 Facebook</a> |
+    <a id="tw" target="_blank">🐦 Twitter</a> |
+    <a id="wa" target="_blank">🟢 WhatsApp</a>
   </div>
 
   <script>
     const cup = document.getElementById('cup');
     const colorPicker = document.getElementById('colorPicker');
-    const stickerSelect = document.getElementById('stickerSelect');
-    const tekstInput = document.getElementById('tekstInput');
 
-    colorPicker.addEventListener('input', () => {
+    function wijzigKleur() {
       cup.style.background = colorPicker.value;
-      updateURL();
-    });
+    }
 
-    stickerSelect.addEventListener('change', () => {
-      const emoji = stickerSelect.value;
-      if (emoji) addSticker(emoji);
-    });
-
-    function addSticker(emoji) {
+    function voegStickerToe(emoji) {
       const el = document.createElement('div');
-      el.classList.add('sticker');
+      el.className = 'sticker';
       el.textContent = emoji;
       el.style.left = '50px';
       el.style.top = '50px';
-      makeDraggable(el);
+      maakSleepbaar(el);
       cup.appendChild(el);
-      updateURL();
     }
 
-    function addText() {
-      const text = tekstInput.value;
-      if (!text) return;
-      const el = document.createElement('div');
-      el.classList.add('tekst');
-      el.textContent = text;
-      el.style.left = '40px';
-      el.style.top = '100px';
-      makeDraggable(el);
-      cup.appendChild(el);
-      tekstInput.value = '';
-      updateURL();
+    function voegTekstToe() {
+      const text = prompt("Voer je tekst in:");
+      if (text) {
+        const el = document.createElement('div');
+        el.className = 'tekst';
+        el.textContent = text;
+        el.style.left = '60px';
+        el.style.top = '60px';
+        maakSleepbaar(el);
+        cup.appendChild(el);
+      }
     }
 
-    function makeDraggable(el) {
+    function maakSleepbaar(el) {
       el.onmousedown = function(e) {
+        e.preventDefault();
         let offsetX = e.offsetX, offsetY = e.offsetY;
-        function moveAt(e) {
-          el.style.left = (e.pageX - cup.offsetLeft - offsetX) + 'px';
-          el.style.top = (e.pageY - cup.offsetTop - offsetY) + 'px';
+
+        function bewegen(ev) {
+          el.style.left = (ev.pageX - cup.offsetLeft - offsetX) + 'px';
+          el.style.top = (ev.pageY - cup.offsetTop - offsetY) + 'px';
         }
-        function stop() {
-          document.removeEventListener('mousemove', moveAt);
-          document.removeEventListener('mouseup', stop);
-          updateURL();
+
+        function loslaten() {
+          document.removeEventListener('mousemove', bewegen);
+          document.removeEventListener('mouseup', loslaten);
         }
-        document.addEventListener('mousemove', moveAt);
-        document.addEventListener('mouseup', stop);
+
+        document.addEventListener('mousemove', bewegen);
+        document.addEventListener('mouseup', loslaten);
       };
     }
 
-    function updateURL() {
-      const kleur = encodeURIComponent(colorPicker.value);
+    function opslaan() {
+      const kleur = colorPicker.value;
       let stickers = [], teksten = [];
 
       cup.querySelectorAll('.sticker').forEach(el => {
@@ -209,134 +194,29 @@
         });
       });
 
-      const params = new URLSearchParams();
-      params.set('kleur', kleur);
-      params.set('stickers', JSON.stringify(stickers));
-      params.set('teksten', JSON.stringify(teksten));
-
-      const url = `${location.origin}${location.pathname}?${params.toString()}`;
-      document.getElementById('shareLink').value = url;
-      document.getElementById('fb').href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
-      document.getElementById('tw').href = `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}`;
-      document.getElementById('wa').href = `https://wa.me/?text=${encodeURIComponent(url)}`;
+      fetch('/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ kleur, stickers, teksten })
+      })
+      .then(res => res.json())
+      .then(data => {
+        const viewLink = `${location.origin}/view.html?id=${data.id}`;
+        document.getElementById('shareLink').value = viewLink;
+        document.getElementById('fb').href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(viewLink)}`;
+        document.getElementById('tw').href = `https://twitter.com/intent/tweet?url=${encodeURIComponent(viewLink)}`;
+        document.getElementById('wa').href = `https://wa.me/?text=${encodeURIComponent(viewLink)}`;
+        document.getElementById('popup').style.display = 'block';
+      });
     }
 
-    function delen() {
-      updateURL();
-      document.getElementById('overlay').style.display = 'block';
-      document.getElementById('sharePopup').style.display = 'block';
-    }
-
-    function sluitPopup() {
-      document.getElementById('overlay').style.display = 'none';
-      document.getElementById('sharePopup').style.display = 'none';
-    }
-
-    function kopieerLink() {
-      const input = document.getElementById('shareLink');
-      input.select();
+    function kopieer() {
+      const copyText = document.getElementById('shareLink');
+      copyText.select();
       document.execCommand('copy');
-      alert('Link gekopieerd!');
+      alert("Gekopieerd!");
     }
-
-    // Laden vanuit URL
-    function loadFromURL() {
-      const params = new URLSearchParams(location.search);
-      const kleur = params.get('kleur');
-      if (kleur) {
-        colorPicker.value = kleur;
-        cup.style.background = kleur;
-      }
-
-      const stickers = JSON.parse(params.get('stickers') || '[]');
-      stickers.forEach(s => {
-        const el = document.createElement('div');
-        el.classList.add('sticker');
-        el.textContent = s.emoji;
-        el.style.left = s.x + 'px';
-        el.style.top = s.y + 'px';
-        makeDraggable(el);
-        cup.appendChild(el);
-      });
-
-      const teksten = JSON.parse(params.get('teksten') || '[]');
-      teksten.forEach(t => {
-        const el = document.createElement('div');
-        el.classList.add('tekst');
-        el.textContent = t.text;
-        el.style.left = t.x + 'px';
-        el.style.top = t.y + 'px';
-        makeDraggable(el);
-        cup.appendChild(el);
-      });
-    }
-
-    window.onload = loadFromURL;
   </script>
-            <style>
-    #cup {
-      width: 200px;
-      height: 300px;
-      margin: 20px auto;
-      border-radius: 20px;
-      background: #ffe066;
-      border: 4px solid #f1c40f;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .sticker, .tekst {
-      position: absolute;
-      cursor: move;
-    }
-
-    .sticker {
-      width: 50px;
-      height: 50px;
-      background-size: cover;
-    }
-
-    .tekst {
-      font-size: 16px;
-      color: #000;
-      font-weight: bold;
-    }
-
-    button, input, select {
-      margin: 5px;
-      padding: 10px;
-      border-radius: 6px;
-      border: none;
-    }
-
-    #overlay, #sharePopup {
-      display: none;
-      position: fixed;
-      z-index: 99;
-    }
-
-    #overlay {
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.5);
-    }
-
-    #sharePopup {
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      background: white;
-      border: 2px solid #f1c40f;
-      padding: 20px;
-      border-radius: 10px;
-      z-index: 100;
-    }
-
-    .social-buttons button {
-      margin: 5px;
-      background: #3498db;
-      color: white;
-    }
-  </style>
 
 <p>
   In dit spel mag je je eigen beker maken en publiceren.
