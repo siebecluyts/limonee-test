@@ -93,134 +93,10 @@
         munten kan je uitbreidingen kopen.
       </p>
       <br />
-      <h3>
-        Maak je eigen beker!
+<h3>
+  Maak je eigen beker!
       </h3>
-        <div class="container">
-    <h1>Maak je eigen beker!</h1>
-  <input type="color" id="colorPicker" value="#ffeb3b">
-  <button onclick="wijzigKleur()">Kleur Beker</button>
-  <br><br>
-
-  <button onclick="voegStickerToe('🍓')">🍓</button>
-  <button onclick="voegStickerToe('🍋')">🍋</button>
-  <button onclick="voegStickerToe('🌞')">🌞</button>
-  <button onclick="voegTekstToe()">📝 Voeg Tekst toe</button>
-  <br><br>
-
-  <div id="cup" class="cup"></div>
-  <br>
-  <button onclick="opslaan()">💾 Opslaan & Delen</button>
-
-  <!-- Delen popup -->
-  <div id="popup" style="display:none; background:#fff3cd; padding:20px; border-radius:10px; margin:20px auto; width:300px;">
-    <p><strong>Jouw deelbare link:</strong></p>
-    <input type="text" id="shareLink" readonly style="width:100%; padding:5px;">
-    <button onclick="kopieer()">📋 Kopieer Link</button>
-    <br><br>
-    <a id="fb" target="_blank">🔵 Facebook</a> |
-    <a id="tw" target="_blank">🐦 Twitter</a> |
-    <a id="wa" target="_blank">🟢 WhatsApp</a>
-  </div>
-
-  <script>
-    const cup = document.getElementById('cup');
-    const colorPicker = document.getElementById('colorPicker');
-
-    function wijzigKleur() {
-      cup.style.background = colorPicker.value;
-    }
-
-    function voegStickerToe(emoji) {
-      const el = document.createElement('div');
-      el.className = 'sticker';
-      el.textContent = emoji;
-      el.style.left = '50px';
-      el.style.top = '50px';
-      maakSleepbaar(el);
-      cup.appendChild(el);
-    }
-
-    function voegTekstToe() {
-      const text = prompt("Voer je tekst in:");
-      if (text) {
-        const el = document.createElement('div');
-        el.className = 'tekst';
-        el.textContent = text;
-        el.style.left = '60px';
-        el.style.top = '60px';
-        maakSleepbaar(el);
-        cup.appendChild(el);
-      }
-    }
-
-    function maakSleepbaar(el) {
-      el.onmousedown = function(e) {
-        e.preventDefault();
-        let offsetX = e.offsetX, offsetY = e.offsetY;
-
-        function bewegen(ev) {
-          el.style.left = (ev.pageX - cup.offsetLeft - offsetX) + 'px';
-          el.style.top = (ev.pageY - cup.offsetTop - offsetY) + 'px';
-        }
-
-        function loslaten() {
-          document.removeEventListener('mousemove', bewegen);
-          document.removeEventListener('mouseup', loslaten);
-        }
-
-        document.addEventListener('mousemove', bewegen);
-        document.addEventListener('mouseup', loslaten);
-      };
-    }
-
-    function opslaan() {
-      const kleur = colorPicker.value;
-      let stickers = [], teksten = [];
-
-      cup.querySelectorAll('.sticker').forEach(el => {
-        stickers.push({
-          emoji: el.textContent,
-          x: parseInt(el.style.left),
-          y: parseInt(el.style.top)
-        });
-      });
-
-      cup.querySelectorAll('.tekst').forEach(el => {
-        teksten.push({
-          text: el.textContent,
-          x: parseInt(el.style.left),
-          y: parseInt(el.style.top)
-        });
-      });
-
-      fetch('/save', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ kleur, stickers, teksten })
-      })
-      .then(res => res.json())
-      .then(data => {
-        const viewLink = `${location.origin}/view.html?id=${data.id}`;
-        document.getElementById('shareLink').value = viewLink;
-        document.getElementById('fb').href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(viewLink)}`;
-        document.getElementById('tw').href = `https://twitter.com/intent/tweet?url=${encodeURIComponent(viewLink)}`;
-        document.getElementById('wa').href = `https://wa.me/?text=${encodeURIComponent(viewLink)}`;
-        document.getElementById('popup').style.display = 'block';
-      });
-    }
-
-    function kopieer() {
-      const copyText = document.getElementById('shareLink');
-      copyText.select();
-      document.execCommand('copy');
-      alert("Gekopieerd!");
-    }
-  </script>
-
-<p>
-  In dit spel mag je je eigen beker maken en publiceren.
-      </p>
+      <a href="limonee-beker.glitch.me">Speel het hier!</a>
       <br />
       <br />
       <br />
@@ -232,7 +108,6 @@
   </div>
       <script src="../script.js"></script>
       <script src="https://formspree.io/js/formbutton-v1.min.js" defer></script>
-    </div>
     </div>
   </body>
   <footer>
