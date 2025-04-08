@@ -98,40 +98,143 @@
       </h3>
         <div class="container">
     <h1>Maak je eigen beker!</h1>
-    <div class="cup">
-      <div id="cup" class="cup-image"></div>
-    </div>
-
-    <div class="tools">
-      <button onclick="changeColor('yellow')">Geel (Lemon)</button>
-      <button onclick="changeColor('blue')">Blauw</button>
-      <button onclick="addSticker('straw')">Voeg een Rietje Toe</button>
-      <button onclick="addSticker('lemon')">Voeg een Citroen Toe</button>
-      <button onclick="addText()">Voeg Tekst Toe</button>
-      <button onclick="changeFont()">Verander het Lettertype</button>
-    </div>
-
-    <div class="actions">
-      <button onclick="shareDesign()">Deel je Ontwerp</button>
-    </div>
+  <div id="cup">
+    <div class="sticker lemon"></div>
+    <div class="sticker straw"></div>
   </div>
 
-  <!-- Popup for sharing -->
-  <div id="share-popup" class="popupCup">
-    <div class="popup-content-cup">
-      <h2>Deel je Limonade Ontwerp!</h2>
-      <p>Klik op de link of gebruik de sociale media knoppen om te delen:</p>
-      <input type="text" id="share-link" value="" readonly>
-      <button onclick="copyLink()">Kopieer Link</button>
-      <div class="social-media">
-        <button class="social-button" onclick="shareOnFacebook()">Facebook</button>
-        <button class="social-button" onclick="shareOnTwitter()">Twitter</button>
-        <button class="social-button" onclick="shareOnInstagram()">Instagram</button>
-      </div>
-      <button onclick="downloadImage()" class="download-button">Download mijn Ontwerp</button>
-      <button onclick="closePopupCup()" class="close-button">Sluiten</button>
+  <button onclick="opslaan()">Opslaan</button>
+  <button onclick="toonPopup()">Delen</button>
+
+  <div id="overlay" onclick="sluitPopup()"></div>
+  <div id="sharePopup">
+    <h3>Deel jouw ontwerp!</h3>
+    <input id="shareLink" readonly style="width: 90%; padding: 8px;" />
+    <button onclick="kopieerLink()">Kopieer link</button>
+
+    <div class="social-buttons">
+      <a target="_blank" id="fb" href="#"><button>Facebook</button></a>
+      <a target="_blank" id="tw" href="#"><button>Twitter</button></a>
+      <a target="_blank" id="wa" href="#"><button>WhatsApp</button></a>
     </div>
+
+    <button onclick="sluitPopup()">Sluiten</button>
   </div>
+
+  <script>
+    function genereerCode() {
+      return 'cup-' + Math.random().toString(36).substr(2, 6);
+    }
+
+    function opslaan() {
+      const code = genereerCode();
+      const ontwerp = {
+        kleur: "#ffe066", // later uitbreidbaar met meer instellingen
+        stickers: ['lemon', 'straw']
+      };
+      localStorage.setItem(code, JSON.stringify(ontwerp));
+      alert("Je ontwerp is opgeslagen! Klik op 'Delen' om te delen.");
+      window.lastSavedCode = code;
+    }
+
+    function toonPopup() {
+      let code = window.lastSavedCode;
+      if (!code) {
+        alert("Sla eerst je ontwerp op.");
+        return;
+      }
+
+      const link = `${window.location.origin}/view.html?code=${code}`;
+      document.getElementById("shareLink").value = link;
+      document.getElementById("fb").href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(link)}`;
+      document.getElementById("tw").href = `https://twitter.com/intent/tweet?url=${encodeURIComponent(link)}`;
+      document.getElementById("wa").href = `https://wa.me/?text=${encodeURIComponent(link)}`;
+
+      document.getElementById("overlay").style.display = "block";
+      document.getElementById("sharePopup").style.display = "block";
+    }
+
+    function sluitPopup() {
+      document.getElementById("overlay").style.display = "none";
+      document.getElementById("sharePopup").style.display = "none";
+    }
+
+    function kopieerLink() {
+      const linkInput = document.getElementById("shareLink");
+      linkInput.select();
+      document.execCommand("copy");
+      alert("Link gekopieerd!");
+    }
+  </script>
+            <style>
+
+    #cup {
+      width: 200px;
+      height: 300px;
+      background: #ffe066;
+      border: 5px solid #f1c40f;
+      border-radius: 20px;
+      margin: 30px auto;
+      position: relative;
+    }
+
+    .sticker {
+      width: 40px;
+      height: 40px;
+      position: absolute;
+      background-size: cover;
+    }
+
+    .lemon {
+      background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Lemon_icon.png/600px-Lemon_icon.png');
+      top: 20px;
+      left: 20px;
+    }
+
+    .straw {
+      background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/4/42/Straw_icon.svg/1024px-Straw_icon.svg.png');
+      top: 20px;
+      right: 20px;
+    }
+
+    button {
+      padding: 10px 20px;
+      margin: 10px;
+      background: #f39c12;
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    #sharePopup {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      border: 2px solid #f1c40f;
+      padding: 20px;
+      border-radius: 10px;
+      z-index: 999;
+    }
+
+    #overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 998;
+    }
+
+    .social-buttons button {
+      margin: 5px;
+      background: #3498db;
+    }
+  </style>
 
 <p>
   In dit spel mag je je eigen beker maken en publiceren.
