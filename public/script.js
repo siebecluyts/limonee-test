@@ -205,3 +205,13 @@ function downloadImage() {
   link.href = canvas.toDataURL("image/png");
   link.click();
 }
+document.querySelector(".click-me").addEventListener("click", function(event) {
+  for (let i = 0; i < 30; i++) {
+    const confetti = document.createElement("div");
+    confetti.classList.add("confetti");
+    confetti.style.left = `${event.pageX + Math.random() * 100 - 50}px`;
+    confetti.style.top = `${event.pageY + Math.random() * 50 - 25}px`;
+    document.body.appendChild(confetti);
+    setTimeout(() => confetti.remove(), 1000); // Verwijder confetti na 1s
+  }
+});

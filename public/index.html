@@ -126,7 +126,7 @@
 <br>    
   <div class="notification">
     <p>Lekkere frisse limonade!</p>
-    <button onclick="goToPage()">Betsel hier!</button>
+    <button class="click-me" onclick="goToPage()">Betsel hier!</button>
     <button onclick="closeNotification()">X</button>
   </div>
 
@@ -138,19 +138,8 @@
      document.getElementById("demo-form").submit();
    }
  </script>
-<div class="bouncing-lemon">🍋</div>
-<style>.bouncing-lemon {
-  position: fixed;
-  bottom: 10px;
-  left: 20px;
-  font-size: 30px;
-  animation: bounce 1.2s infinite;
-}
+<div class="mouse-follow"></div>
 
-@keyframes bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
-}</style>
   </body>
   <footer>
     <div class="footer">

@@ -299,32 +299,22 @@ ul.agenda li.closed {
   }
 }
 
-.cup {
-  width: 220px;
-  height: 320px;
-  margin: 20px auto;
-  border-radius: 30px;
-  border: 5px solid #fdd835;
-  background: #ffeb3b;
-  position: relative;
-  overflow: hidden;
-  animation: pop 0.4s ease-out;
-}
 
-@keyframes pop {
-  0% { transform: scale(0.8); opacity: 0; }
-  100% { transform: scale(1); opacity: 1; }
-}
-
-.sticker, .tekst {
+.confetti {
   position: absolute;
-  font-size: 28px;
-  cursor: move;
-  user-select: none;
+  width: 5px;
+  height: 5px;
+  background-color: #ff5722;
+  opacity: 0.9;
+  animation: confetti 1s ease-out infinite;
 }
 
-.tekst {
-  font-size: 18px;
-  color: #333;
-  font-weight: bold;
+@keyframes confetti {
+  0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(300px) rotate(360deg); opacity: 0; }
+}.mouse-follow {
+  position: absolute;
+  font-size: 20px;
+  pointer-events: none;
+  animation: starFollow 1s linear infinite;
 }
