@@ -98,141 +98,243 @@
       </h3>
         <div class="container">
     <h1>Maak je eigen beker!</h1>
-  <div id="cup">
-    <div class="sticker lemon"></div>
-    <div class="sticker straw"></div>
-  </div>
+  <label for="colorPicker">Kies kleur:</label>
+  <input type="color" id="colorPicker" value="#ffe066">
 
-  <button onclick="opslaan()">Opslaan</button>
-  <button onclick="toonPopup()">Delen</button>
+  <select id="stickerSelect">
+    <option value="">Sticker kiezen</option>
+    <option value="🍋">Citroen</option>
+    <option value="🌞">Zon</option>
+    <option value="🍓">Aardbei</option>
+    <option value="🧊">IJsblok</option>
+  </select>
 
+  <input type="text" id="tekstInput" placeholder="Voeg tekst toe">
+  <button onclick="addText()">➕ Voeg tekst toe</button>
+  <br>
+
+  <div id="cup"></div>
+
+  <button onclick="delen()">📤 Delen</button>
+
+  <!-- SHARE POPUP -->
   <div id="overlay" onclick="sluitPopup()"></div>
   <div id="sharePopup">
-    <h3>Deel jouw ontwerp!</h3>
-    <input id="shareLink" readonly style="width: 90%; padding: 8px;" />
+    <h3>Deel deze beker</h3>
+    <input id="shareLink" readonly style="width: 90%; padding: 5px">
     <button onclick="kopieerLink()">Kopieer link</button>
-
     <div class="social-buttons">
-      <a target="_blank" id="fb" href="#"><button>Facebook</button></a>
-      <a target="_blank" id="tw" href="#"><button>Twitter</button></a>
-      <a target="_blank" id="wa" href="#"><button>WhatsApp</button></a>
+      <a target="_blank" id="fb"><button>Facebook</button></a>
+      <a target="_blank" id="tw"><button>Twitter</button></a>
+      <a target="_blank" id="wa"><button>WhatsApp</button></a>
     </div>
-
     <button onclick="sluitPopup()">Sluiten</button>
   </div>
 
   <script>
-    function genereerCode() {
-      return 'cup-' + Math.random().toString(36).substr(2, 6);
+    const cup = document.getElementById('cup');
+    const colorPicker = document.getElementById('colorPicker');
+    const stickerSelect = document.getElementById('stickerSelect');
+    const tekstInput = document.getElementById('tekstInput');
+
+    colorPicker.addEventListener('input', () => {
+      cup.style.background = colorPicker.value;
+      updateURL();
+    });
+
+    stickerSelect.addEventListener('change', () => {
+      const emoji = stickerSelect.value;
+      if (emoji) addSticker(emoji);
+    });
+
+    function addSticker(emoji) {
+      const el = document.createElement('div');
+      el.classList.add('sticker');
+      el.textContent = emoji;
+      el.style.left = '50px';
+      el.style.top = '50px';
+      makeDraggable(el);
+      cup.appendChild(el);
+      updateURL();
     }
 
-    function opslaan() {
-      const code = genereerCode();
-      const ontwerp = {
-        kleur: "#ffe066", // later uitbreidbaar met meer instellingen
-        stickers: ['lemon', 'straw']
+    function addText() {
+      const text = tekstInput.value;
+      if (!text) return;
+      const el = document.createElement('div');
+      el.classList.add('tekst');
+      el.textContent = text;
+      el.style.left = '40px';
+      el.style.top = '100px';
+      makeDraggable(el);
+      cup.appendChild(el);
+      tekstInput.value = '';
+      updateURL();
+    }
+
+    function makeDraggable(el) {
+      el.onmousedown = function(e) {
+        let offsetX = e.offsetX, offsetY = e.offsetY;
+        function moveAt(e) {
+          el.style.left = (e.pageX - cup.offsetLeft - offsetX) + 'px';
+          el.style.top = (e.pageY - cup.offsetTop - offsetY) + 'px';
+        }
+        function stop() {
+          document.removeEventListener('mousemove', moveAt);
+          document.removeEventListener('mouseup', stop);
+          updateURL();
+        }
+        document.addEventListener('mousemove', moveAt);
+        document.addEventListener('mouseup', stop);
       };
-      localStorage.setItem(code, JSON.stringify(ontwerp));
-      alert("Je ontwerp is opgeslagen! Klik op 'Delen' om te delen.");
-      window.lastSavedCode = code;
     }
 
-    function toonPopup() {
-      let code = window.lastSavedCode;
-      if (!code) {
-        alert("Sla eerst je ontwerp op.");
-        return;
-      }
+    function updateURL() {
+      const kleur = encodeURIComponent(colorPicker.value);
+      let stickers = [], teksten = [];
 
-      const link = `${window.location.origin}/view.html?code=${code}`;
-      document.getElementById("shareLink").value = link;
-      document.getElementById("fb").href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(link)}`;
-      document.getElementById("tw").href = `https://twitter.com/intent/tweet?url=${encodeURIComponent(link)}`;
-      document.getElementById("wa").href = `https://wa.me/?text=${encodeURIComponent(link)}`;
+      cup.querySelectorAll('.sticker').forEach(el => {
+        stickers.push({
+          emoji: el.textContent,
+          x: parseInt(el.style.left),
+          y: parseInt(el.style.top)
+        });
+      });
 
-      document.getElementById("overlay").style.display = "block";
-      document.getElementById("sharePopup").style.display = "block";
+      cup.querySelectorAll('.tekst').forEach(el => {
+        teksten.push({
+          text: el.textContent,
+          x: parseInt(el.style.left),
+          y: parseInt(el.style.top)
+        });
+      });
+
+      const params = new URLSearchParams();
+      params.set('kleur', kleur);
+      params.set('stickers', JSON.stringify(stickers));
+      params.set('teksten', JSON.stringify(teksten));
+
+      const url = `${location.origin}${location.pathname}?${params.toString()}`;
+      document.getElementById('shareLink').value = url;
+      document.getElementById('fb').href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+      document.getElementById('tw').href = `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}`;
+      document.getElementById('wa').href = `https://wa.me/?text=${encodeURIComponent(url)}`;
+    }
+
+    function delen() {
+      updateURL();
+      document.getElementById('overlay').style.display = 'block';
+      document.getElementById('sharePopup').style.display = 'block';
     }
 
     function sluitPopup() {
-      document.getElementById("overlay").style.display = "none";
-      document.getElementById("sharePopup").style.display = "none";
+      document.getElementById('overlay').style.display = 'none';
+      document.getElementById('sharePopup').style.display = 'none';
     }
 
     function kopieerLink() {
-      const linkInput = document.getElementById("shareLink");
-      linkInput.select();
-      document.execCommand("copy");
-      alert("Link gekopieerd!");
+      const input = document.getElementById('shareLink');
+      input.select();
+      document.execCommand('copy');
+      alert('Link gekopieerd!');
     }
+
+    // Laden vanuit URL
+    function loadFromURL() {
+      const params = new URLSearchParams(location.search);
+      const kleur = params.get('kleur');
+      if (kleur) {
+        colorPicker.value = kleur;
+        cup.style.background = kleur;
+      }
+
+      const stickers = JSON.parse(params.get('stickers') || '[]');
+      stickers.forEach(s => {
+        const el = document.createElement('div');
+        el.classList.add('sticker');
+        el.textContent = s.emoji;
+        el.style.left = s.x + 'px';
+        el.style.top = s.y + 'px';
+        makeDraggable(el);
+        cup.appendChild(el);
+      });
+
+      const teksten = JSON.parse(params.get('teksten') || '[]');
+      teksten.forEach(t => {
+        const el = document.createElement('div');
+        el.classList.add('tekst');
+        el.textContent = t.text;
+        el.style.left = t.x + 'px';
+        el.style.top = t.y + 'px';
+        makeDraggable(el);
+        cup.appendChild(el);
+      });
+    }
+
+    window.onload = loadFromURL;
   </script>
             <style>
-
     #cup {
       width: 200px;
       height: 300px;
-      background: #ffe066;
-      border: 5px solid #f1c40f;
+      margin: 20px auto;
       border-radius: 20px;
-      margin: 30px auto;
+      background: #ffe066;
+      border: 4px solid #f1c40f;
       position: relative;
+      overflow: hidden;
+    }
+
+    .sticker, .tekst {
+      position: absolute;
+      cursor: move;
     }
 
     .sticker {
-      width: 40px;
-      height: 40px;
-      position: absolute;
+      width: 50px;
+      height: 50px;
       background-size: cover;
     }
 
-    .lemon {
-      background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Lemon_icon.png/600px-Lemon_icon.png');
-      top: 20px;
-      left: 20px;
-    }
-
-    .straw {
-      background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/4/42/Straw_icon.svg/1024px-Straw_icon.svg.png');
-      top: 20px;
-      right: 20px;
-    }
-
-    button {
-      padding: 10px 20px;
-      margin: 10px;
-      background: #f39c12;
-      border: none;
-      border-radius: 8px;
-      color: white;
+    .tekst {
       font-size: 16px;
-      cursor: pointer;
+      color: #000;
+      font-weight: bold;
+    }
+
+    button, input, select {
+      margin: 5px;
+      padding: 10px;
+      border-radius: 6px;
+      border: none;
+    }
+
+    #overlay, #sharePopup {
+      display: none;
+      position: fixed;
+      z-index: 99;
+    }
+
+    #overlay {
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.5);
     }
 
     #sharePopup {
-      display: none;
-      position: fixed;
-      top: 50%;
-      left: 50%;
+      top: 50%; left: 50%;
       transform: translate(-50%, -50%);
       background: white;
       border: 2px solid #f1c40f;
       padding: 20px;
       border-radius: 10px;
-      z-index: 999;
-    }
-
-    #overlay {
-      display: none;
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.5);
-      z-index: 998;
+      z-index: 100;
     }
 
     .social-buttons button {
       margin: 5px;
       background: #3498db;
+      color: white;
     }
   </style>
 
@@ -250,6 +352,7 @@
   </div>
       <script src="../script.js"></script>
       <script src="https://formspree.io/js/formbutton-v1.min.js" defer></script>
+    </div>
     </div>
   </body>
   <footer>
