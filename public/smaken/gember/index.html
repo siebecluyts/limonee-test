@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-    <title>Limonee - Zoet</title>
+    <title>Limonee - Gember</title>
     <link rel="stylesheet" href="../../styles.css">
     <meta charset="UTF-8">
     <meta name="description" content="Drink de beste Limonee!">
@@ -16,7 +16,7 @@
 <body>
     <div class="heading">
         <a href="/"> 
-            <img src="https://cdn.glitch.global/638bdc36-d676-479e-8f39-ff81bc2e3bb1/contact%2Fimages%2Flogo.png?v=1735472051762" alt="limonee" width="500">
+            <img src="https://cdn.glitch.global/638bdc36-d676-479e-8f39-ff81bc2e3bb1/contact%2Fimages%2Flogo.png?v=1735472051762" alt="limonee" width="500" class="logo" >
         </a>
         <ul>
             <li><a href="/limonade/">Limonade</a></li>
@@ -27,7 +27,7 @@
             <li><a href="/contact/bestelling/">Bestellen</a></li>
             <li><a href="/smaken/">Onze smaken</a></li>
         </ul>
-        <button id="openPopup">Abonneer</button>
+<button onclick="window.location.href='http://eepurl.com/jcuxWM';">Abonneer</button>
     </div>
 
     <!-- Popup Form -->
@@ -49,12 +49,12 @@
     </div>
 
     <div id="content">
-        <h2>Zoete Limonade</h2>
+        <h2>Gember Limonade</h2>
         <h3>Wat?</h3>
-        <p>Zoete limonade is de limonade die je het meeste ziet. Deze kost €1.00 per 25 cl</p>
+        <p>Gember Limonade is een andere limonade die begin zomer 2025 bij ons te koop zal zijn voor €1.00 per 25 cl</p>
         
         <h3>Wanneer?</h3>
-        <p>Zoete limonade zal <strong>altijd</strong> te koop zijn!</p>
+        <p>Dit is nog niet duidelijk vanwegen het experimenteren van de smaak.</p>
         
     </div>
 <br>
@@ -64,7 +64,11 @@
     <script src="../../script.js"></script>
     <script src="https://formspree.io/js/formbutton-v1.min.js" defer></script>
     
-   
+     <div class="notification">
+    <p>Lekkere frisse limonade!</p>
+    <button onclick="goToPage()">Bestel hier!</button>
+    <button onclick="closeNotification()">X</button>
+  </div>
 
     <footer>
         <div class="footer">
