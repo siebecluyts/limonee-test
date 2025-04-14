@@ -215,3 +215,16 @@ document.querySelector(".click-me").addEventListener("click", function(event) {
     setTimeout(() => confetti.remove(), 1000); // Verwijder confetti na 1s
   }
 });
+let buffer = "";
+
+document.addEventListener("keydown", (e) => {
+  buffer += e.key.toLowerCase();
+
+  if (buffer.length > 20) {
+    buffer = buffer.slice(-20); // maximaal 20 karakters onthouden
+  }
+
+  if (buffer.includes("limonee")) {
+    window.location.href = "/easter-egg/";
+  }
+});
