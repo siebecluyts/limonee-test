@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Limonee - easter egg</title>
+    <title>Limonee - badges</title>
     <link rel="stylesheet" href="../styles.css" />
     <meta charset="UTF-8" />
     <meta name="description" content="Drink de beste Limonee!" />
@@ -80,36 +80,33 @@
             </form>
         </div>
     </div>
-   <div id="content"></div>
+  <div id="badge-info"></div>
 
   <script>
-    const badgeData = {
-      citroenezoeker: "de Citroenezoeker Badge",
-      geheimepagina: "de Geheime Pagina Badge"
-    };
-
-    window.onload = function () {
-      const params = new URLSearchParams(window.location.search);
-      const badge = params.get("badge") || "geheimepagina";
-      const content = document.getElementById("content");
-
-      if (badgeData[badge]) {
-        content.innerHTML = `
-          <p>Wauw, je hebt ${badgeData[badge]} gewonnen!</p>
-          <button onclick="ontvangBadge('${badge}')">Badge ophalen</button>
-        `;
-      } else {
-        content.innerHTML = `<p>Sorry, maar deze badge bestaat niet.</p>`;
+    const badgeDetails = {
+      citroenezoeker: {
+        naam: "Citroenezoeker Badge",
+        beschrijving: "Je hebt een geheime QR-code gevonden! 🍋"
+      },
+      geheimepagina: {
+        naam: "Geheime Pagina Badge",
+        beschrijving: "Je hebt een verborgen pagina ontdekt!"
       }
     };
 
-    function ontvangBadge(naam) {
-      let badges = JSON.parse(localStorage.getItem("badges")) || [];
-      if (!badges.includes(naam)) {
-        badges.push(naam);
-        localStorage.setItem("badges", JSON.stringify(badges));
-      }
-      window.location.href = "/";
+    const params = new URLSearchParams(window.location.search);
+    const badge = params.get("badge");
+    const container = document.getElementById("badge-info");
+
+    if (badgeDetails[badge]) {
+      const data = badgeDetails[badge];
+      container.innerHTML = `
+        <h2>${data.naam}</h2>
+        <p>${data.beschrijving}</p>
+        <a href="/">← Terug naar homepage</a>
+      `;
+    } else {
+      container.innerHTML = `<p>Deze badge bestaat niet.</p><a href="/">← Terug</a>`;
     }
   </script>
       <br />
