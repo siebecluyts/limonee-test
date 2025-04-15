@@ -12,6 +12,7 @@
 <link rel="icon" type="image/png" sizes="32x32" href="https://cdn.glitch.global/638bdc36-d676-479e-8f39-ff81bc2e3bb1/contact%2Fimages%2Ffavicon-32x32.png?v=1735472050279">
 <link rel="icon" type="image/png" sizes="16x16" href="https://cdn.glitch.global/638bdc36-d676-479e-8f39-ff81bc2e3bb1/contact%2Fimages%2Ffavicon-16x16.png?v=1735472049971">
 <link rel="manifest" href="/site.webmanifest">
+      
     </head>
     <body>
         <div class="heading">
@@ -66,75 +67,36 @@
               
             </ul>
         </div>
-        <script>// script.js
+<script>
+// Basislijst van open dagen
 const openDays = [
-  //YYYY-MM-DD
-    { date: '2025-04-20', location: 'Kortenaken, Krawatenstraat 21', time: '14:15 - 16:30' },
+  { date: "2025-04-20", location: "Kortenaken, Krawatenstraat 21", time: "14:15 - 16:30" },
 ];
-          // Haal opgeslagen extra dagen op (voor iedereen)
-const extraDays = JSON.parse(localStorage.getItem("extraDays")) || [];
 
-// Voeg ze toe aan de bestaande dagen
-openDays = openDays.concat(extraDays);
-
+// Selecteer het agenda element
 const agendaList = document.getElementById("agenda-list");
 
-// Functie om de lijst van open dagen dynamisch weer te geven
+// Functie om de dagen op de pagina te tonen
 function generateAgenda() {
-    // Zorg ervoor dat de lijst eerst leeg is om duplicaten te voorkomen
-    agendaList.innerHTML = "";
+  agendaList.innerHTML = "";
 
-    openDays.forEach(entry => {
-        const date = new Date(entry.date);
-        const listItem = document.createElement("li");
+  openDays.forEach(entry => {
+    const date = new Date(entry.date);
+    const listItem = document.createElement("li");
 
-        // Converteer de datum naar een leesbaar formaat
-        listItem.textContent = `${date.toLocaleDateString("nl-NL", { 
-            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
-        })} - Wij zijn open van ${entry.time} in ${entry.location}`;
+    listItem.textContent = `${date.toLocaleDateString("nl-NL", { 
+      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
+    })} - Wij zijn open van ${entry.time} in ${entry.location}`;
 
-        listItem.classList.add("open");
-        agendaList.appendChild(listItem);
-    });
+    listItem.classList.add("open");
+    agendaList.appendChild(listItem);
+  });
 }
 
-// Genereer de agenda
+// Roep de functie aan om de agenda te tonen
 generateAgenda();
-// Controleer of gebruiker admin is (badge in localStorage)
-const opgeslagenBadges = JSON.parse(localStorage.getItem("badges")) || [];
-const isAdmin = opgeslagenBadges.includes("admin");
+</script>
 
-if (isAdmin) {
-  // Voeg de admin controls toe
-  const adminForm = document.createElement("div");
-  adminForm.innerHTML = `
-    <h3 style="margin-top:2em;">📅 Admin: Voeg een dag toe</h3>
-    <input type="date" id="adminDate" required>
-    <input type="text" id="adminTime" placeholder="bv. 14:00 - 17:00" required>
-    <input type="text" id="adminLoc" placeholder="bv. Kortenaken, Krawatenstraat 21" required>
-    <button onclick="voegAdminDagToe()">Toevoegen</button>
-    <p id="adminFeedback" style="color:green;"></p>
-  `;
-  document.getElementById("agenda").appendChild(adminForm);
-}
-
-// Functie om dag toe te voegen aan openDays en tonen
-function voegAdminDagToe() {
-  const datum = document.getElementById("adminDate").value;
-  const tijd = document.getElementById("adminTime").value;
-  const locatie = document.getElementById("adminLoc").value;
-
-  if (!datum || !tijd || !locatie) {
-    document.getElementById("adminFeedback").textContent = "⚠️ Vul alle velden in.";
-    return;
-  }
-
-  openDays.push({ date: datum, time: tijd, location: locatie });
-  generateAgenda();
-  document.getElementById("adminFeedback").textContent = "✅ Dag succesvol toegevoegd!";
-}
-
-            </script>
           <script src="https://formspree.io/js/formbutton-v1.min.js" defer></script>
           <script src="../script.js"></script>
 
