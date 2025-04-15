@@ -215,3 +215,11 @@ document.querySelector(".click-me").addEventListener("click", function(event) {
     setTimeout(() => confetti.remove(), 1000); // Verwijder confetti na 1s
   }
 });
+               function clickLimoneMail() {
+  status.textContent = "Bedankt om je in te schrijven! 🎉 Je hebt de LimoneMailer Badge gekregen.";
+  
+  let badges = JSON.parse(localStorage.getItem("badges")) || [];
+  if (!badges.includes("limonemailer")) {
+    badges.push("limonemailer");
+    localStorage.setItem("badges", JSON.stringify(badges));
+  }}

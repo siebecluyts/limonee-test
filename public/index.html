@@ -129,7 +129,7 @@
   <option value="5" name="5">5</option>
 </select>
       <textarea name="revieuw" placeholder="Review"></textarea>
-        <button type="submit">Stuur</button>
+        <button onclick="submitreview()" type="submit">Stuur</button>
     </form>
     <br>
     <h3>
@@ -142,7 +142,10 @@
     const badgeNames = {
       citroenezoeker: "Citroenezoeker Badge",
       geheimepagina: "Geheime Pagina Badge",
-      admin: "Limonee-Admin Badge"
+      admin: "Limonee-Admin Badge",
+        reviewer: "Reviewer Badge",
+  besteller: "Bestel Badge",
+      limonemailer: "LimoneMailer Badge"
     };
 
     const badges = JSON.parse(localStorage.getItem("badges")) || [];
@@ -165,6 +168,15 @@
         badgeDiv.appendChild(badge);
       });
     }
+                function submitReview() {
+  status.textContent = "Bedankt voor je review! 🎉 Je hebt de reviewer Badge gekregen.";
+  
+  let badges = JSON.parse(localStorage.getItem("badges")) || [];
+  if (!badges.includes("reviewer")) {
+    badges.push("reviewer");
+    localStorage.setItem("badges", JSON.stringify(badges));
+  }
+}
   </script>
     <br>
     <br>

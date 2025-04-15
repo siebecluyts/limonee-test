@@ -81,7 +81,7 @@
   <textarea  id="bericht" name="bericht"></textarea>
 
   <!-- your other form fields go here -->
-  <button type="submit">Send</button>
+  <button onclick="submitbestelling()" type="submit">Send</button>
 </form>
 
         </div>
@@ -110,6 +110,15 @@
             // Genereer een nieuwe willekeurige code voordat het formulier wordt verzonden
             generateRandomCode();
         }
+            function submitbestelling() {
+  status.textContent = "Bedankt voor je bestelling! 🎉 Je hebt de besteller Badge gekregen.";
+  
+  let badges = JSON.parse(localStorage.getItem("badges")) || [];
+  if (!badges.includes("besteller")) {
+    badges.push("besteller");
+    localStorage.setItem("badges", JSON.stringify(badges));
+  }
+}
     </script>
       <script src="https://formspree.io/js/formbutton-v1.min.js" defer></script>
   <div class="notification">
