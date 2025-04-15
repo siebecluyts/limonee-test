@@ -83,16 +83,14 @@
    <div id="content"></div>
 
   <script>
-    const badgeData = {
-      citroenezoeker: "de Citroenezoeker Badge",
-      geheimepagina: "de Geheime Pagina Badge",
-      admin: "de Limonee-Admin badge"
-    };
+const badgeData = {
+  citroenezoeker: "de Citroenezoeker Badge",
+  geheimepagina: "de Geheime Pagina Badge",
+  admin: "de Limonee Admin Badge"
+};
 
-    window.onload = function () {
-      const params = new URLSearchParams(window.location.search);
-      const badge = params.get("badge") || "geheimepagina";
-      const content = document.getElementById("content");
+const badge = new URLSearchParams(window.location.search).get("badge");
+const content = document.getElementById("content");
 
 if (badge === "admin") {
   content.innerHTML = `
@@ -101,6 +99,7 @@ if (badge === "admin") {
     <br><br>
     <button onclick="checkAdminCode()">Code Versturen</button>
     <p id="foutmelding" style="color:red;"></p>
+    <div id="adminBadgeKnop"></div>
   `;
 } else if (badgeData[badge]) {
   content.innerHTML = `
@@ -109,28 +108,47 @@ if (badge === "admin") {
   `;
 } else {
   content.innerHTML = `<p>Sorry, maar deze badge bestaat niet.</p>`;
-};
-      function checkAdminCode() {
-  const juisteCode = "supergeheim123"; // Verander dit naar jouw geheime code
+}
+function checkAdminCode() {
+  const juisteCode = "Limone3!admin"; // verander deze code!
   const ingevoerdeCode = document.getElementById("codeInput").value;
   const fout = document.getElementById("foutmelding");
 
   if (ingevoerdeCode === juisteCode) {
-    ontvangBadge("admin");
+    // Code is goed, toon de knop
+    document.getElementById("adminBadgeKnop").innerHTML = `
+      <p>✅ Code correct! Je mag nu de admin badge ophalen.</p>
+      <button onclick="ontvangBadge('admin')">Admin Badge ophalen</button>
+    `;
+    fout.textContent = "";
   } else {
     fout.textContent = "Oei! Verkeerde code.";
   }
 }
+function ontvangBadge(badge) {
+  let badges = JSON.parse(localStorage.getItem("badges")) || [];
 
-
-    function ontvangBadge(naam) {
-      let badges = JSON.parse(localStorage.getItem("badges")) || [];
-      if (!badges.includes(naam)) {
-        badges.push(naam);
-        localStorage.setItem("badges", JSON.stringify(badges));
+  if (badge === "admin") {
+    const alleBadges = ["citroenezoeker", "geheimepagina", "admin", "reviewer", "besteller"];
+    alleBadges.forEach(b => {
+      if (!badges.includes(b)) {
+        badges.push(b);
       }
-      window.location.href = "/";
+    });
+    alert("✅ Admin badge ontvangen! Je hebt nu alle badges.");
+  } else {
+    if (!badges.includes(badge)) {
+      badges.push(badge);
+      alert(`🎉 Je hebt de ${badge}-badge ontvangen!`);
+    } else {
+      alert("Je hebt deze badge al!");
     }
+  }
+
+  localStorage.setItem("badges", JSON.stringify(badges));
+  window.location.href = "/"; // Terug naar homepage
+}
+
   </script>
       <br />
       <br />
