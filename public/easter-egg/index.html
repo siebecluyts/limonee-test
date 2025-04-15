@@ -85,7 +85,8 @@
   <script>
     const badgeData = {
       citroenezoeker: "de Citroenezoeker Badge",
-      geheimepagina: "de Geheime Pagina Badge"
+      geheimepagina: "de Geheime Pagina Badge",
+      admin: "de Limonee-Admin badge"
     };
 
     window.onload = function () {
@@ -93,15 +94,34 @@
       const badge = params.get("badge") || "geheimepagina";
       const content = document.getElementById("content");
 
-      if (badgeData[badge]) {
-        content.innerHTML = `
-          <p>Wauw, je hebt ${badgeData[badge]} gewonnen!</p>
-          <button onclick="ontvangBadge('${badge}')">Badge ophalen</button>
-        `;
-      } else {
-        content.innerHTML = `<p>Sorry, maar deze badge bestaat niet.</p>`;
-      }
-    };
+if (badge === "admin") {
+  content.innerHTML = `
+    <p>Deze badge vereist een geheime toegangscode.</p>
+    <input type="password" id="codeInput" placeholder="Voer toegangscode in" />
+    <br><br>
+    <button onclick="checkAdminCode()">Code Versturen</button>
+    <p id="foutmelding" style="color:red;"></p>
+  `;
+} else if (badgeData[badge]) {
+  content.innerHTML = `
+    <p>Wauw, je hebt ${badgeData[badge]} gewonnen!</p>
+    <button onclick="ontvangBadge('${badge}')">Badge ophalen</button>
+  `;
+} else {
+  content.innerHTML = `<p>Sorry, maar deze badge bestaat niet.</p>`;
+};
+      function checkAdminCode() {
+  const juisteCode = "supergeheim123"; // Verander dit naar jouw geheime code
+  const ingevoerdeCode = document.getElementById("codeInput").value;
+  const fout = document.getElementById("foutmelding");
+
+  if (ingevoerdeCode === juisteCode) {
+    ontvangBadge("admin");
+  } else {
+    fout.textContent = "Oei! Verkeerde code.";
+  }
+}
+
 
     function ontvangBadge(naam) {
       let badges = JSON.parse(localStorage.getItem("badges")) || [];

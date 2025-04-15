@@ -366,3 +366,8 @@ ul.agenda li.closed {
 .badge-geheimepagina .badge-icon {
   background: linear-gradient(45deg, #8e24aa, #d81b60); /* paars-roze */
 }
+
+
+.badge-admin .badge-icon {
+  background: linear-gradient(45deg, #8e24aa, #d81b60); /* paars-roze */
+}
