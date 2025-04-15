@@ -70,8 +70,12 @@
 const openDays = [
   //YYYY-MM-DD
     { date: '2025-04-20', location: 'Kortenaken, Krawatenstraat 21', time: '14:15 - 16:30' },
-
 ];
+          // Haal opgeslagen extra dagen op (voor iedereen)
+const extraDays = JSON.parse(localStorage.getItem("extraDays")) || [];
+
+// Voeg ze toe aan de bestaande dagen
+openDays = openDays.concat(extraDays);
 
 const agendaList = document.getElementById("agenda-list");
 
@@ -96,33 +100,40 @@ function generateAgenda() {
 
 // Genereer de agenda
 generateAgenda();
+// Controleer of gebruiker admin is (badge in localStorage)
+const opgeslagenBadges = JSON.parse(localStorage.getItem("badges")) || [];
+const isAdmin = opgeslagenBadges.includes("admin");
 
-              const query = new URLSearchParams(window.location.search);
-    const smaak = query.get('filter');
+if (isAdmin) {
+  // Voeg de admin controls toe
+  const adminForm = document.createElement("div");
+  adminForm.innerHTML = `
+    <h3 style="margin-top:2em;">📅 Admin: Voeg een dag toe</h3>
+    <input type="date" id="adminDate" required>
+    <input type="text" id="adminTime" placeholder="bv. 14:00 - 17:00" required>
+    <input type="text" id="adminLoc" placeholder="bv. Kortenaken, Krawatenstraat 21" required>
+    <button onclick="voegAdminDagToe()">Toevoegen</button>
+    <p id="adminFeedback" style="color:green;"></p>
+  `;
+  document.getElementById("agenda").appendChild(adminForm);
+}
 
-    // Change the image based on the language parameter
-    if (smaak === 'vlierbloesem') {
-      document.getElementById('agenda-header').textContent = 'Bekijk hier wanneer we vlier bloesem limonade verkopen:'; // French image
-                  const agendaList = document.getElementById("agenda-list");
-            // Functie om de lijst van open dagen dynamisch weer te geven
-            function generateAgenda() {
-                // Zorg ervoor dat de lijst eerst leeg is om duplicaten te voorkomen
-                agendaList.innerHTML = "";
-            
-                vlierbloesem.forEach(dateStr => {
-                    const date = new Date(dateStr);
-                    const listItem = document.createElement("li");
-            
-                    // Converteer de datum naar een leesbaar formaat
-                    listItem.textContent = `${date.toLocaleDateString("nl-NL", { 
-                        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
-                    })} - Wij zijn open van 14:15 tot 16:30 in Kortenaken krawatenstraat 21`;
-            
-                    listItem.classList.add("open");
-                    agendaList.appendChild(listItem);
-                });
-            }
-    }
+// Functie om dag toe te voegen aan openDays en tonen
+function voegAdminDagToe() {
+  const datum = document.getElementById("adminDate").value;
+  const tijd = document.getElementById("adminTime").value;
+  const locatie = document.getElementById("adminLoc").value;
+
+  if (!datum || !tijd || !locatie) {
+    document.getElementById("adminFeedback").textContent = "⚠️ Vul alle velden in.";
+    return;
+  }
+
+  openDays.push({ date: datum, time: tijd, location: locatie });
+  generateAgenda();
+  document.getElementById("adminFeedback").textContent = "✅ Dag succesvol toegevoegd!";
+}
+
             </script>
           <script src="https://formspree.io/js/formbutton-v1.min.js" defer></script>
           <script src="../script.js"></script>
