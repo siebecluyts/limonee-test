@@ -215,3 +215,29 @@ document.querySelector(".click-me").addEventListener("click", function(event) {
     setTimeout(() => confetti.remove(), 1000); // Verwijder confetti na 1s
   }
 });
+window.onload = function () {
+  const params = new URLSearchParams(window.location.search);
+  const badgeNaam = params.get("badge");
+  const contentDiv = document.getElementById("content");
+
+  if (badgeNaam) {
+    contentDiv.innerHTML = `
+      <h2>Wauw, je hebt de <strong>${badgeNaam}</strong> badge gewonnen!</h2>
+      <button onclick="ontvangBadge('${badgeNaam}')">Badge ophalen</button>
+    `;
+  } else {
+    contentDiv.innerHTML = "<p>Geen badge gevonden in de URL.</p>";
+  }
+};
+
+function ontvangBadge(naam) {
+  let badges = JSON.parse(localStorage.getItem("badges")) || [];
+
+  if (!badges.includes(naam)) {
+    badges.push(naam);
+    localStorage.setItem("badges", JSON.stringify(badges));
+    alert(`Je hebt de badge "${naam}" ontvangen!`);
+  } else {
+    alert("Je hebt deze badge al.");
+  }
+}
