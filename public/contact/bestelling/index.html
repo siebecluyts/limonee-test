@@ -119,14 +119,10 @@
 
   if (aantal >= 5) {
     const hasBesteller = badges.includes("besteller");
-    const hasGroothandelaar = badges.includes("groothandelaar");
 
     if (!hasBesteller && !hasGroothandelaar) {
-      status.textContent = "Bedankt voor je bestelling! 🎉 Je hebt de Besteller Badge en de Groothandelaars Badge gekregen.";
-      badges.push("besteller", "groothandelaar");
-    } else if (hasBesteller && !hasGroothandelaar) {
-      status.textContent = "Bedankt voor je bestelling! 🎉 Je hebt de Groothandelaars Badge gekregen.";
-      badges.push("groothandelaar");
+      status.textContent = "Bedankt voor je bestelling! 🎉 Je hebt de Besteller Badge gekregen.";
+      badges.push("besteller");
     } else {
       status.textContent = "Bedankt voor je bestelling! 🎉";
     }
