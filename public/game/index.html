@@ -124,7 +124,7 @@
   <div id="result" style="display:none;">
     <h3 id="result-text"></h3>
     <div id="badge" style="display:none;">
-      🏅 <strong>Badge verdiend:</strong> <span class="badge">LimoneKenner</span>
+      🏅 <strong>Badge verdiend!</strong>
     </div>
   </div>
 </div>
@@ -154,7 +154,7 @@
       <script src="../script.js"></script>
       <script src="https://formspree.io/js/formbutton-v1.min.js" defer></script>
     </div>
-    <script>
+<script>
 function submitQuiz() {
   let score = 0;
 
@@ -176,10 +176,12 @@ function submitQuiz() {
   if (score >= 2) {
     resultText.textContent = `🎉 Goed gedaan! Je had ${score} van de 3 goed. Je krijgt nu de LimoneKenner Badge!`;
     badge.style.display = 'block';
-      let badges = JSON.parse(localStorage.getItem("badges")) || [];
-  if (!badges.includes("limonekenner")) {
-    badges.push("limonekenner");
-    localStorage.setItem("badges", JSON.stringify(badges));
+
+    let badges = JSON.parse(localStorage.getItem("badges")) || [];
+    if (!badges.includes("limonekenner")) {
+      badges.push("limonekenner");
+      localStorage.setItem("badges", JSON.stringify(badges));
+    }
   } else {
     resultText.textContent = `😕 Je had maar ${score} van de 3 goed. Probeer het nog eens!`;
     badge.style.display = 'none';
