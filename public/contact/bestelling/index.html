@@ -81,7 +81,7 @@
   <textarea  id="bericht" name="bericht"></textarea>
 
   <!-- your other form fields go here -->
-  <button onclick="submitbestelling()" type="submit">Send</button>
+  <button onclick="submitbestelling() if" type="submit">Send</button>
 </form>
 
         </div>
@@ -111,12 +111,29 @@
             generateRandomCode();
         }
             function submitbestelling() {
-  status.textContent = "Bedankt voor je bestelling! 🎉 Je hebt de besteller Badge gekregen.";
-  
+  function submitbestelling() {
+  const aantal = parseInt(document.getElementById("aantal").value);
+  const status = document.getElementById("status"); // Zorg dat je dit element hebt in je HTML
+
   let badges = JSON.parse(localStorage.getItem("badges")) || [];
-  if (!badges.includes("besteller")) {
-    badges.push("besteller");
+
+  if (aantal >= 5) {
+    const hasBesteller = badges.includes("besteller");
+    const hasGroothandelaar = badges.includes("groothandelaar");
+
+    if (!hasBesteller && !hasGroothandelaar) {
+      status.textContent = "Bedankt voor je bestelling! 🎉 Je hebt de Besteller Badge en de Groothandelaars Badge gekregen.";
+      badges.push("besteller", "groothandelaar");
+    } else if (hasBesteller && !hasGroothandelaar) {
+      status.textContent = "Bedankt voor je bestelling! 🎉 Je hebt de Groothandelaars Badge gekregen.";
+      badges.push("groothandelaar");
+    } else {
+      status.textContent = "Bedankt voor je bestelling! 🎉";
+    }
+
     localStorage.setItem("badges", JSON.stringify(badges));
+  } else {
+    status.textContent = "Bedankt voor je bestelling!";
   }
 }
     </script>
