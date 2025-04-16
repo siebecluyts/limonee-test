@@ -93,7 +93,55 @@
         munten kan je uitbreidingen kopen.
       </p>
       <br />
-      
+      <div id="quiz-container">
+  <h3>🍋 Limonee Quiz</h3>
+
+  <div id="quiz">
+    <div class="question">
+      <p>1. Wat is het hoofdingrediënt van limonade?</p>
+      <label><input type="radio" name="q1" value="a"> Melk</label><br>
+      <label><input type="radio" name="q1" value="b"> Citroen</label><br>
+      <label><input type="radio" name="q1" value="c"> Appelsap</label>
+    </div>
+
+    <div class="question">
+      <p>2. Hoeveel mensen werken bij ons?</p>
+      <label><input type="radio" name="q2" value="a"> 5</label><br>
+      <label><input type="radio" name="q2" value="b"> 6</label><br>
+      <label><input type="radio" name="q2" value="c"> 4</label>
+    </div>
+
+    <div class="question">
+      <p>3. Welke kleur heeft limonade meestal?</p>
+      <label><input type="radio" name="q3" value="a"> Blauw</label><br>
+      <label><input type="radio" name="q3" value="b"> Geel</label><br>
+      <label><input type="radio" name="q3" value="c"> Zwart</label>
+    </div>
+
+    <button onclick="submitQuiz()">Beantwoord quiz</button>
+  </div>
+
+  <div id="result" style="display:none;">
+    <h3 id="result-text"></h3>
+    <div id="badge" style="display:none;">
+      🏅 <strong>Badge verdiend:</strong> <span class="badge">LimoneKenner</span>
+    </div>
+  </div>
+</div>
+ <style>     #quiz-container {
+  max-width: 600px;
+  margin: auto;
+  padding: 20px;
+  font-family: 'Arial', sans-serif;
+  background-color: #fffbe6;
+  border-radius: 12px;
+  box-shadow: 0 0 12px rgba(0,0,0,0.1);
+}
+
+.question {
+  margin-bottom: 20px;
+}
+</style>
       <br />
       <br />
       <br />
@@ -106,6 +154,39 @@
       <script src="../script.js"></script>
       <script src="https://formspree.io/js/formbutton-v1.min.js" defer></script>
     </div>
+    <script>
+function submitQuiz() {
+  let score = 0;
+
+  const q1 = document.querySelector('input[name="q1"]:checked');
+  const q2 = document.querySelector('input[name="q2"]:checked');
+  const q3 = document.querySelector('input[name="q3"]:checked');
+
+  if (q1 && q1.value === 'b') score++;
+  if (q2 && q2.value === 'a') score++;
+  if (q3 && q3.value === 'b') score++;
+
+  document.getElementById('quiz').style.display = 'none';
+  const result = document.getElementById('result');
+  const resultText = document.getElementById('result-text');
+  const badge = document.getElementById('badge');
+
+  result.style.display = 'block';
+
+  if (score >= 2) {
+    resultText.textContent = `🎉 Goed gedaan! Je had ${score} van de 3 goed. Je krijgt nu de LimoneKenner Badge!`;
+    badge.style.display = 'block';
+      let badges = JSON.parse(localStorage.getItem("badges")) || [];
+  if (!badges.includes("limonekenner")) {
+    badges.push("limonekenner");
+    localStorage.setItem("badges", JSON.stringify(badges));
+  } else {
+    resultText.textContent = `😕 Je had maar ${score} van de 3 goed. Probeer het nog eens!`;
+    badge.style.display = 'none';
+  }
+}
+</script>
+
   </body>
   <footer>
     <div class="footer">
