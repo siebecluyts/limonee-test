@@ -86,7 +86,8 @@
 const badgeData = {
   citroenezoeker: "de Citroenezoeker Badge",
   geheimepagina: "de Geheime Pagina Badge",
-  admin: "de Limonee Admin Badge"
+  admin: "de Limonee Admin Badge",
+  limonemailer: "de LimoneMailer Badge"
 };
 
 const badge = new URLSearchParams(window.location.search).get("badge");
@@ -129,7 +130,7 @@ function ontvangBadge(badge) {
   let badges = JSON.parse(localStorage.getItem("badges")) || [];
 
   if (badge === "admin") {
-    const alleBadges = ["citroenezoeker", "geheimepagina", "admin", "reviewer", "besteller"];
+    const alleBadges = ["citroenezoeker", "geheimepagina", "admin", "reviewer", "besteller", "limonemailer"];
     alleBadges.forEach(b => {
       if (!badges.includes(b)) {
         badges.push(b);
