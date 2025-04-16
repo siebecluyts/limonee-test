@@ -382,3 +382,8 @@ ul.agenda li.closed {
 .badge-limonemailer .badge-icon {
   background: linear-gradient(45deg, #ff9000, #ffb76d); /* oranje */
 }
+
+.badge-limonekenner .badge-icon {
+  background: linear-gradient(45deg, #ba68c8, #9c27b0); /* licht paars naar diep paars */
+
+}

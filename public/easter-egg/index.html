@@ -130,7 +130,7 @@ function ontvangBadge(badge) {
   let badges = JSON.parse(localStorage.getItem("badges")) || [];
 
   if (badge === "admin") {
-    const alleBadges = ["citroenezoeker", "geheimepagina", "admin", "reviewer", "besteller", "limonemailer"];
+    const alleBadges = ["citroenezoeker", "geheimepagina", "admin", "reviewer", "besteller", "limonemailer", "limonekenner"];
     alleBadges.forEach(b => {
       if (!badges.includes(b)) {
         badges.push(b);
