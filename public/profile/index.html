@@ -69,9 +69,17 @@
             </form>
         </div>
     </div>
-        <h2>
-            Profiel
-        </h2>
+<div id="greeting"></div>
+
+<script>
+  fetch('/api/user')
+    .then(res => res.json())
+    .then(data => {
+      if (data.username) {
+        document.getElementById('greeting').innerText = `Hallo ${data.username}`;
+      }
+    });
+</script>
    <h3>
       Je badges
     </h3>
