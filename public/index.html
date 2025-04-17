@@ -36,17 +36,6 @@
     <meta name="msvalidate.01" content="DB1FB07C10E03B70BA6544D54607890A" />
   </head>
   <body>
-<div id="greeting" style="position: fixed; top: 10px; right: 10px; font-weight: bold;"><a href="/profile/"></a></div>
-
-<script>
-  fetch('/api/user')
-    .then(res => res.json())
-    .then(data => {
-      if (data.username) {
-        document.getElementById('greeting').innerText = `Hallo ${data.username}`;
-      }
-    });
-</script>
 
       <a href="/"
         ><img
@@ -143,20 +132,51 @@
         <button onclick="submitreview()" type="submit">Stuur</button>
     </form>
     <br>
-  <script>
-    function submitReview() {
-  status.textContent = "Bedankt voor je review! 🎉 Je hebt de Reviewer Badge gekregen.";
 
-  fetch('/api/badges', {
-    method: 'POST',
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ badge: "reviewer" })
-  }).then(() => {
-    // eventueel refreshen of feedback geven
-  });
+      <div id="badges"></div>
+
+<script>
+const badgeNames = {
+      citroenezoeker: "Citroenezoeker Badge",
+      geheimepagina: "Geheime Pagina Badge",
+      admin: "Limonee-Admin Badge",
+        reviewer: "Reviewer Badge",
+  besteller: "Bestel Badge",
+      limonemailer: "LimoneMailer Badge",
+     limonekenner: "LimoneKenner Badge"
+    };
+
+    const badges = JSON.parse(localStorage.getItem("badges")) || [];
+    const badgeDiv = document.getElementById("badges");
+
+    if (badges.length === 0) {
+      badgeDiv.innerHTML = "<p>Je hebt nog geen badges gevonden!</p>";
+    } else {
+      badges.forEach(naam => {
+        if (!badgeNames[naam]) return;
+
+        const badge = document.createElement("div");
+        badge.className = badge badge-${naam};
+        badge.innerHTML = 
+          <a href="/badges/?badge=${naam}">
+            <div class="badge-icon"></div>
+            <p>${badgeNames[naam]}</p>
+          </a>
+        ;
+        badgeDiv.appendChild(badge);
+      });
+    }
+                function submitReview() {
+  status.textContent = "Bedankt voor je review! 🎉 Je hebt de reviewer Badge gekregen.";
+  
+  let badges = JSON.parse(localStorage.getItem("badges")) || [];
+  if (!badges.includes("reviewer")) {
+    badges.push("reviewer");
+    localStorage.setItem("badges", JSON.stringify(badges));
+  }
 }
-
 </script>
+
     <br>
     <br>
     <br>

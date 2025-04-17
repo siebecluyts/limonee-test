@@ -84,38 +84,73 @@
 
   <script>
 function ontvangBadge(badge) {
-  // Als het een admin badge is, geven we alle badges tegelijk
+const badgeData = {
+  citroenezoeker: "de Citroenezoeker Badge",
+  geheimepagina: "de Geheime Pagina Badge",
+  admin: "de Limonee Admin Badge",
+  limonemailer: "de LimoneMailer Badge"
+};
+
+const badge = new URLSearchParams(window.location.search).get("badge");
+const content = document.getElementById("content");
+
+if (badge === "admin") {
+  content.innerHTML = 
+    <p>Deze badge vereist een geheime toegangscode.</p>
+    <input type="password" id="codeInput" placeholder="Voer toegangscode in" />
+    <br><br>
+    <button onclick="checkAdminCode()">Code Versturen</button>
+    <p id="foutmelding" style="color:red;"></p>
+    <div id="adminBadgeKnop"></div>
+  ;
+} else if (badgeData[badge]) {
+  content.innerHTML = 
+    <p>Wauw, je hebt ${badgeData[badge]} gewonnen!</p>
+    <button onclick="ontvangBadge('${badge}')">Badge ophalen</button>
+  ;
+} else {
+  content.innerHTML = <p>Sorry, maar deze badge bestaat niet.</p>;
+}
+function checkAdminCode() {
+  const juisteCode = "Limone3!admin"; // verander deze code!
+  const ingevoerdeCode = document.getElementById("codeInput").value;
+  const fout = document.getElementById("foutmelding");
+
+  if (ingevoerdeCode === juisteCode) {
+    // Code is goed, toon de knop
+    document.getElementById("adminBadgeKnop").innerHTML = 
+      <p>✅ Code correct! Je mag nu de admin badge ophalen.</p>
+      <button onclick="ontvangBadge('admin')">Admin Badge ophalen</button>
+    ;
+    fout.textContent = "";
+  } else {
+    fout.textContent = "Oei! Verkeerde code.";
+  }
+}
+function ontvangBadge(badge) {
+  let badges = JSON.parse(localStorage.getItem("badges")) || [];
+
   if (badge === "admin") {
     const alleBadges = ["citroenezoeker", "geheimepagina", "admin", "reviewer", "besteller", "limonemailer", "limonekenner"];
-
-    // Stuur elke badge naar de server
-    Promise.all(alleBadges.map(b => {
-      return fetch('/api/badges', {
-        method: 'POST',
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ badge: b })
-      });
-    })).then(() => {
-      alert("✅ Admin badge ontvangen! Je hebt nu alle badges.");
-      window.location.href = "/";
-    });
-
-  } else {
-    // Gewone badge toevoegen
-    fetch('/api/badges', {
-      method: 'POST',
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ badge })
-    })
-    .then(res => {
-      if (res.ok) {
-        alert(`🎉 Je hebt de ${badge}-badge ontvangen!`);
-        window.location.href = "/";
-      } else {
-        alert("Je hebt deze badge al of er is iets fout gegaan.");
+    alleBadges.forEach(b => {
+      if (!badges.includes(b)) {
+        badges.push(b);
       }
     });
+    
+    alert("✅ Admin badge ontvangen! Je hebt nu alle badges.");
+  } else {
+    if (!badges.includes(badge)) {
+      badges.push(badge);
+      alert(🎉 Je hebt de ${badge}-badge ontvangen!);
+    } else {
+      alert("Je hebt deze badge al!");
+    }
   }
+
+  localStorage.setItem("badges", JSON.stringify(badges));
+  window.location.href = "/"; // Terug naar homepage
+}
 }
 
   </script>
