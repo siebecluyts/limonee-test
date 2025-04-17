@@ -110,28 +110,38 @@
             // Genereer een nieuwe willekeurige code voordat het formulier wordt verzonden
             generateRandomCode();
         }
-            function submitbestelling() {
   function submitbestelling() {
   const aantal = parseInt(document.getElementById("aantal").value);
-  const status = document.getElementById("status"); // Zorg dat je dit element hebt in je HTML
-
-  let badges = JSON.parse(localStorage.getItem("badges")) || [];
+  const status = document.getElementById("status");
 
   if (aantal >= 5) {
-    const hasBesteller = badges.includes("besteller");
+    // Vraag eerst alle badges op van de gebruiker
+    fetch('/api/badges')
+      .then(res => res.json())
+      .then(data => {
+        const badges = data.badges || [];
 
-    if (!hasBesteller && !hasGroothandelaar) {
-      status.textContent = "Bedankt voor je bestelling! 🎉 Je hebt de Besteller Badge gekregen.";
-      badges.push("besteller");
-    } else {
-      status.textContent = "Bedankt voor je bestelling! 🎉";
-    }
+        const hasBesteller = badges.includes("besteller");
+        const hasGroothandelaar = badges.includes("groothandelaar"); // voeg toe als je die badge ook hebt
 
-    localStorage.setItem("badges", JSON.stringify(badges));
+        if (!hasBesteller && !hasGroothandelaar) {
+          // Badge toevoegen
+          fetch('/api/badges', {
+            method: 'POST',
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ badge: "besteller" })
+          }).then(() => {
+            status.textContent = "Bedankt voor je bestelling! 🎉 Je hebt de Besteller Badge gekregen.";
+          });
+        } else {
+          status.textContent = "Bedankt voor je bestelling! 🎉";
+        }
+      });
   } else {
     status.textContent = "Bedankt voor je bestelling!";
   }
 }
+
     </script>
       <script src="https://formspree.io/js/formbutton-v1.min.js" defer></script>
   <div class="notification">
