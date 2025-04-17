@@ -1,1 +1,14 @@
-{}
+{
+  "pope": {
+    "password": "$2b$10$xgnrG5ARLBBM5UtBjKF7h.srcivUqm5frbTkPrPkWXDQkdehU5yh6",
+    "badges": [
+      "Zure Starter"
+    ]
+  },
+  "haha": {
+    "password": "$2b$10$XPpP1GJxQbVBBJQe6DwsHOyFMi2T1EeAzFaSeK1Twa9wC.0hGplyu",
+    "badges": [
+      "Zure Starter"
+    ]
+  }
+}
