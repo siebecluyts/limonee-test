@@ -127,15 +127,13 @@ function checkAdminCode() {
   }
 }
 function ontvangBadge(badge) {
-  let badges = JSON.parse(localStorage.getItem("badges")) || [];
-
-  if (badge === "admin") {
-    const alleBadges = ["citroenezoeker", "geheimepagina", "admin", "reviewer", "besteller", "limonemailer", "limonekenner"];
-    alleBadges.forEach(b => {
-      if (!badges.includes(b)) {
-        badges.push(b);
-      }
-    });
+  fetch('/api/badges', {
+    method: 'POST',
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ badge: "reviewer" })
+  }).then(() => {
+    // eventueel refreshen of feedback geven
+  });
     alert("✅ Admin badge ontvangen! Je hebt nu alle badges.");
   } else {
     if (!badges.includes(badge)) {

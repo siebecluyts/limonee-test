@@ -1,74 +1,54 @@
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
-const bcrypt = require('bcryptjs');
 const session = require('express-session');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Inladen gebruikersdata
-let users = {};
-if (fs.existsSync('users.json')) {
-    users = JSON.parse(fs.readFileSync('users.json', 'utf8'));
-}
+const usersFile = path.join(__dirname, 'users.json');
 
 // Middleware
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 app.use(session({
-    secret: 'limonee-super-secret',
-    resave: false,
-    saveUninitialized: true,
+  secret: 'limonee-secret-key',
+  resave: false,
+  saveUninitialized: true
 }));
 
-// Register route
-app.post('/register', async (req, res) => {
-    const { username, password } = req.body;
-    if (users[username]) {
-        return res.send('Gebruiker bestaat al!');
-    }
-    const hashed = await bcrypt.hash(password, 10);
-    users[username] = { password: hashed, badges: ["Zure Starter"] };
-    fs.writeFileSync('users.json', JSON.stringify(users, null, 2));
-    res.redirect('/login.html');
+// 🟢 API om badges van de ingelogde gebruiker op te halen
+app.get('/api/badges', (req, res) => {
+  if (!req.session.user) return res.status(401).json({ error: 'Niet ingelogd' });
+  const users = JSON.parse(fs.readFileSync(usersFile, 'utf8'));
+  const user = users.find(u => u.username === req.session.user);
+  if (!user) return res.status(404).json({ error: 'Gebruiker niet gevonden' });
+  res.json({ badges: user.badges || [] });
 });
 
-// Login route
-app.post('/login', async (req, res) => {
-    const { username, password } = req.body;
-    const user = users[username];
-    if (!user || !(await bcrypt.compare(password, user.password))) {
-        return res.send('Ongeldige login!');
-    }
-    req.session.username = username;
-    res.redirect('/profile');
+// 🟢 API om een badge toe te voegen aan ingelogde gebruiker
+app.post('/api/badges', (req, res) => {
+  const { badge } = req.body;
+  if (!req.session.user) return res.status(401).json({ error: 'Niet ingelogd' });
+
+  const users = JSON.parse(fs.readFileSync(usersFile, 'utf8'));
+  const user = users.find(u => u.username === req.session.user);
+  if (!user) return res.status(404).json({ error: 'Gebruiker niet gevonden' });
+
+  if (!user.badges.includes(badge)) {
+    user.badges.push(badge);
+    fs.writeFileSync(usersFile, JSON.stringify(users, null, 2));
+  }
+
+  res.json({ success: true });
 });
 
-// Profile page
-app.get('/profile', (req, res) => {
-    const user = users[req.session.username];
-    if (!user) return res.redirect('/login.html');
-    res.send(`
-        <h1>Welkom ${req.session.username} 🍋</h1>
-        <p>Jouw badges: ${user.badges.join(', ')}</p>
-        <a href="/logout">Uitloggen</a>
-    `);
-});
-
-// Logout
-app.get('/logout', (req, res) => {
-    req.session.destroy();
-    res.redirect('/login.html');
-});
-
-// 404
-app.use((req, res, next) => {
-    res.status(404).sendFile(path.join(__dirname, '/404.html'));
+// 404 fallback
+app.use((req, res) => {
+  res.status(404).sendFile(path.join(__dirname, '/404.html'));
 });
 
 // Start de server
 app.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });
