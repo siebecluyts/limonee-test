@@ -5,10 +5,7 @@
     <link rel="stylesheet" href="../styles.css" />
     <meta charset="UTF-8" />
     <meta name="description" content="Drink de beste Limonee!" />
-    <meta
-      name="keywords"
-      content="Limonade, limonee, limone, lekker, zoet, fris"
-    />
+    <meta name="keywords" content="Limonade, limonee, limone, lekker, zoet, fris" />
     <meta name="author" content="limonee" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link
@@ -34,7 +31,7 @@
     <div class="heading">
       <a href="/">
         <img
-              class="logo"
+          class="logo"
           src="https://cdn.glitch.global/638bdc36-d676-479e-8f39-ff81bc2e3bb1/contact%2Fimages%2Flogo.png?v=1735472051762"
           alt="limonee"
           width="500"
@@ -48,126 +45,118 @@
         <li><a href="/game/">Spelletje</a></li>
         <li><a href="/planning/">Planning</a></li>
         <li><a href="/contact/bestelling/">Bestellen</a></li>
-                    <li><a href="/smaken/">Onze smaken</a></li>
+        <li><a href="/smaken/">Onze smaken</a></li>
       </ul>
-          <div id="custom-menu">
+      <div id="custom-menu">
         <ul>
-            <li onclick="location.href='/';">Home</li>
+          <li onclick="location.href='/'">Home</li>
         </ul>
+      </div>
+      <button onclick="window.location.href='http://eepurl.com/jcuxWM';">Abonneer</button>
     </div>
-<button onclick="window.location.href='http://eepurl.com/jcuxWM'; clickLimoneMail">Abonneer</button>
 
     <!-- Popup Form -->
     <div id="popup" class="popup">
-        <div class="popup-content">
-            <span id="closePopup" class="close">&times;</span>
-            <h2>Abonneer op de LimoneMail!</h2>
-            <form action="https://formspree.io/f/manenqdz" method="POST">
-              <input type="naam" name="naam" placeholder="Naam" required>
-                <input type="email" name="email" placeholder="Email addres" required>
-              <p>Selecteer waar je berichten van wilt krijgen:</p>
-                <label>
-                    <input type="checkbox" name="interests" value="dagen open"> Nieuwe dagen open
-                </label><br>
-                <label>
-                    <input type="checkbox" name="interests" value="new taste"> Nieuwe smaken
-                </label><br>                              <label>
-                    <input type="checkbox" name="interests" value="news"> Nieuws
-                </label><br>
-
-                <button type="submit">Abonneer!</button>
-              <a href="/limonemail/">Meer info.</a>
-            </form>
-        </div>
+      <div class="popup-content">
+        <span id="closePopup" class="close">&times;</span>
+        <h2>Abonneer op de LimoneMail!</h2>
+        <form action="https://formspree.io/f/manenqdz" method="POST">
+          <input type="naam" name="naam" placeholder="Naam" required>
+          <input type="email" name="email" placeholder="Email addres" required>
+          <p>Selecteer waar je berichten van wilt krijgen:</p>
+          <label><input type="checkbox" name="interests" value="dagen open"> Nieuwe dagen open</label><br>
+          <label><input type="checkbox" name="interests" value="new taste"> Nieuwe smaken</label><br>
+          <label><input type="checkbox" name="interests" value="news"> Nieuws</label><br>
+          <button type="submit">Abonneer!</button>
+          <a href="/limonemail/">Meer info.</a>
+        </form>
+      </div>
     </div>
-   <div id="content"></div>
 
-  <script>
-function ontvangBadge(badge) {
-const badgeData = {
-  citroenezoeker: "de Citroenezoeker Badge",
-  geheimepagina: "de Geheime Pagina Badge",
-  admin: "de Limonee Admin Badge",
-  limonemailer: "de LimoneMailer Badge"
-};
+    <div id="content"></div>
 
-const badge = new URLSearchParams(window.location.search).get("badge");
-const content = document.getElementById("content");
+    <script>
+      const badgeData = {
+        citroenezoeker: "de Citroenezoeker Badge",
+        geheimepagina: "de Geheime Pagina Badge",
+        admin: "de Limonee Admin Badge",
+        limonemailer: "de LimoneMailer Badge"
+      };
 
-if (badge === "admin") {
-  content.innerHTML = 
-    <p>Deze badge vereist een geheime toegangscode.</p>
-    <input type="password" id="codeInput" placeholder="Voer toegangscode in" />
-    <br><br>
-    <button onclick="checkAdminCode()">Code Versturen</button>
-    <p id="foutmelding" style="color:red;"></p>
-    <div id="adminBadgeKnop"></div>
-  ;
-} else if (badgeData[badge]) {
-  content.innerHTML = 
-    <p>Wauw, je hebt ${badgeData[badge]} gewonnen!</p>
-    <button onclick="ontvangBadge('${badge}')">Badge ophalen</button>
-  ;
-} else {
-  content.innerHTML = <p>Sorry, maar deze badge bestaat niet.</p>;
-}
-function checkAdminCode() {
-  const juisteCode = "Limone3!admin"; // verander deze code!
-  const ingevoerdeCode = document.getElementById("codeInput").value;
-  const fout = document.getElementById("foutmelding");
+      const badgeParam = new URLSearchParams(window.location.search).get("badge");
+      const content = document.getElementById("content");
 
-  if (ingevoerdeCode === juisteCode) {
-    // Code is goed, toon de knop
-    document.getElementById("adminBadgeKnop").innerHTML = 
-      <p>✅ Code correct! Je mag nu de admin badge ophalen.</p>
-      <button onclick="ontvangBadge('admin')">Admin Badge ophalen</button>
-    ;
-    fout.textContent = "";
-  } else {
-    fout.textContent = "Oei! Verkeerde code.";
-  }
-}
-function ontvangBadge(badge) {
-  let badges = JSON.parse(localStorage.getItem("badges")) || [];
-
-  if (badge === "admin") {
-    const alleBadges = ["citroenezoeker", "geheimepagina", "admin", "reviewer", "besteller", "limonemailer", "limonekenner"];
-    alleBadges.forEach(b => {
-      if (!badges.includes(b)) {
-        badges.push(b);
+      if (badgeParam === "admin") {
+        content.innerHTML = `
+          <p>Deze badge vereist een geheime toegangscode.</p>
+          <input type="password" id="codeInput" placeholder="Voer toegangscode in" />
+          <br><br>
+          <button onclick="checkAdminCode()">Code Versturen</button>
+          <p id="foutmelding" style="color:red;"></p>
+          <div id="adminBadgeKnop"></div>
+        `;
+      } else if (badgeData[badgeParam]) {
+        content.innerHTML = `
+          <p>Wauw, je hebt ${badgeData[badgeParam]} gewonnen!</p>
+          <button onclick="ontvangBadge('${badgeParam}')">Badge ophalen</button>
+        `;
+      } else {
+        content.innerHTML = `<p>Sorry, maar deze badge bestaat niet.</p>`;
       }
-    });
-    
-    alert("✅ Admin badge ontvangen! Je hebt nu alle badges.");
-  } else {
-    if (!badges.includes(badge)) {
-      badges.push(badge);
-      alert(🎉 Je hebt de ${badge}-badge ontvangen!);
-    } else {
-      alert("Je hebt deze badge al!");
-    }
-  }
 
-  localStorage.setItem("badges", JSON.stringify(badges));
-  window.location.href = "/"; // Terug naar homepage
-}
-}
+      function checkAdminCode() {
+        const juisteCode = "Limone3!admin";
+        const ingevoerdeCode = document.getElementById("codeInput").value;
+        const fout = document.getElementById("foutmelding");
 
-  </script>
-      <br />
-      <br />
-      <br />
-      <br />
-      <br />
-  <div class="notification">
-    <p>Lekkere frisse limonade!</p>
-    <button onclick="goToPage()">Bestel hier!</button>
-    <button onclick="closeNotification()">X</button>
-  </div>
-      <script src="../script.js"></script>
-      <script src="https://formspree.io/js/formbutton-v1.min.js" defer></script>
+        if (ingevoerdeCode === juisteCode) {
+          document.getElementById("adminBadgeKnop").innerHTML = `
+            <p>✅ Code correct! Je mag nu de admin badge ophalen.</p>
+            <button onclick="ontvangBadge('admin')">Admin Badge ophalen</button>
+          `;
+          fout.textContent = "";
+        } else {
+          fout.textContent = "Oei! Verkeerde code.";
+        }
+      }
+
+      function ontvangBadge(badge) {
+        let badges = JSON.parse(localStorage.getItem("badges")) || [];
+
+        if (badge === "admin") {
+          const alleBadges = ["citroenezoeker", "geheimepagina", "admin", "reviewer", "besteller", "limonemailer", "limonekenner"];
+          alleBadges.forEach(b => {
+            if (!badges.includes(b)) {
+              badges.push(b);
+            }
+          });
+          alert("✅ Admin badge ontvangen! Je hebt nu alle badges.");
+        } else {
+          if (!badges.includes(badge)) {
+            badges.push(badge);
+            alert(`🎉 Je hebt de ${badge}-badge ontvangen!`);
+          } else {
+            alert("Je hebt deze badge al!");
+          }
+        }
+
+        localStorage.setItem("badges", JSON.stringify(badges));
+        window.location.href = "/";
+      }
+    </script>
+
+    <br /><br /><br /><br /><br />
+
+    <div class="notification">
+      <p>Lekkere frisse limonade!</p>
+      <button onclick="goToPage()">Bestel hier!</button>
+      <button onclick="closeNotification()">X</button>
     </div>
+
+    <script src="../script.js"></script>
+    <script src="https://formspree.io/js/formbutton-v1.min.js" defer></script>
   </body>
+
   <footer>
     <div class="footer">
       <p>&#169;2025 Limonee</p>
