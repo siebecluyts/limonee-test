@@ -11,19 +11,20 @@ app.set('views', path.join(__dirname, 'views'));
 
 // Middleware
 app.use(express.json());
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'public')));
 
-// Automatische route-handler
-app.get('/:page?/:subpage?', (req, res, next) => {
+// Automatische route-handler voor pagina's met dynamische parameters
+app.get('/:page?/:subpage?/:person?', (req, res, next) => {
     const page = req.params.page;
     const subpage = req.params.subpage;
+    const person = req.params.person; // Nieuwe parameter voor de persoon
 
     // Als geen pagina opgegeven, render de homepagina
     if (!page) {
         return res.render('index');
     }
 
-    // Bepaal het pad voor de huidige pagina (index.ejs)
+    // Pad voor de huidige pagina (index.ejs)
     const pagePath = subpage ? path.join(__dirname, 'views', page, subpage, 'index.ejs') : path.join(__dirname, 'views', page, 'index.ejs');
 
     // Check of de index.ejs bestaat in de opgegeven map
@@ -31,7 +32,13 @@ app.get('/:page?/:subpage?', (req, res, next) => {
         if (err) {
             next(); // niet gevonden ➔ naar 404
         } else {
-            res.render(path.join(page, subpage || '', 'index')); // Render de juiste pagina
+            // Render de juiste pagina
+            if (person) {
+                // Als er een persoon parameter is, kun je deze gebruiken
+                return res.render(path.join(page, subpage || '', 'index'), { person });
+            } else {
+                return res.render(path.join(page, subpage || '', 'index'));
+            }
         }
     });
 });

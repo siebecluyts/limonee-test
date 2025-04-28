@@ -223,3 +223,12 @@ document.querySelector(".click-me").addEventListener("click", function(event) {
     badges.push("limonemailer");
     localStorage.setItem("badges", JSON.stringify(badges));
   }}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const myElement = document.querySelector('#myElement');
+    if (myElement) {
+        myElement.addEventListener('click', function() {
+            // Je event handler
+        });
+    }
+});
