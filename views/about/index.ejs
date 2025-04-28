@@ -31,57 +31,7 @@
     <link rel="manifest" href="/site.webmanifest" />
   </head>
   <body>
-    <div class="heading">
-      <a href="/"
-        ><img
-               class="logo"
-          src="https://cdn.glitch.global/638bdc36-d676-479e-8f39-ff81bc2e3bb1/contact%2Fimages%2Flogo.png?v=1735472051762"
-          alt="limonee"
-          sizes="50"
-          width="500"
-      /></a>
-      <ul>
-        <li><a href="/limonade/">Limonade</a></li>
-        <li><a id="about" href="/about/">Over ons</a></li>
-        <li><a href="/contact/">Contact</a></li>
-        <li><a href="/game/">Spelletje</a></li>
-                <li><a href="/planning/">Planning</a></li>
-                    <li><a href="/contact/bestelling/">Bestellen</a></li>
-                    <li><a href="/smaken/">Onze smaken</a></li>
-      </ul>
-<button onclick="window.location.href='http://eepurl.com/jcuxWM';">Abonneer</button>
-    <div id="custom-menu">
-        <ul>
-            <li onclick="location.href='/';">Home</li>
-        </ul>
-    </div>  <div class="notification">
-    <p>Lekkere frisse limonade!</p>
-    <button onclick="goToPage()">Bestel hier!</button>
-    <button onclick="closeNotification()">X</button>
-  </div>
-    <!-- Popup Form -->
-    <div id="popup" class="popup">
-        <div class="popup-content">
-            <span id="closePopup" class="close">&times;</span>
-            <h2>Abonneer op de LimoneMail!</h2>
-            <form action="https://formspree.io/f/manenqdz" method="POST">
-              <input type="naam" name="naam" placeholder="Naam" required>
-                <input type="email" name="email" placeholder="Email addres" required>
-              <p>Selecteer waar je berichten van wilt krijgen:</p>
-                <label>
-                    <input type="checkbox" name="interests" value="dagen open"> Nieuwe dagen open
-                </label><br>
-                <label>
-                    <input type="checkbox" name="interests" value="new taste"> Nieuwe smaken
-                </label><br>                              <label>
-                    <input type="checkbox" name="interests" value="news"> Nieuws
-                </label><br>
-
-                <button type="submit">Abonneer!</button>
-              <a href="/limonemail/">Meer info.</a>
-            </form>
-        </div>
-    </div>
+   <%- include('partials/header') %>
       <h2 id="h22-1">Over ons</h2>
       <h3 id="h32-1">Ons team</h3>
       <p id="par2-1">
