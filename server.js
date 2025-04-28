@@ -12,7 +12,7 @@ app.use(express.json());
 app.use(express.static('public'));
 // 404 handler voor onbekende routes
 app.use((req, res, next) => {
-    res.status(404).sendFile(path.join(__dirname, '/404.html'));
+    res.status(404).sendFile(path.join(__dirname, '/404.ejs'));
 });
 
 // Start the server
