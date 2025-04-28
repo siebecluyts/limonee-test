@@ -14,22 +14,24 @@ app.use(express.json());
 app.use(express.static('public'));
 
 // Automatische route-handler
-app.get('/:page?', (req, res, next) => {
+app.get('/:page?/:subpage?', (req, res, next) => {
     const page = req.params.page;
+    const subpage = req.params.subpage;
 
+    // Als geen pagina opgegeven, render de homepagina
     if (!page) {
-        // Als geen pagina opgegeven ➔ home pagina
         return res.render('index');
     }
 
-    const filePath = path.join(__dirname, 'views', page, 'index.ejs');
+    // Bepaal het pad voor de huidige pagina (index.ejs)
+    const pagePath = subpage ? path.join(__dirname, 'views', page, subpage, 'index.ejs') : path.join(__dirname, 'views', page, 'index.ejs');
 
-    // Check of de folder + index.ejs bestaat
-    fs.access(filePath, fs.constants.F_OK, (err) => {
+    // Check of de index.ejs bestaat in de opgegeven map
+    fs.access(pagePath, fs.constants.F_OK, (err) => {
         if (err) {
             next(); // niet gevonden ➔ naar 404
         } else {
-            res.render(`${page}/index`);
+            res.render(path.join(page, subpage || '', 'index')); // Render de juiste pagina
         }
     });
 });
