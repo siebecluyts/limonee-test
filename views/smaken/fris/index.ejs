@@ -14,7 +14,7 @@
     <link rel="manifest" href="/site.webmanifest">
 </head>
 <body>
-
+<%- include('../../partials/header') %>
     <div id="content">
         <h2>Frisse Limonade</h2>
         <h3>Wat?</h3>
@@ -31,11 +31,6 @@
     <script src="../../script.js"></script>
     <script src="https://formspree.io/js/formbutton-v1.min.js" defer></script>
     
-     <div class="notification">
-    <p>Lekkere frisse limonade!</p>
-    <button onclick="goToPage()">Bestel hier!</button>
-    <button onclick="closeNotification()">X</button>
-  </div>
-<%- include('../partials/footer') %>
+<%- include('../../partials/footer') %>
 </body>
 </html>
