@@ -1,4 +1,4 @@
-
+    <link rel="stylesheet" href="styles.css" />
       <a href="/"
         ><img
                class="logo"
@@ -25,30 +25,20 @@
             <li onclick="location.href='/';">Home</li>
         </ul>
     </div>
-    <!-- Popup Form -->
-    <div id="popup" class="popup">
-        <div class="popup-content">
-            <span id="closePopup" class="close">&times;</span>
-            <h2>Abonneer op de LimoneMail!</h2>
-            <form action="https://formspree.io/f/manenqdz" method="POST">
-              <input type="naam" name="naam" placeholder="Naam" required>
-                <input type="email" name="email" placeholder="Email addres" required>
-              <p>Selecteer waar je berichten van wilt krijgen:</p>
-                <label>
-                    <input type="checkbox" name="interests" value="dagen open"> Nieuwe dagen open
-                </label><br>
-                <label>
-                    <input type="checkbox" name="interests" value="new taste"> Nieuwe smaken
-                </label><br> 
-              <label>
-                    <input type="checkbox" name="interests" value="news"> Nieuws
-                </label><br>
 
-                <button type="submit">Abonneer!</button>
-              <a href="/limonemail/">Meer info.</a>
-            </form>
-        </div>
-    </div>
+  <div>
+    <% if (user) { %>
+      <div style="position: relative; display: inline-block;">
+        <a href="/dashboard" style="text-decoration: none; font-weight: bold;">
+          👤 <%= user %>
+        </a>
+        <a href="/logout" style="margin-left: 10px;">(Uitloggen)</a>
+      </div>
+    <% } else { %>
+      <a href="/login">Inloggen</a>
+      <a href="/register" style="margin-left: 10px;">Registreren</a>
+    <% } %>
+  </div>
         <div class="notification">
     <p>Lekkere frisse limonade!</p>
     <button onclick="goToPage()">Bestel hier!</button>
