@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Inloggen - Limonee</title>
+</head>
+<body>
+  <%- include('partials/header') %>
+  <h2>Inloggen</h2>
+  <form method="POST" action="/login">
+    <input type="text" name="username" placeholder="Gebruikersnaam" required><br>
+    <input type="password" name="password" placeholder="Wachtwoord" required><br>
+    <button type="submit">Inloggen</button>
+  </form>
+</body>
+  <%- include('partials/footer') %>
+</html>
