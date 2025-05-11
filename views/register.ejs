@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Registreren - Limonee</title>
+</head>
+<body>
+  <%- include('partials/header') %>
+  <h2>Account aanmaken</h2>
+  <form method="POST" action="/register">
+    <input type="text" name="username" placeholder="Gebruikersnaam" required><br>
+    <input type="password" name="password" placeholder="Wachtwoord" required><br>
+    <button type="submit">Registreren</button>
+  </form>
+</body>
+    <%- include('partials/footer') %>
+</html>
