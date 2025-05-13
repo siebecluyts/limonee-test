@@ -89,6 +89,18 @@ app.get('/logout', (req, res) => {
   res.redirect('/');
 });
 
+// Route voor planning
+app.get('/planning', (req, res) => {
+  const planningPath = path.join(__dirname, 'data/planning.json');
+  let planning = [];
+
+  if (fs.existsSync(planningPath)) {
+    planning = JSON.parse(fs.readFileSync(planningPath));
+  }
+
+  res.render('planning/index', { openDays: planning });
+});
+
 // Dynamische routes (zoals /info, /about/index.ejs, ...)
 app.get('/*', (req, res) => {
   const urlPath = req.path;
