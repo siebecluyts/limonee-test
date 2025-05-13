@@ -23,10 +23,23 @@
     </div>
         <div class="agenda-container" id="agenda">
             <p id="agenda-header">Bekijk hieronder op welke dagen wij open zijn:</p>
-            <ul class="agenda" id="agenda-list">
-                <!-- Dynamische datums komen hier -->
-              
-            </ul>
+<ul class="agenda" id="agenda-list">
+  <% if (openDays && openDays.length > 0) { %>
+    <% openDays.forEach(entry => { 
+         const d = new Date(entry.date);
+         const formattedDate = d.toLocaleDateString("nl-NL", {
+           weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+         });
+    %>
+      <li class="open">
+        <%= formattedDate %> - Wij zijn open van <%= entry.time %> in <%= entry.location %>
+      </li>
+    <% }) %>
+  <% } else { %>
+    <li>Er zijn momenteel geen geplande openingsdagen.</li>
+  <% } %>
+</ul>
+
         </div>
 <script>
 // Basislijst van open dagen
