@@ -3,7 +3,7 @@ const app = express();
 const path = require('path');
 const fs = require('fs');
 const session = require('express-session');
-const bcrypt = require('bcryptjs');
+const bcrypt = require('bcrypt');
 
 // EJS view engine
 app.set('view engine', 'ejs');
@@ -89,16 +89,25 @@ app.get('/logout', (req, res) => {
   res.redirect('/');
 });
 
-// Route voor planning
-app.get('/planning', (req, res) => {
-  const planningPath = path.join(__dirname, 'data/planning.json');
-  let planning = [];
+// Dagelijkse verrassing
+const verrassingen = [
+  "Citroenfeit: Citroenen drijven omdat ze een dikke schil met luchtzakjes hebben.",
+  "Limonademop: Waarom hield de limonade een speech? Omdat hij bruisend was!",
+  "Citroenfeit: In de Middeleeuwen dacht men dat citroen gif kon tegengaan.",
+  "Limonademop: Wat zegt de citroen tegen de limonade? Jij bent té zoet!",
+  "Citroenfeit: Citroenen bevatten meer suiker dan aardbeien!",
+  "Limonademop: Wat doet een citroen in de sportschool? Zich uitpersen!"
+];
 
-  if (fs.existsSync(planningPath)) {
-    planning = JSON.parse(fs.readFileSync(planningPath));
-  }
+app.get('/verrassing', (req, res) => {
+  if (!req.session.user) return res.redirect('/login');
 
-  res.render('planning/index', { openDays: planning });
+  // Selecteer een verrassing per dag
+  const today = new Date().toISOString().slice(0, 10); // bv. "2025-05-15"
+  const dayIndex = new Date(today).getDate() % verrassingen.length;
+  const verrassing = verrassingen[dayIndex];
+
+  res.render('verrassing', { verrassing });
 });
 
 // Dynamische routes (zoals /info, /about/index.ejs, ...)
