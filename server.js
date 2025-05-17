@@ -1,14 +1,21 @@
-const express = require('express');
-const path = require('path');
-const fs = require('fs');
-const session = require('express-session');
-const bcrypt = require('bcrypt');
-const http = require('http');
+import express from 'express';
+import path from 'path';
+import fs from 'fs';
+import session from 'express-session';
+import bcrypt from 'bcrypt';
+import http from 'http';
+import { Server } from 'socket.io';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 const app = express();
 const server = http.createServer(app);
-const { Server } = require('socket.io');
 const io = new Server(server);
 
+// Express config
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(express.static('public'));
@@ -20,7 +27,6 @@ app.use(session({
   saveUninitialized: false
 }));
 
-// Zorg dat 'user' beschikbaar is in elke view
 app.use((req, res, next) => {
   res.locals.user = req.session.username || null;
   next();
@@ -56,14 +62,10 @@ function saveMessages(msgs) {
   fs.writeFileSync(MESSAGES_FILE, JSON.stringify(msgs, null, 2));
 }
 
-// Home
-app.get('/', (req, res) => {
-  res.render('index');
-});
-
+// Routes
+app.get('/', (req, res) => res.render('index'));
 app.get('/register', (req, res) => res.render('register'));
 
-// Registratie
 app.post('/register', async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -81,7 +83,6 @@ app.post('/register', async (req, res) => {
   }
 });
 
-// Login
 app.get('/login', (req, res) => res.render('login'));
 
 app.post('/login', async (req, res) => {
@@ -95,14 +96,12 @@ app.post('/login', async (req, res) => {
   res.redirect('/dashboard');
 });
 
-// Dashboard
 app.get('/dashboard', (req, res) => {
   if (!req.session.username) return res.redirect('/login');
   const users = readUsers();
   const me = users.find(u => u.username === req.session.username);
-
-  // Bereken ongelezen berichten per vriend
   const messages = readMessages();
+
   const newMessageCounts = {};
   me.friends.forEach(friend => {
     const unread = messages.filter(m => m.from === friend && m.to === me.username);
@@ -114,11 +113,10 @@ app.get('/dashboard', (req, res) => {
     friends: me.friends,
     requests: me.requests,
     error: null,
-    newMessageCounts // 👈 Zorg dat dit wordt meegegeven
+    newMessageCounts
   });
 });
 
-// Vriendschapsverzoek versturen
 app.post('/friend-request', (req, res) => {
   const { receiver } = req.body;
   const sender = req.session.username;
@@ -143,7 +141,6 @@ app.post('/friend-request', (req, res) => {
   res.redirect('/dashboard');
 });
 
-// Vriendschapsverzoek accepteren
 app.post('/accept-friend', (req, res) => {
   const { sender } = req.body;
   const receiver = req.session.username;
@@ -163,7 +160,6 @@ app.post('/accept-friend', (req, res) => {
   res.redirect('/dashboard');
 });
 
-// Vriendschapsverzoek afwijzen
 app.post('/decline-friend', (req, res) => {
   const { sender } = req.body;
   const me = req.session.username;
@@ -174,7 +170,6 @@ app.post('/decline-friend', (req, res) => {
   res.redirect('/dashboard');
 });
 
-// Chatpagina
 app.get('/chat/:friend', (req, res) => {
   const me = req.session.username;
   const { friend } = req.params;
@@ -189,7 +184,6 @@ app.get('/chat/:friend', (req, res) => {
   res.render('chat', { friend, messages });
 });
 
-// Socket.IO realtime chat
 io.on('connection', socket => {
   socket.on('join', username => {
     socket.join(username);
@@ -202,15 +196,11 @@ io.on('connection', socket => {
     messages.push(message);
     saveMessages(messages);
 
-    // Verstuur bericht naar ontvanger
     io.to(to).emit('receive-message', message);
-
-    // Verstuur bericht ook naar zender voor directe weergave
     io.to(from).emit('receive-message', message);
   });
 });
 
-// Berichten ophalen als fallback
 app.get('/messages/:friend', (req, res) => {
   const me = req.session.username;
   const friend = req.params.friend;
@@ -223,17 +213,10 @@ app.get('/messages/:friend', (req, res) => {
   res.send(html);
 });
 
-// Logout
 app.get('/logout', (req, res) => {
   req.session.destroy(() => res.redirect('/'));
 });
 
-// Homepagina
-app.get('/', (req, res) => {
-  res.render('index');
-});
-
-// Dagelijkse verrassing
 const verrassingen = [
   "Citroenfeit: Citroenen drijven omdat ze een dikke schil met luchtzakjes hebben.",
   "Limonademop: Waarom hield de limonade een speech? Omdat hij bruisend was!",
@@ -245,43 +228,33 @@ const verrassingen = [
 
 app.get('/verrassing', (req, res) => {
   if (!req.session.user) return res.redirect('/login');
-
-  // Selecteer een verrassing per dag
-  const today = new Date().toISOString().slice(0, 10); // bv. "2025-05-15"
+  const today = new Date().toISOString().slice(0, 10);
   const dayIndex = new Date(today).getDate() % verrassingen.length;
   const verrassing = verrassingen[dayIndex];
-
   res.render('verrassing', { verrassing });
 });
 
-// Dynamische route
 app.get('/*', (req, res) => {
-  const urlPath = req.path; // bijvoorbeeld: /about/personen
-  const parts = urlPath.split('/').filter(Boolean); // ['about', 'personen']
-
-  // Eerste: check of er een .ejs file direct bestaat
+  const urlPath = req.path;
+  const parts = urlPath.split('/').filter(Boolean);
   let filePath = path.join(__dirname, 'views', ...parts) + '.ejs';
 
-  fs.access(filePath, fs.constants.F_OK, (err) => {
+  fs.access(filePath, fs.constants.F_OK, err => {
     if (!err) {
-      // Bestaat direct als bestand
       res.render(parts.join('/'));
     } else {
-      // Tweede: check of het een map is met index.ejs erin
       let folderPath = path.join(__dirname, 'views', ...parts, 'index.ejs');
-      fs.access(folderPath, fs.constants.F_OK, (folderErr) => {
+      fs.access(folderPath, fs.constants.F_OK, folderErr => {
         if (!folderErr) {
-          // Bestaat als map/index.ejs
           res.render(path.join(parts.join('/'), 'index'));
         } else {
-          // Bestaat niet -> 404
           res.status(404).render('404');
         }
       });
     }
   });
 });
-// 404 fallback
+
 app.use((req, res) => res.status(404).render('404'));
 
 const PORT = process.env.PORT || 3000;
