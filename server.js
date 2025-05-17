@@ -9,6 +9,7 @@ const server = http.createServer(app);
 const { Server } = require('socket.io');
 const io = new Server(server);
 
+// Setup
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(express.static('public'));
@@ -20,25 +21,21 @@ app.use(session({
   saveUninitialized: false
 }));
 
-// Zorg dat 'user' beschikbaar is in elke view
 app.use((req, res, next) => {
   res.locals.user = req.session.username || null;
   next();
 });
 
-// Bestandspaden
+// Bestanden
 const USERS_FILE = path.join(__dirname, 'users.json');
 const MESSAGES_FILE = path.join(__dirname, 'messages.json');
 
-// JSON helpers
+// Helperfuncties
 function readUsers() {
   try {
     if (!fs.existsSync(USERS_FILE)) return [];
-    const data = fs.readFileSync(USERS_FILE);
-    const parsed = JSON.parse(data);
-    return Array.isArray(parsed) ? parsed : [];
-  } catch (err) {
-    console.error("Fout bij lezen van users.json:", err);
+    return JSON.parse(fs.readFileSync(USERS_FILE));
+  } catch {
     return [];
   }
 }
@@ -52,33 +49,24 @@ function readMessages() {
   return JSON.parse(fs.readFileSync(MESSAGES_FILE));
 }
 
-function saveMessages(msgs) {
-  fs.writeFileSync(MESSAGES_FILE, JSON.stringify(msgs, null, 2));
+function saveMessages(messages) {
+  fs.writeFileSync(MESSAGES_FILE, JSON.stringify(messages, null, 2));
 }
 
 // Home
-app.get('/', (req, res) => {
-  res.render('index');
-});
-
-app.get('/register', (req, res) => res.render('register'));
+app.get('/', (req, res) => res.render('index'));
 
 // Registratie
+app.get('/register', (req, res) => res.render('register'));
+
 app.post('/register', async (req, res) => {
-  try {
-    const { username, password } = req.body;
-    const users = readUsers();
-    if (users.find(u => u.username === username)) {
-      return res.send("Gebruiker bestaat al");
-    }
-    const hashed = await bcrypt.hash(password, 10);
-    users.push({ username, password: hashed, friends: [], requests: [] });
-    saveUsers(users);
-    res.redirect('/login');
-  } catch (err) {
-    console.error("Registratiefout:", err);
-    res.status(500).send("Er is iets misgegaan tijdens registratie.");
-  }
+  const { username, password } = req.body;
+  const users = readUsers();
+  if (users.find(u => u.username === username)) return res.send("Gebruiker bestaat al");
+  const hashed = await bcrypt.hash(password, 10);
+  users.push({ username, password: hashed, friends: [], requests: [] });
+  saveUsers(users);
+  res.redirect('/login');
 });
 
 // Login
@@ -100,13 +88,10 @@ app.get('/dashboard', (req, res) => {
   if (!req.session.username) return res.redirect('/login');
   const users = readUsers();
   const me = users.find(u => u.username === req.session.username);
-
-  // Bereken ongelezen berichten per vriend
   const messages = readMessages();
   const newMessageCounts = {};
   me.friends.forEach(friend => {
-    const unread = messages.filter(m => m.from === friend && m.to === me.username);
-    newMessageCounts[friend] = unread.length;
+    newMessageCounts[friend] = messages.filter(m => m.from === friend && m.to === me.username).length;
   });
 
   res.render('dashboard', {
@@ -114,14 +99,14 @@ app.get('/dashboard', (req, res) => {
     friends: me.friends,
     requests: me.requests,
     error: null,
-    newMessageCounts // 👈 Zorg dat dit wordt meegegeven
+    newMessageCounts
   });
 });
 
-// Vriendschapsverzoek versturen
+// Vriendschapsverzoeken
 app.post('/friend-request', (req, res) => {
-  const { receiver } = req.body;
   const sender = req.session.username;
+  const { receiver } = req.body;
   const users = readUsers();
   const me = users.find(u => u.username === sender);
   const target = users.find(u => u.username === receiver);
@@ -143,17 +128,12 @@ app.post('/friend-request', (req, res) => {
   res.redirect('/dashboard');
 });
 
-// Vriendschapsverzoek accepteren
 app.post('/accept-friend', (req, res) => {
   const { sender } = req.body;
   const receiver = req.session.username;
   const users = readUsers();
   const me = users.find(u => u.username === receiver);
   const other = users.find(u => u.username === sender);
-
-  if (!other || !me.requests.includes(sender)) {
-    return res.send("Verzoek niet gevonden");
-  }
 
   me.requests = me.requests.filter(r => r !== sender);
   if (!me.friends.includes(sender)) me.friends.push(sender);
@@ -163,21 +143,19 @@ app.post('/accept-friend', (req, res) => {
   res.redirect('/dashboard');
 });
 
-// Vriendschapsverzoek afwijzen
 app.post('/decline-friend', (req, res) => {
   const { sender } = req.body;
-  const me = req.session.username;
   const users = readUsers();
-  const user = users.find(u => u.username === me);
-  user.requests = user.requests.filter(r => r !== sender);
+  const me = users.find(u => u.username === req.session.username);
+  me.requests = me.requests.filter(r => r !== sender);
   saveUsers(users);
   res.redirect('/dashboard');
 });
 
-// Chatpagina
+// Chat
 app.get('/chat/:friend', (req, res) => {
   const me = req.session.username;
-  const { friend } = req.params;
+  const friend = req.params.friend;
   const users = readUsers();
   const user = users.find(u => u.username === me);
   if (!user.friends.includes(friend)) return res.send("Geen toegang");
@@ -189,38 +167,47 @@ app.get('/chat/:friend', (req, res) => {
   res.render('chat', { friend, messages });
 });
 
-// Socket.IO realtime chat
+// Socket.IO
 io.on('connection', socket => {
-  socket.on('join', username => {
-    socket.join(username);
-  });
-
+  socket.on('join', username => socket.join(username));
   socket.on('send-message', data => {
     const { from, to, text } = data;
-    const messages = readMessages();
     const message = { from, to, text, time: new Date().toISOString() };
+    const messages = readMessages();
     messages.push(message);
     saveMessages(messages);
-
-    // Verstuur bericht naar ontvanger
     io.to(to).emit('receive-message', message);
-
-    // Verstuur bericht ook naar zender voor directe weergave
     io.to(from).emit('receive-message', message);
   });
 });
 
-// Berichten ophalen als fallback
 app.get('/messages/:friend', (req, res) => {
   const me = req.session.username;
   const friend = req.params.friend;
   const messages = readMessages().filter(
     m => (m.from === me && m.to === friend) || (m.from === friend && m.to === me)
   );
-  const html = messages.map(m =>
+  res.send(messages.map(m =>
     `<p><strong>${m.from}:</strong> ${m.text} <small>(${new Date(m.time).toLocaleTimeString()})</small></p>`
-  ).join('');
-  res.send(html);
+  ).join(''));
+});
+
+// Dagelijkse verrassing
+const verrassingen = [
+  "Citroenfeit: Citroenen drijven omdat ze een dikke schil met luchtzakjes hebben.",
+  "Limonademop: Waarom hield de limonade een speech? Omdat hij bruisend was!",
+  "Citroenfeit: In de Middeleeuwen dacht men dat citroen gif kon tegengaan.",
+  "Limonademop: Wat zegt de citroen tegen de limonade? Jij bent té zoet!",
+  "Citroenfeit: Citroenen bevatten meer suiker dan aardbeien!",
+  "Limonademop: Wat doet een citroen in de sportschool? Zich uitpersen!"
+];
+
+app.get('/verrassing', (req, res) => {
+  if (!req.session.username) return res.redirect('/login');
+  const today = new Date().toISOString().slice(0, 10);
+  const dayIndex = new Date(today).getDate() % verrassingen.length;
+  const verrassing = verrassingen[dayIndex];
+  res.render('verrassing', { verrassing });
 });
 
 // Logout
@@ -228,8 +215,30 @@ app.get('/logout', (req, res) => {
   req.session.destroy(() => res.redirect('/'));
 });
 
-// 404 fallback
+// Dynamische route
+app.get('/*', (req, res) => {
+  const parts = req.path.split('/').filter(Boolean);
+  const filePath = path.join(__dirname, 'views', ...parts) + '.ejs';
+  const folderPath = path.join(__dirname, 'views', ...parts, 'index.ejs');
+
+  fs.access(filePath, fs.constants.F_OK, (err) => {
+    if (!err) {
+      res.render(parts.join('/'));
+    } else {
+      fs.access(folderPath, fs.constants.F_OK, (folderErr) => {
+        if (!folderErr) {
+          res.render(path.join(parts.join('/'), 'index'));
+        } else {
+          res.status(404).render('404');
+        }
+      });
+    }
+  });
+});
+
+// Fallback 404
 app.use((req, res) => res.status(404).render('404'));
 
+// Server starten
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => console.log(`Server draait op http://localhost:${PORT}`));
