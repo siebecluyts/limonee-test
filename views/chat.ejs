@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>chat - Limonee</title>
+  <link rel="stylesheet" href="https://limonee.be/styles.css" />
+  <style>
+#chat {
+  max-width: 700px;
+  margin: 20px auto;
+  padding: 10px;
+}
+
+.message {
+  margin: 15px 0;
+  padding: 15px 20px;
+  border-radius: 15px;
+  max-width: 70%;
+  font-size: 1.1rem;
+  line-height: 1.4;
+  clear: both;
+  word-wrap: break-word;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.me {
+  background-color: #dcf8c6;
+  float: right;
+  text-align: right;
+}
+
+.friend {
+  background-color: #f1f0f0;
+  float: left;
+  text-align: left;
+}
+
+.message small {
+  display: block;
+  font-size: 0.75rem;
+  color: #666;
+  margin-top: 8px;
+}
+
+/* Zorg dat floats worden opgeruimd */
+#chat::after {
+  content: "";
+  display: block;
+  clear: both;
+}
+
+  </style>
+</head>
+<body>
+  <%- include('partials/header') %>
+
+  <h2>Chat met <%= friend %></h2>
+
+  <div id="chat">
+    <% messages.forEach(m => { %>
+      <div class="message <%= m.from === user ? 'me' : 'friend' %>">
+        <strong><%= m.from %>:</strong> <%= m.text %>
+        <small><%= new Date(m.time).toLocaleTimeString() %></small>
+      </div>
+    <% }) %>
+  </div>
+
+  <form method="POST" autocomplete="off">
+    <input name="text" placeholder="Bericht..." autofocus>
+    <button>Verzend</button>
+  </form>
+
+  <a href="/dashboard" class="back-link">← Terug naar dashboard</a>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    const me = "<%= user %>";
+    const friend = "<%= friend %>";
+
+    socket.emit('join', me);
+
+    // Scroll meteen naar beneden bij laden, zodat je de laatste berichten ziet
+    window.scrollTo(0, document.body.scrollHeight);
+
+    document.querySelector('form').addEventListener('submit', e => {
+      e.preventDefault();
+      const input = document.querySelector('input[name="text"]');
+      const text = input.value.trim();
+      if (!text) return;
+      socket.emit('send-message', { from: me, to: friend, text });
+      input.value = '';
+    });
+
+    socket.on('receive-message', data => {
+      if (data.from === friend || data.from === me) {
+        const chat = document.getElementById('chat');
+        const msgDiv = document.createElement('div');
+        msgDiv.className = 'message ' + (data.from === me ? 'me' : 'friend');
+        msgDiv.innerHTML = `
+          <strong>${data.from}:</strong> ${data.text}
+          <small>${new Date(data.time).toLocaleTimeString()}</small>
+        `;
+        chat.appendChild(msgDiv);
+
+        // Scroll naar het nieuwste bericht
+        window.scrollTo(0, document.body.scrollHeight);
+      }
+    });
+  </script>
+
+  <%- include('partials/footer') %>
+</body>
+</html>
