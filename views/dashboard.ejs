@@ -1,12 +1,89 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="UTF-8">
   <title>Dashboard - Limonee</title>
 </head>
 <body>
   <%- include('partials/header') %>
+
   <h2>Welkom op je dashboard, <%= username %>!</h2>
-  <p>Hier kun je je instellingen beheren, badges bekijken of andere persoonlijke dingen toevoegen.</p>
+  <p>Hier kun je je vrienden beheren en chatten.</p>
+
+    <ul>
+  <% friends.forEach(friend => { %>
+    <li>
+      <a href="/chat/<%= friend %>"><%= friend %></a>
+      <% if (newMessageCounts && newMessageCounts[friend]) { %>
+        <span style="color:red"> (nieuw: <%= newMessageCounts[friend] %>)</span>
+      <% } %>
+    </li>
+  <% }) %>
+</ul>
+
+          <ul id="meldingen"></ul>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  const socket = io();
+  const me = "<%= username %>";
+  socket.emit('join', me);
+
+  socket.on('receive-message', data => {
+    const ul = document.getElementById('meldingen');
+    const li = document.createElement('li');
+    li.innerHTML = `Nieuw bericht van <strong>${data.from}</strong>`;
+    ul.appendChild(li);
+  });
+</script>
+
+  <h3>Jouw vrienden</h3>
+  <% if (friends.length === 0) { %>
+    <p>Je hebt nog geen vrienden.</p>
+  <% } else { %>
+    <ul>
+      <% friends.forEach(friend => { %>
+        <li>
+          <%= friend %> - 
+          <a href="/chat/<%= friend %>">Chatten</a>
+        </li>
+      <% }) %>
+    </ul>
+  <% } %>
+
+  <h3>Stuur een vriendverzoek</h3>
+  <form method="POST" action="/friend-request">
+    <input type="text" name="receiver" placeholder="Gebruikersnaam" required>
+    <button type="submit">Vriend toevoegen</button>
+  </form>
+
+  <% if (error) { %>
+    <p style="color:red;"><%= error %></p>
+  <% } %>
+
+  <% if (requests.length > 0) { %>
+    <h3>Vriendschapsverzoeken</h3>
+    <ul>
+      <% requests.forEach(sender => { %>
+        <li>
+          <%= sender %>
+          <form method="POST" action="/accept-friend" style="display:inline;">
+            <input type="hidden" name="sender" value="<%= sender %>">
+            <button type="submit">Accepteren</button>
+          </form>
+          <form method="POST" action="/decline-friend" style="display:inline;">
+            <input type="hidden" name="sender" value="<%= sender %>">
+            <button type="submit">Afwijzen</button>
+          </form>
+        </li>
+      <% }) %>
+    </ul>
+  <% } else { %>
+    <p>Geen nieuwe vriendschapsverzoeken.</p>
+  <% } %>
+
+  <p><a href="/logout">Uitloggen</a></p>
+
+  <%- include('partials/footer') %>
 </body>
-      <%- include('partials/footer') %>
 </html>
