@@ -24,6 +24,12 @@ app.use(
   })
 );
 
+// Middleware om 'user' beschikbaar te maken in alle EJS views
+app.use((req, res, next) => {
+  res.locals.user = req.session.username || null;
+  next();
+});
+
 const USERS_FILE = "data/users.json";
 const MSG_FILE = "data/messages.json";
 
