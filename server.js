@@ -228,11 +228,6 @@ app.get('/logout', (req, res) => {
   req.session.destroy(() => res.redirect('/'));
 });
 
-// Homepagina
-app.get('/', (req, res) => {
-  res.render('index');
-});
-
 // Dagelijkse verrassing
 const verrassingen = [
   "Citroenfeit: Citroenen drijven omdat ze een dikke schil met luchtzakjes hebben.",
