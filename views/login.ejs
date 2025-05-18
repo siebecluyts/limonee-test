@@ -4,7 +4,7 @@
   <title>Inloggen - Limonee</title>
 </head>
 <body>
-<%- include('partials/header', { user: null }) %>
+  <%- include('partials/header', { user: null }) %>
 
   <h2>Inloggen</h2>
   <form method="POST" action="/login">
@@ -12,6 +12,7 @@
     <input type="password" name="password" placeholder="Wachtwoord" required><br>
     <button type="submit">Inloggen</button>
   </form>
+
+  <%- include('partials/footer', { user: null }) %>
 </body>
-  <%- include('partials/footer', { user: null })) %>
 </html>
