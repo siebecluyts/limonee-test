@@ -244,7 +244,7 @@ const verrassingen = [
 ];
 
 app.get('/verrassing', (req, res) => {
-  if (!req.session.user) return res.redirect('/login');
+  if (!req.session.username) return res.redirect('/login');
 
   // Selecteer een verrassing per dag
   const today = new Date().toISOString().slice(0, 10); // bv. "2025-05-15"
