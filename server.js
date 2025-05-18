@@ -11,6 +11,7 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 
+// Middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
 app.set("view engine", "ejs");
@@ -24,19 +25,21 @@ app.use(
   })
 );
 
-// Middleware om 'user' beschikbaar te maken in alle EJS views
+// user info beschikbaar maken in EJS views
 app.use((req, res, next) => {
   res.locals.user = req.session.username || null;
   next();
 });
 
+// Bestandslocaties
 const USERS_FILE = "data/users.json";
 const MSG_FILE = "data/messages.json";
 
-// Zorg dat de json-bestanden bestaan
+// Init bestanden als ze niet bestaan
 if (!fs.existsSync(USERS_FILE)) fs.writeFileSync(USERS_FILE, "{}");
 if (!fs.existsSync(MSG_FILE)) fs.writeFileSync(MSG_FILE, "{}");
 
+// Helpers
 function readUsers() {
   return JSON.parse(fs.readFileSync(USERS_FILE, "utf8"));
 }
@@ -52,6 +55,8 @@ function readMessages() {
 function writeMessages(data) {
   fs.writeFileSync(MSG_FILE, JSON.stringify(data, null, 2));
 }
+
+// Routes
 
 app.get("/", (req, res) => {
   if (req.session.username) return res.redirect("/dashboard");
@@ -135,7 +140,10 @@ app.post("/friend-request", (req, res) => {
     });
   }
 
-  if (users[receiver].requests.includes(sender) || users[receiver].friends.includes(sender)) {
+  if (
+    users[receiver].requests.includes(sender) ||
+    users[receiver].friends.includes(sender)
+  ) {
     return res.redirect("/dashboard");
   }
 
@@ -149,10 +157,16 @@ app.post("/accept-friend", (req, res) => {
   const receiver = req.session.username;
   const users = readUsers();
 
-  users[receiver].friends.push(sender);
-  users[sender].friends.push(receiver);
+  if (!users[sender] || !users[receiver]) return res.redirect("/dashboard");
 
-  users[receiver].requests = users[receiver].requests.filter((u) => u !== sender);
+  if (!users[receiver].friends.includes(sender))
+    users[receiver].friends.push(sender);
+  if (!users[sender].friends.includes(receiver))
+    users[sender].friends.push(receiver);
+
+  users[receiver].requests = users[receiver].requests.filter(
+    (u) => u !== sender
+  );
 
   writeUsers(users);
   res.redirect("/dashboard");
@@ -163,7 +177,9 @@ app.post("/decline-friend", (req, res) => {
   const receiver = req.session.username;
   const users = readUsers();
 
-  users[receiver].requests = users[receiver].requests.filter((u) => u !== sender);
+  users[receiver].requests = users[receiver].requests.filter(
+    (u) => u !== sender
+  );
   writeUsers(users);
   res.redirect("/dashboard");
 });
@@ -171,7 +187,6 @@ app.post("/decline-friend", (req, res) => {
 app.get("/chat/:friend", (req, res) => {
   const user = req.session.username;
   const friend = req.params.friend;
-
   if (!user) return res.redirect("/");
 
   const users = readUsers();
@@ -181,7 +196,6 @@ app.get("/chat/:friend", (req, res) => {
 
   const chat = messages[user]?.[friend] || [];
 
-  // Markeer ontvangen berichten als gelezen
   chat.forEach((m) => {
     if (m.to === user) m.read = true;
   });
@@ -231,6 +245,7 @@ app.get("/logout", (req, res) => {
   });
 });
 
+// Socket.IO
 io.on("connection", (socket) => {
   socket.on("join", (username) => {
     socket.join(username);
@@ -242,6 +257,7 @@ io.on("connection", (socket) => {
     const msg = { from, to, text, time, read: false };
 
     const messages = readMessages();
+
     if (!messages[from]) messages[from] = {};
     if (!messages[to]) messages[to] = {};
     if (!messages[from][to]) messages[from][to] = [];
@@ -249,6 +265,7 @@ io.on("connection", (socket) => {
 
     messages[from][to].push(msg);
     messages[to][from].push(msg);
+
     writeMessages(messages);
 
     io.to(to).emit("receive-message", msg);
@@ -256,6 +273,7 @@ io.on("connection", (socket) => {
   });
 });
 
+// Start server
 server.listen(process.env.PORT || 3000, () => {
   console.log("Server gestart op http://localhost:3000");
 });
