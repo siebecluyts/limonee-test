@@ -1,87 +1,94 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Limonee - planning</title>
-        <link rel="stylesheet" href="../styles.css">
-        <meta charset="UTF-8">
-        <meta name="description" content="Drink de beste Limonee!">
-        <meta name="keywords" content="Limonade, limonee, limone, lekker, zoet, fris">
-        <meta name="author" content="limonee">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="apple-touch-icon" sizes="180x180" href="https://cdn.glitch.global/638bdc36-d676-479e-8f39-ff81bc2e3bb1/contact%2Fimages%2Fapple-touch-icon.png?v=1735472049644">
-<link rel="icon" type="image/png" sizes="32x32" href="https://cdn.glitch.global/638bdc36-d676-479e-8f39-ff81bc2e3bb1/contact%2Fimages%2Ffavicon-32x32.png?v=1735472050279">
-<link rel="icon" type="image/png" sizes="16x16" href="https://cdn.glitch.global/638bdc36-d676-479e-8f39-ff81bc2e3bb1/contact%2Fimages%2Ffavicon-16x16.png?v=1735472049971">
-<link rel="manifest" href="/site.webmanifest">
-      
-    </head>
-    <body>
-   <%- include('../partials/header') %>
-              <div id="custom-menu">
-        <ul>
-            <li onclick="location.href='/';">Home</li>
-        </ul>
+  <head>
+    <title>Limonee - planning</title>
+    <link rel="stylesheet" href="../styles.css" />
+    <meta charset="UTF-8" />
+    <meta name="description" content="Drink de beste Limonee!" />
+    <meta name="keywords" content="Limonade, limonee, limone, lekker, zoet, fris" />
+    <meta name="author" content="limonee" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="https://cdn.glitch.global/638bdc36-d676-479e-8f39-ff81bc2e3bb1/contact%2Fimages%2Fapple-touch-icon.png?v=1735472049644"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="https://cdn.glitch.global/638bdc36-d676-479e-8f39-ff81bc2e3bb1/contact%2Fimages%2Ffavicon-32x32.png?v=1735472050279"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="https://cdn.glitch.global/638bdc36-d676-479e-8f39-ff81bc2e3bb1/contact%2Fimages%2Ffavicon-16x16.png?v=1735472049971"
+    />
+    <link rel="manifest" href="/site.webmanifest" />
+  </head>
+  <body>
+    <%- include('../partials/header') %>
+
+    <div id="custom-menu">
+      <ul>
+        <li onclick="location.href='/'">Home</li>
+      </ul>
     </div>
-        <div class="agenda-container" id="agenda">
-            <p id="agenda-header">Bekijk hieronder op welke dagen wij open zijn:</p>
-<ul class="agenda" id="agenda-list">
-  <% if (openDays && openDays.length > 0) { %>
-    <% openDays.forEach(entry => { 
-         const d = new Date(entry.date);
-         const formattedDate = d.toLocaleDateString("nl-NL", {
-           weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-         });
-    %>
-      <li class="open">
-        <%= formattedDate %> - Wij zijn open van <%= entry.time %> in <%= entry.location %>
-      </li>
-    <% }) %>
-  <% } else { %>
-    <li>Er zijn momenteel geen geplande openingsdagen.</li>
-  <% } %>
-</ul>
 
-        </div>
-<script>
-// Basislijst van open dagen
-const openDays = [
-      {
-    date: "2025-05-18",
-    time: "14:15 - 16:30",
-    location: "Kortenaken Krawatenstraat 21"
-  },
-];
+    <div class="agenda-container" id="agenda">
+      <p id="agenda-header">Bekijk hieronder op welke dagen wij open zijn:</p>
+      <ul class="agenda" id="agenda-list">
+        <!-- De lijst wordt hier automatisch ingevuld met JS -->
+      </ul>
+    </div>
 
-// Selecteer het agenda element
-const agendaList = document.getElementById("agenda-list");
+    <script>
+      const openDays = [
+        {
+          date: "2025-05-18",
+          time: "14:15 - 16:30",
+          location: "Kortenaken Krawatenstraat 21",
+        },
+        {
+          date: "2025-06-01",
+          time: "13:00 - 17:00",
+          location: "Diest Marktplein 5",
+        },
+      ];
 
-// Functie om de dagen op de pagina te tonen
-function generateAgenda() {
-  agendaList.innerHTML = "";
+      const agendaList = document.getElementById("agenda-list");
 
-  openDays.forEach(entry => {
-    const date = new Date(entry.date);
-    const listItem = document.createElement("li");
+      function generateAgenda() {
+        if (openDays.length === 0) {
+          const li = document.createElement("li");
+          li.textContent = "Er zijn momenteel geen geplande openingsdagen.";
+          agendaList.appendChild(li);
+          return;
+        }
 
-    listItem.textContent = `${date.toLocaleDateString("nl-NL", { 
-      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
-    })} - Wij zijn open van ${entry.time} in ${entry.location}`;
+        openDays.forEach((entry) => {
+          const date = new Date(entry.date);
+          const formattedDate = date.toLocaleDateString("nl-NL", {
+            weekday: "long",
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          });
 
-    listItem.classList.add("open");
-    agendaList.appendChild(listItem);
-  });
-}
+          const listItem = document.createElement("li");
+          listItem.textContent = `${formattedDate} - Wij zijn open van ${entry.time} in ${entry.location}`;
+          listItem.classList.add("open");
+          agendaList.appendChild(listItem);
+        });
+      }
 
-// Roep de functie aan om de agenda te tonen
-generateAgenda();
-</script>
+      generateAgenda();
+    </script>
 
-          <script src="https://formspree.io/js/formbutton-v1.min.js" defer></script>
-          <script src="../script.js"></script>
+    <script src="https://formspree.io/js/formbutton-v1.min.js" defer></script>
+    <script src="../script.js"></script>
 
-            <br>
-            <br>
-            <br>
-      </div>
-    </body>
-<%- include('../partials/footer') %>
+    <%- include('../partials/footer') %>
+  </body>
 </html>
