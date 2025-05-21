@@ -11,6 +11,21 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 
+const bannedUsersPath = path.join(__dirname, 'data', 'bannedUsers.json');
+
+function getBannedUsers() {
+  try {
+    const data = fs.readFileSync(bannedUsersPath, 'utf8');
+    return JSON.parse(data);
+  } catch (e) {
+    return [];
+  }
+}
+
+function saveBannedUsers(bannedUsers) {
+  fs.writeFileSync(bannedUsersPath, JSON.stringify(bannedUsers, null, 2));
+}
+
 // Middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
