@@ -65,12 +65,25 @@ app.post('/register', async (req, res) => {
   res.redirect('/login');
 });
 
+function banUser(username) {
+  const banned = readBanned();
+  if (!banned.includes(username)) {
+    banned.push(username);
+    saveJSON(BANNED_FILE, banned);
+    console.log(`Gebruiker ${username} is geblokkeerd.`);
+  }
+}
+
 // Login
 app.get('/login', (req, res) => res.render('login'));
 
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
   const users = readUsers();
+  const banned = readBanned();
+
+  if (banned.includes(username)) return res.send("Je account is geblokkeerd.");
+
   const user = users.find(u => u.username === username);
   if (!user) return res.send("Gebruiker niet gevonden");
 
