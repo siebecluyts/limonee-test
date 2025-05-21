@@ -64,63 +64,201 @@ const saveMessages = (data) => saveJSON(MESSAGES_FILE, data);
 // Voor kortheid laat ik die hier weg; focus ligt op chat + upload.
 
 // Chat pagina GET
-app.get('/chat/:friend', (req, res) => {
-  if (!req.session.username) return res.redirect('/login');
+// Homepagina
+app.get('/', (req, res) => {
+  res.render('index');
+});
 
+// Registratiepagina
+app.get('/register', (req, res) => {
+  res.render('register');
+});
+
+// Registratie POST
+app.post('/register', async (req, res) => {
+  const { username, password } = req.body;
+  const users = readUsers();
+  if (users.find(u => u.username === username)) {
+    return res.send("Gebruiker bestaat al");
+  }
+  const hashed = await bcrypt.hash(password, 10);
+  users.push({ username, password: hashed, friends: [], requests: [] });
+  saveUsers(users);
+  res.redirect('/login');
+});
+
+// Loginpagina
+app.get('/login', (req, res) => {
+  res.render('login');
+});
+
+// Login POST
+app.post('/login', async (req, res) => {
+  const { username, password } = req.body;
+  const users = readUsers();
+  const user = users.find(u => u.username === username);
+  if (!user) return res.send("Gebruiker niet gevonden");
+  const match = await bcrypt.compare(password, user.password);
+  if (!match) return res.send("Wachtwoord onjuist");
+  req.session.username = username;
+  res.redirect('/dashboard');
+});
+
+// Dashboardpagina (alleen voor ingelogde gebruikers)
+app.get('/dashboard', (req, res) => {
+  if (!req.session.username) return res.redirect('/login');
+  const users = readUsers();
+  const me = users.find(u => u.username === req.session.username);
+
+  // Ongelezen berichten tellen
+  const messages = readMessages();
+  const newMessageCounts = {};
+  me.friends.forEach(friend => {
+    const unread = messages.filter(m => m.from === friend && m.to === me.username);
+    newMessageCounts[friend] = unread.length;
+  });
+
+  res.render('dashboard', {
+    username: me.username,
+    friends: me.friends,
+    requests: me.requests,
+    error: null,
+    newMessageCounts
+  });
+});
+
+// Vriendschapsverzoek sturen
+app.post('/friend-request', (req, res) => {
+  const { receiver } = req.body;
+  const sender = req.session.username;
+  const users = readUsers();
+  const me = users.find(u => u.username === sender);
+  const target = users.find(u => u.username === receiver);
+
+  if (!target || sender === receiver) {
+    return res.render('dashboard', {
+      username: me.username,
+      friends: me.friends,
+      requests: me.requests,
+      error: "Gebruiker bestaat niet."
+    });
+  }
+
+  if (!target.requests.includes(sender) && !target.friends.includes(sender)) {
+    target.requests.push(sender);
+    saveUsers(users);
+  }
+
+  res.redirect('/dashboard');
+});
+
+// Vriendschapsverzoek accepteren
+app.post('/accept-friend', (req, res) => {
+  const { sender } = req.body;
+  const receiver = req.session.username;
+  const users = readUsers();
+  const me = users.find(u => u.username === receiver);
+  const other = users.find(u => u.username === sender);
+
+  if (!other || !me.requests.includes(sender)) {
+    return res.send("Verzoek niet gevonden");
+  }
+
+  me.requests = me.requests.filter(r => r !== sender);
+  if (!me.friends.includes(sender)) me.friends.push(sender);
+  if (!other.friends.includes(receiver)) other.friends.push(receiver);
+
+  saveUsers(users);
+  res.redirect('/dashboard');
+});
+
+// Vriendschapsverzoek afwijzen
+app.post('/decline-friend', (req, res) => {
+  const { sender } = req.body;
   const me = req.session.username;
-  const friend = req.params.friend;
   const users = readUsers();
   const user = users.find(u => u.username === me);
+  user.requests = user.requests.filter(r => r !== sender);
+  saveUsers(users);
+  res.redirect('/dashboard');
+});
 
+// Chatpagina tussen jou en een vriend
+app.get('/chat/:friend', (req, res) => {
+  const me = req.session.username;
+  const { friend } = req.params;
+  const users = readUsers();
+  const user = users.find(u => u.username === me);
   if (!user.friends.includes(friend)) return res.send("Geen toegang");
 
   const messages = readMessages().filter(
     m => (m.from === me && m.to === friend) || (m.from === friend && m.to === me)
   );
 
-  res.render('chat', { friend, messages, user: me });
+  res.render('chat', { friend, messages });
 });
 
-// Upload bestand via POST, terug naar dezelfde chat
-app.post('/chat/:friend/upload', upload.single('file'), (req, res) => {
-  if (!req.session.username) return res.redirect('/login');
+// Berichten ophalen (fallback)
+app.get('/messages/:friend', (req, res) => {
   const me = req.session.username;
   const friend = req.params.friend;
-
-  if (!req.file) return res.status(400).send("Geen bestand geüpload.");
-
-  // Sla het bericht op met het pad naar het bestand
-  const messages = readMessages();
-  messages.push({
-    from: me,
-    to: friend,
-    text: null,
-    file: `/uploads/${req.file.filename}`,
-    time: new Date().toISOString()
-  });
-  saveMessages(messages);
-
-  res.redirect(`/chat/${friend}`);
+  const messages = readMessages().filter(
+    m => (m.from === me && m.to === friend) || (m.from === friend && m.to === me)
+  );
+  const html = messages.map(m =>
+    `<p><strong>${m.from}:</strong> ${m.text} <small>(${new Date(m.time).toLocaleTimeString()})</small></p>`
+  ).join('');
+  res.send(html);
 });
 
-// Chat bericht verzenden via POST (indien je dat wil via form submit)
-app.post('/chat/:friend/message', (req, res) => {
+// Logout
+app.get('/logout', (req, res) => {
+  req.session.destroy(() => res.redirect('/'));
+});
+
+// Dagelijkse verrassing (ingelogd)
+app.get('/verrassing', (req, res) => {
   if (!req.session.username) return res.redirect('/login');
-  const me = req.session.username;
-  const friend = req.params.friend;
-  const text = req.body.text?.trim();
-  if (!text) return res.redirect(`/chat/${friend}`);
 
-  const messages = readMessages();
-  messages.push({
-    from: me,
-    to: friend,
-    text,
-    time: new Date().toISOString()
+  const verrassingen = [
+    "Citroenfeit: Citroenen drijven omdat ze een dikke schil met luchtzakjes hebben.",
+    "Limonademop: Waarom hield de limonade een speech? Omdat hij bruisend was!",
+    "Citroenfeit: In de Middeleeuwen dacht men dat citroen gif kon tegengaan.",
+    "Limonademop: Wat zegt de citroen tegen de limonade? Jij bent té zoet!",
+    "Citroenfeit: Citroenen bevatten meer suiker dan aardbeien!",
+    "Limonademop: Wat doet een citroen in de sportschool? Zich uitpersen!"
+  ];
+
+  const today = new Date().getDate();
+  const verrassing = verrassingen[today % verrassingen.length];
+  res.render('verrassing', { verrassing });
+});
+
+// Dynamische pagina's (controle op bestaan van EJS-bestand of index.ejs)
+app.get('/*', (req, res) => {
+  const urlPath = req.path;
+  const parts = urlPath.split('/').filter(Boolean);
+  let filePath = path.join(__dirname, 'views', ...parts) + '.ejs';
+
+  fs.access(filePath, fs.constants.F_OK, (err) => {
+    if (!err) {
+      res.render(parts.join('/'));
+    } else {
+      let folderPath = path.join(__dirname, 'views', ...parts, 'index.ejs');
+      fs.access(folderPath, fs.constants.F_OK, (folderErr) => {
+        if (!folderErr) {
+          res.render(path.join(parts.join('/'), 'index'));
+        } else {
+          res.status(404).render('404');
+        }
+      });
+    }
   });
-  saveMessages(messages);
+});
 
-  res.redirect(`/chat/${friend}`);
+// 404 fallback
+app.use((req, res) => {
+  res.status(404).render('404');
 });
 
 // Socket.IO voor real-time chat
