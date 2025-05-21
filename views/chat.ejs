@@ -1,53 +1,51 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>chat - Limonee</title>
+  <title>Chat met <%= friend %> - Limonee</title>
   <link rel="stylesheet" href="https://limonee.be/styles.css" />
   <style>
-#chat {
-  max-width: 700px;
-  margin: 20px auto;
-  padding: 10px;
-}
-
-.message {
-  margin: 15px 0;
-  padding: 15px 20px;
-  border-radius: 15px;
-  max-width: 70%;
-  font-size: 1.1rem;
-  line-height: 1.4;
-  clear: both;
-  word-wrap: break-word;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-}
-
-.me {
-  background-color: #dcf8c6;
-  float: right;
-  text-align: right;
-}
-
-.friend {
-  background-color: #f1f0f0;
-  float: left;
-  text-align: left;
-}
-
-.message small {
-  display: block;
-  font-size: 0.75rem;
-  color: #666;
-  margin-top: 8px;
-}
-
-/* Zorg dat floats worden opgeruimd */
-#chat::after {
-  content: "";
-  display: block;
-  clear: both;
-}
-
+    #chat {
+      max-width: 700px;
+      margin: 20px auto;
+      padding: 10px;
+    }
+    .message {
+      margin: 15px 0;
+      padding: 15px 20px;
+      border-radius: 15px;
+      max-width: 70%;
+      font-size: 1.1rem;
+      line-height: 1.4;
+      clear: both;
+      word-wrap: break-word;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .me {
+      background-color: #dcf8c6;
+      float: right;
+      text-align: right;
+    }
+    .friend {
+      background-color: #f1f0f0;
+      float: left;
+      text-align: left;
+    }
+    .message small {
+      display: block;
+      font-size: 0.75rem;
+      color: #666;
+      margin-top: 8px;
+    }
+    #chat::after {
+      content: "";
+      display: block;
+      clear: both;
+    }
+    img.chat-image {
+      max-width: 100%;
+      border-radius: 10px;
+      margin-top: 5px;
+    }
   </style>
 </head>
 <body>
@@ -58,15 +56,31 @@
   <div id="chat">
     <% messages.forEach(m => { %>
       <div class="message <%= m.from === user ? 'me' : 'friend' %>">
-        <strong><%= m.from %>:</strong> <%= m.text %>
+        <strong><%= m.from %>:</strong>
+        <% if(m.text){ %>
+          <%= m.text %>
+        <% } else if(m.file) { %>
+          <% if(m.file.match(/\.(jpg|jpeg|png|gif)$/i)) { %>
+            <a href="<%= m.file %>" target="_blank">
+              <img src="<%= m.file %>" class="chat-image" alt="Afbeelding">
+            </a>
+          <% } else { %>
+            <a href="<%= m.file %>" target="_blank">Bestand: <%= m.file.split('/').pop() %></a>
+          <% } %>
+        <% } %>
         <small><%= new Date(m.time).toLocaleTimeString() %></small>
       </div>
     <% }) %>
   </div>
 
-  <form method="POST" autocomplete="off">
-    <input name="text" placeholder="Bericht..." autofocus>
-    <button>Verzend</button>
+  <form id="messageForm" autocomplete="off">
+    <input name="text" placeholder="Typ een bericht of plak een link..." autofocus autocomplete="off" />
+    <button type="submit">Verzend</button>
+  </form>
+
+  <form id="uploadForm" action="/chat/<%= friend %>/upload" method="POST" enctype="multipart/form-data" style="margin-top:10px;">
+    <input type="file" name="file" accept="image/*,application/pdf,.doc,.docx,.xls,.xlsx,.txt,.zip" />
+    <button type="submit">Upload bestand</button>
   </form>
 
   <a href="/dashboard" class="back-link">← Terug naar dashboard</a>
@@ -79,14 +93,15 @@
 
     socket.emit('join', me);
 
-    // Scroll meteen naar beneden bij laden, zodat je de laatste berichten ziet
+    // Scroll meteen naar beneden bij laden
     window.scrollTo(0, document.body.scrollHeight);
 
-    document.querySelector('form').addEventListener('submit', e => {
+    document.getElementById('messageForm').addEventListener('submit', e => {
       e.preventDefault();
-      const input = document.querySelector('input[name="text"]');
+      const input = e.target.elements.text;
       const text = input.value.trim();
       if (!text) return;
+
       socket.emit('send-message', { from: me, to: friend, text });
       input.value = '';
     });
@@ -96,18 +111,24 @@
         const chat = document.getElementById('chat');
         const msgDiv = document.createElement('div');
         msgDiv.className = 'message ' + (data.from === me ? 'me' : 'friend');
-        msgDiv.innerHTML = `
-          <strong>${data.from}:</strong> ${data.text}
-          <small>${new Date(data.time).toLocaleTimeString()}</small>
-        `;
+        let content = `<strong>${data.from}:</strong> `;
+        if(data.text) {
+          content += data.text;
+        } else if(data.file) {
+          const ext = data.file.split('.').pop().toLowerCase();
+          if(['jpg','jpeg','png','gif'].includes(ext)) {
+            content += `<a href="${data.file}" target="_blank"><img src="${data.file}" class="chat-image" alt="Afbeelding"></a>`;
+          } else {
+            const filename = data.file.split('/').pop();
+            content += `<a href="${data.file}" target="_blank">Bestand: ${filename}</a>`;
+          }
+        }
+        content += `<small>${new Date(data.time).toLocaleTimeString()}</small>`;
+        msgDiv.innerHTML = content;
         chat.appendChild(msgDiv);
-
-        // Scroll naar het nieuwste bericht
         window.scrollTo(0, document.body.scrollHeight);
       }
     });
   </script>
-
-  <%- include('partials/footer') %>
 </body>
 </html>
