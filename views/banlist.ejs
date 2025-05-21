@@ -1,0 +1,32 @@
+<h1>Banlijst beheren</h1>
+<p>Ingelogd als <%= user %> (Admin)</p>
+
+<table border="1" cellpadding="5" cellspacing="0">
+  <tr>
+    <th>Gebruiker</th>
+    <th>Status</th>
+    <th>Actie</th>
+  </tr>
+  <% users.forEach(u => { %>
+    <tr>
+      <td><%= u %></td>
+      <td><%= bannedUsers.includes(u) ? "Geband" : "Actief" %></td>
+      <td>
+        <% if (u !== "SiebeCluyts") { %>
+          <form action="/admin/ban" method="POST" style="display:inline;">
+            <input type="hidden" name="username" value="<%= u %>" />
+            <% if (bannedUsers.includes(u)) { %>
+              <button type="submit" name="action" value="unban">Unban</button>
+            <% } else { %>
+              <button type="submit" name="action" value="ban">Ban</button>
+            <% } %>
+          </form>
+        <% } else { %>
+          N.v.t.
+        <% } %>
+      </td>
+    </tr>
+  <% }) %>
+</table>
+
+<a href="/dashboard">Terug naar dashboard</a>
