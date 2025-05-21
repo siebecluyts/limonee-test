@@ -1,386 +1,116 @@
-const express = require("express");
-const session = require("express-session");
-const FileStore = require("session-file-store")(session);
-const fs = require("fs");
-const bcrypt = require("bcryptjs");
-const path = require("path");
-const http = require("http");
-const socketIo = require("socket.io");
+const express = require('express');
+const session = require('express-session');
+const bodyParser = require('body-parser');
+const fs = require('fs');
+const bcrypt = require('bcrypt');
+const path = require('path');
 
 const app = express();
-const server = http.createServer(app);
-const io = socketIo(server);
+const PORT = process.env.PORT || 3000;
 
-const bannedUsersPath = path.join(__dirname, 'data', 'bannedUsers.json');
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
 
-function getBannedUsers() {
-  try {
-    const data = fs.readFileSync(bannedUsersPath, 'utf8');
-    return JSON.parse(data);
-  } catch (e) {
-    return [];
-  }
-}
-
-function saveBannedUsers(bannedUsers) {
-  fs.writeFileSync(bannedUsersPath, JSON.stringify(bannedUsers, null, 2));
-}
-
-// Middleware
-app.use(express.urlencoded({ extended: true }));
-app.use(express.static("public"));
-app.set("view engine", "ejs");
-
-app.use(
-  session({
-    store: new FileStore({ path: "./sessions" }),
-    secret: "geheimelimoen",
+app.use(express.static('public'));
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(session({
+    secret: 'geheime sleutel',
     resave: false,
-    saveUninitialized: true,
-  })
-);
+    saveUninitialized: false,
+}));
 
-// user info beschikbaar maken in EJS views
-app.use((req, res, next) => {
-  res.locals.user = req.session.username || null;
-  next();
-});
-
-// Bestandslocaties
-const USERS_FILE = "data/users.json";
-const MSG_FILE = "data/messages.json";
-
-// Init bestanden als ze niet bestaan
-if (!fs.existsSync(USERS_FILE)) fs.writeFileSync(USERS_FILE, "{}");
-if (!fs.existsSync(MSG_FILE)) fs.writeFileSync(MSG_FILE, "{}");
-if (!fs.existsSync(bannedUsersPath)) fs.writeFileSync(bannedUsersPath, "[]");
-
-// Helpers
-function readUsers() {
-  return JSON.parse(fs.readFileSync(USERS_FILE, "utf8"));
+// ➤ Helper om users.json in te laden
+function loadUsers() {
+    return JSON.parse(fs.readFileSync('./data/users.json', 'utf8'));
 }
 
-function writeUsers(data) {
-  fs.writeFileSync(USERS_FILE, JSON.stringify(data, null, 2));
+// ➤ Helper om banlist.json in te laden
+function loadBanlist() {
+    if (!fs.existsSync('./data/banlist.json')) {
+        fs.writeFileSync('./data/banlist.json', '[]');
+    }
+    return JSON.parse(fs.readFileSync('./data/banlist.json', 'utf8'));
 }
 
-function readMessages() {
-  return JSON.parse(fs.readFileSync(MSG_FILE, "utf8"));
-}
-
-function writeMessages(data) {
-  fs.writeFileSync(MSG_FILE, JSON.stringify(data, null, 2));
-}
-
-// Middleware om te checken of je admin bent (SiebeCluyts)
-function checkAdmin(req, res, next) {
-  if (req.session.username === "SiebeCluyts") {
+// ➤ Middleware: redirect als niet ingelogd
+function requireLogin(req, res, next) {
+    if (!req.session.username) return res.redirect('/login');
     next();
-  } else {
-    res.status(403).send("Forbidden: Alleen voor admin");
-  }
 }
 
-// Routes
+// ➤ Middleware: enkel SiebeCluyts mag deze route zien
+function requireAdmin(req, res, next) {
+    if (req.session.username !== 'SiebeCluyts') {
+        return res.status(403).send('Toegang geweigerd');
+    }
+    next();
+}
+
+// ✅ ROUTES
 
 // Home
 app.get('/', (req, res) => {
-  res.render('index');
+    res.render('index', { username: req.session.username });
 });
 
-app.get("/register", (req, res) => {
-  res.render("register", { error: null });
+// Login
+app.get('/login', (req, res) => {
+    res.render('login');
 });
 
-app.post("/register", async (req, res) => {
-  const { username, password } = req.body;
-  const users = readUsers();
+app.post('/login', (req, res) => {
+    const users = loadUsers();
+    const { username, password } = req.body;
+    const user = users.find(u => u.username === username);
 
-  if (users[username]) {
-    return res.render("register", { error: "Gebruiker bestaat al." });
-  }
+    if (!user) return res.send('Gebruiker bestaat niet');
 
-  const bannedUsers = getBannedUsers();
-  if (bannedUsers.includes(username)) {
-    return res.render("register", { error: "Je bent verbannen en kunt niet registreren." });
-  }
-
-  const hash = await bcrypt.hash(password, 10);
-  users[username] = {
-    password: hash,
-    friends: [],
-    requests: [],
-  };
-  writeUsers(users);
-
-  req.session.username = username;
-  res.redirect("/dashboard");
-});
-
-app.post("/login", async (req, res) => {
-  const { username, password } = req.body;
-  const users = readUsers();
-  const user = users[username];
-
-  if (!user) return res.render("login", { error: "Gebruiker bestaat niet." });
-
-  const bannedUsers = getBannedUsers();
-  if (bannedUsers.includes(username)) {
-    return res.render("login", { error: "Je bent verbannen en kunt niet inloggen." });
-  }
-
-  const valid = await bcrypt.compare(password, user.password);
-  if (!valid) return res.render("login", { error: "Wachtwoord incorrect." });
-
-  req.session.username = username;
-  res.redirect("/dashboard");
-});
-
-app.get("/dashboard", (req, res) => {
-  const username = req.session.username;
-  if (!username) return res.redirect("/");
-
-  const users = readUsers();
-  const user = users[username];
-  const messages = readMessages();
-
-  const newMessageCounts = {};
-  user.friends.forEach((f) => {
-    const chat = messages[username]?.[f] || [];
-    const unread = chat.filter((m) => !m.read && m.to === username);
-    if (unread.length > 0) newMessageCounts[f] = unread.length;
-  });
-
-  res.render("dashboard", {
-    username,
-    friends: user.friends,
-    requests: user.requests,
-    error: null,
-    newMessageCounts,
-  });
-});
-
-app.post("/friend-request", (req, res) => {
-  const sender = req.session.username;
-  const receiver = req.body.receiver;
-  const users = readUsers();
-
-  if (!users[receiver]) {
-    return res.render("dashboard", {
-      username: sender,
-      friends: users[sender].friends,
-      requests: users[sender].requests,
-      error: "Gebruiker bestaat niet.",
-      newMessageCounts: {},
-    });
-  }
-
-  if (
-    users[receiver].requests.includes(sender) ||
-    users[receiver].friends.includes(sender)
-  ) {
-    return res.redirect("/dashboard");
-  }
-
-  users[receiver].requests.push(sender);
-  writeUsers(users);
-  res.redirect("/dashboard");
-});
-
-app.post("/accept-friend", (req, res) => {
-  const sender = req.body.sender;
-  const receiver = req.session.username;
-  const users = readUsers();
-
-  if (!users[sender] || !users[receiver]) return res.redirect("/dashboard");
-
-  if (!users[receiver].friends.includes(sender))
-    users[receiver].friends.push(sender);
-  if (!users[sender].friends.includes(receiver))
-    users[sender].friends.push(receiver);
-
-  users[receiver].requests = users[receiver].requests.filter(
-    (u) => u !== sender
-  );
-
-  writeUsers(users);
-  res.redirect("/dashboard");
-});
-
-app.post("/decline-friend", (req, res) => {
-  const sender = req.body.sender;
-  const receiver = req.session.username;
-  const users = readUsers();
-
-  users[receiver].requests = users[receiver].requests.filter(
-    (u) => u !== sender
-  );
-  writeUsers(users);
-  res.redirect("/dashboard");
-});
-
-app.get("/chat/:friend", (req, res) => {
-  const user = req.session.username;
-  const friend = req.params.friend;
-  if (!user) return res.redirect("/");
-
-  const users = readUsers();
-  const messages = readMessages();
-
-  if (!users[user].friends.includes(friend)) return res.redirect("/dashboard");
-
-  const chat = messages[user]?.[friend] || [];
-
-  chat.forEach((m) => {
-    if (m.to === user) m.read = true;
-  });
-
-  if (!messages[user]) messages[user] = {};
-  messages[user][friend] = chat;
-  if (!messages[friend]) messages[friend] = {};
-  if (!messages[friend][user]) messages[friend][user] = chat;
-
-  writeMessages(messages);
-
-  res.render("chat", {
-    user,
-    friend,
-    messages: chat,
-  });
-});
-
-app.post("/chat/:friend", (req, res) => {
-  const from = req.session.username;
-  const to = req.params.friend;
-  const text = req.body.text;
-  const time = Date.now();
-
-  if (!from) return res.redirect("/");
-
-  const messages = readMessages();
-
-  if (!messages[from]) messages[from] = {};
-  if (!messages[to]) messages[to] = {};
-  if (!messages[from][to]) messages[from][to] = [];
-  if (!messages[to][from]) messages[to][from] = [];
-
-  const msg = { from, to, text, time, read: false };
-
-  messages[from][to].push(msg);
-  messages[to][from].push(msg);
-
-  writeMessages(messages);
-
-  res.redirect(`/chat/${to}`);
-});
-
-app.get("/logout", (req, res) => {
-  req.session.destroy(() => {
-    res.redirect("/");
-  });
-});
-
-// Dagelijkse verrassing
-const verrassingen = [
-  "Citroenfeit: Citroenen drijven omdat ze een dikke schil met luchtzakjes hebben.",
-  "Limonademop: Waarom hield de limonade een speech? Omdat hij bruisend was!",
-  "Citroenfeit: In de Middeleeuwen dacht men dat citroen gif kon tegengaan.",
-  "Limonademop: Wat zegt de citroen tegen de limonade? Jij bent té zoet!",
-  "Citroenfeit: Citroenen bevatten meer suiker dan aardbeien!",
-  "Limonademop: Wat doet een citroen in de sportschool? Zich uitpersen!"
-];
-
-app.get('/verrassing', (req, res) => {
-  if (!req.session.username) return res.redirect('/login');
-
-  // Selecteer een verrassing per dag
-  const today = new Date().toISOString().slice(0, 10); // bv. "2025-05-15"
-  const dayIndex = new Date(today).getDate() % verrassingen.length;
-  const verrassing = verrassingen[dayIndex];
-
-  res.render('verrassing', { verrassing });
-});
-
-// Admin routes: banlist bekijken en gebruiker bannen (alleen SiebeCluyts)
-
-app.get("/admin/banlist", checkAdmin, (req, res) => {
-  const bannedUsers = getBannedUsers();
-  res.render("banlist", { bannedUsers });
-});
-
-app.post("/admin/banlist", checkAdmin, (req, res) => {
-  const { username } = req.body;
-  if (!username) return res.redirect("/admin/banlist");
-
-  let bannedUsers = getBannedUsers();
-  if (!bannedUsers.includes(username)) {
-    bannedUsers.push(username);
-    saveBannedUsers(bannedUsers);
-
-    // Optioneel: gebruiker meteen uitloggen door sessie verwijderen
-    // of bij volgende login blokkeren (je checkt dat al bij login/registratie)
-  }
-
-  res.redirect("/admin/banlist");
-});
-
-// Dynamische route
-app.get('/*', (req, res) => {
-  const urlPath = req.path; // bijvoorbeeld: /about/personen
-  const parts = urlPath.split('/').filter(Boolean); // ['about', 'personen']
-
-  // Eerste: check of er een .ejs file direct bestaat
-  let filePath = path.join(__dirname, 'views', ...parts) + '.ejs';
-
-  fs.access(filePath, fs.constants.F_OK, (err) => {
-    if (!err) {
-      // Bestaat direct als bestand
-      res.render(parts.join('/'));
-    } else {
-      // Tweede: check of het een map is met index.ejs erin
-      let folderPath = path.join(__dirname, 'views', ...parts, 'index.ejs');
-      fs.access(folderPath, fs.constants.F_OK, (folderErr) => {
-        if (!folderErr) {
-          // Bestaat als map/index.ejs
-          res.render(path.join(parts.join('/'), 'index'));
+    bcrypt.compare(password, user.password, (err, result) => {
+        if (result) {
+            req.session.username = user.username;
+            res.redirect('/');
         } else {
-          // Bestaat niet -> 404
-          res.status(404).render('404');
+            res.send('Wachtwoord incorrect');
         }
-      });
+    });
+});
+
+// Logout
+app.get('/logout', (req, res) => {
+    req.session.destroy(() => {
+        res.redirect('/');
+    });
+});
+
+// ✅ Admin banlist (alleen voor SiebeCluyts)
+app.get('/admin/banlist', requireLogin, requireAdmin, (req, res) => {
+    const banlist = loadBanlist();
+    res.render('admin/banlist', { banlist });
+});
+
+// ✅ Verban een gebruiker via POST
+app.post('/admin/ban', requireLogin, requireAdmin, (req, res) => {
+    const { username } = req.body;
+    let banlist = loadBanlist();
+
+    if (!banlist.includes(username)) {
+        banlist.push(username);
+        fs.writeFileSync('./data/banlist.json', JSON.stringify(banlist, null, 2));
     }
-  });
+
+    res.redirect('/admin/banlist');
 });
 
-// Socket.IO
-io.on("connection", (socket) => {
-  socket.on("join", (username) => {
-    socket.join(username);
-  });
-
-  socket.on("send-message", (data) => {
-    const { from, to, text } = data;
-    const time = Date.now();
-    const msg = { from, to, text, time, read: false };
-
-    const messages = readMessages();
-
-    if (!messages[from]) messages[from] = {};
-    if (!messages[to]) messages[to] = {};
-    if (!messages[from][to]) messages[from][to] = [];
-    if (!messages[to][from]) messages[to][from] = [];
-
-    messages[from][to].push(msg);
-    messages[to][from].push(msg);
-
-    writeMessages(messages);
-
-    io.to(to).emit("receive-message", msg);
-    io.to(from).emit("receive-message", msg);
-  });
+// ❗ Bancheck middleware (indien nodig)
+app.use((req, res, next) => {
+    const banlist = loadBanlist();
+    if (req.session.username && banlist.includes(req.session.username)) {
+        return res.send('Je bent verbannen van deze site.');
+    }
+    next();
 });
 
-// Start server
-server.listen(process.env.PORT || 3000, () => {
-  console.log("Server gestart op http://localhost:3000");
+// Server starten
+app.listen(PORT, () => {
+    console.log(`Server draait op http://localhost:${PORT}`);
 });
