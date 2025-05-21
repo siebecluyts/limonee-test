@@ -41,6 +41,9 @@ function readJSON(file, fallback) {
 function saveJSON(file, data) {
   fs.writeFileSync(file, JSON.stringify(data, null, 2));
 }
+const BANNED_FILE = path.join(__dirname, 'banned.json');
+const readBanned = () => readJSON(BANNED_FILE, []);
+
 const readUsers = () => readJSON(USERS_FILE, []);
 const saveUsers = (data) => saveJSON(USERS_FILE, data);
 const readMessages = () => readJSON(MESSAGES_FILE, []);
