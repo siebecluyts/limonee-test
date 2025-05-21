@@ -21,6 +21,11 @@
   <% }) %>
 </ul>
 
+<form method="POST" action="/admin/ban">
+  <input name="usernameToBan" placeholder="Gebruikersnaam te bannen" required />
+  <button type="submit">Ban gebruiker</button>
+</form>
+
           <ul id="meldingen"></ul>
 
 <script src="/socket.io/socket.io.js"></script>
