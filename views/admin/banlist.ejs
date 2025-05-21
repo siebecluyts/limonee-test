@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Banlijst</title>
+</head>
+<body>
+  <h1>Banlijst</h1>
+  <ul>
+    <% banlist.forEach(function(user) { %>
+      <li><%= user %></li>
+    <% }) %>
+  </ul>
+
+  <h2>Gebruiker verbannen</h2>
+  <form method="POST" action="/admin/ban">
+    <input type="text" name="username" placeholder="Gebruikersnaam om te bannen" required>
+    <button type="submit">Verban</button>
+  </form>
+
+  <a href="/">Terug naar home</a>
+</body>
+</html>
