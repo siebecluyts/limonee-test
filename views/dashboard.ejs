@@ -25,6 +25,9 @@
   <input name="usernameToBan" placeholder="Gebruikersnaam te bannen" required />
   <button type="submit">Ban gebruiker</button>
 </form>
+<% if (user === 'SiebeCluyts') { %>
+  <a href="/userslist"><button>Beheer gebruikers</button></a>
+<% } %>
 
           <ul id="meldingen"></ul>
 
