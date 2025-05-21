@@ -65,6 +65,18 @@ app.post('/register', async (req, res) => {
   res.redirect('/login');
 });
 
+app.post('/ban', (req, res) => {
+  const { username } = req.body;
+
+  if (!req.session.username) return res.redirect('/login');
+
+  // Eventueel alleen admins laten bannen
+  // if (req.session.username !== 'admin') return res.send("Geen toegang");
+
+  banUser(username);
+  res.send(`Gebruiker ${username} is geblokkeerd.`);
+});
+
 function banUser(username) {
   const banned = readBanned();
   if (!banned.includes(username)) {
