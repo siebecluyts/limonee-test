@@ -60,6 +60,9 @@ app.post('/register', async (req, res) => {
   const { username, password } = req.body;
   const users = readUsers();
   if (users.find(u => u.username === username)) return res.send("Gebruiker bestaat al");
+  const banned = readBanned();
+  if (banned.includes(username)) return res.send("Je bent geblokkeerd en kan niet registreren.");
+
   const hashed = await bcrypt.hash(password, 10);
   users.push({ username, password: hashed, friends: [], requests: [] });
   saveUsers(users);
@@ -85,25 +88,35 @@ app.post('/login', async (req, res) => {
   res.redirect('/dashboard');
 });
 
-// Admin – Ban user
-app.get('/admin/ban', (req, res) => {
-  if (req.session.username !== 'admin') return res.send("Geen toegang");
-
-  const users = readUsers();
+// Ban/unban routes — Alleen SiebeCluyts mag bannen
+app.get('/banlist', (req, res) => {
+  if (req.session.username !== 'SiebeCluyts') return res.status(403).send("Geen toegang");
   const banned = readBanned();
-  res.render('admin/ban', { users, banned });
+  res.render('banlist', { banned });
 });
 
-app.post('/admin/ban', (req, res) => {
-  if (req.session.username !== 'admin') return res.send("Geen toegang");
-
+app.post('/ban', (req, res) => {
+  if (req.session.username !== 'SiebeCluyts') return res.status(403).send("Geen toegang");
   const { username } = req.body;
+  if (!username) return res.redirect('/banlist');
+
   const banned = readBanned();
   if (!banned.includes(username)) {
     banned.push(username);
     saveBanned(banned);
   }
-  res.redirect('/admin/ban');
+  res.redirect('/banlist');
+});
+
+app.post('/unban', (req, res) => {
+  if (req.session.username !== 'SiebeCluyts') return res.status(403).send("Geen toegang");
+  const { username } = req.body;
+  if (!username) return res.redirect('/banlist');
+
+  let banned = readBanned();
+  banned = banned.filter(u => u !== username);
+  saveBanned(banned);
+  res.redirect('/banlist');
 });
 
 // Dashboard
@@ -112,6 +125,8 @@ app.get('/dashboard', (req, res) => {
 
   const users = readUsers();
   const me = users.find(u => u.username === req.session.username);
+  if (!me) return res.redirect('/login');
+
   const messages = readMessages();
 
   const newMessageCounts = {};
@@ -125,14 +140,49 @@ app.get('/dashboard', (req, res) => {
     friends: me.friends,
     requests: me.requests,
     error: null,
-    newMessageCounts
+    newMessageCounts,
+    isSiebe: me.username === 'SiebeCluyts' // Voor conditional rendering in dashboard.ejs
   });
+});
+
+// Secret userslist beheerpagina, alleen voor SiebeCluyts
+app.get('/userslist', (req, res) => {
+  if (req.session.username !== 'SiebeCluyts') return res.status(403).send('Geen toegang');
+
+  const users = readUsers();
+  res.render('userslist', { users });
+});
+
+app.post('/userslist/update', async (req, res) => {
+  if (req.session.username !== 'SiebeCluyts') return res.status(403).send('Geen toegang');
+
+  const { username, newUsername, newPassword, newFriends } = req.body;
+  const users = readUsers();
+  const index = users.findIndex(u => u.username === username);
+  if (index === -1) return res.status(404).send('Gebruiker niet gevonden');
+
+  users[index].username = newUsername;
+
+  if (newPassword && newPassword.trim() !== '') {
+    users[index].password = await bcrypt.hash(newPassword, 10);
+  }
+
+  try {
+    users[index].friends = JSON.parse(newFriends);
+  } catch {
+    return res.status(400).send('Vrienden moeten geldig JSON-array zijn');
+  }
+
+  saveUsers(users);
+  res.redirect('/userslist');
 });
 
 // Friend requests
 app.post('/friend-request', (req, res) => {
   const { receiver } = req.body;
   const sender = req.session.username;
+  if (!sender) return res.redirect('/login');
+
   const users = readUsers();
   const me = users.find(u => u.username === sender);
   const target = users.find(u => u.username === receiver);
@@ -157,6 +207,8 @@ app.post('/friend-request', (req, res) => {
 app.post('/accept-friend', (req, res) => {
   const { sender } = req.body;
   const receiver = req.session.username;
+  if (!receiver) return res.redirect('/login');
+
   const users = readUsers();
   const me = users.find(u => u.username === receiver);
   const other = users.find(u => u.username === sender);
@@ -174,6 +226,8 @@ app.post('/accept-friend', (req, res) => {
 app.post('/decline-friend', (req, res) => {
   const { sender } = req.body;
   const me = req.session.username;
+  if (!me) return res.redirect('/login');
+
   const users = readUsers();
   const user = users.find(u => u.username === me);
   user.requests = user.requests.filter(r => r !== sender);
@@ -187,7 +241,7 @@ app.get('/chat/:friend', (req, res) => {
   const { friend } = req.params;
   const users = readUsers();
   const user = users.find(u => u.username === me);
-  if (!user.friends.includes(friend)) return res.send("Geen toegang");
+  if (!user || !user.friends.includes(friend)) return res.send("Geen toegang");
 
   const messages = readMessages().filter(
     m => (m.from === me && m.to === friend) || (m.from === friend && m.to === me)
@@ -212,53 +266,13 @@ io.on('connection', socket => {
   });
 });
 
-app.get('/messages/:friend', (req, res) => {
-  const me = req.session.username;
-  const friend = req.params.friend;
-  const messages = readMessages().filter(
-    m => (m.from === me && m.to === friend) || (m.from === friend && m.to === me)
-  );
-  const html = messages.map(m =>
-    `<p><strong>${m.from}:</strong> ${m.text} <small>(${new Date(m.time).toLocaleTimeString()})</small></p>`
-  ).join('');
-  res.send(html);
+// Uitloggen
+app.get('/logout', (req, res) => {
+  req.session.destroy();
+  res.redirect('/');
 });
-
-// Verrassing
-const verrassingen = [
-  "Citroenfeit: Citroenen drijven omdat ze een dikke schil met luchtzakjes hebben.",
-  "Limonademop: Waarom hield de limonade een speech? Omdat hij bruisend was!",
-  "Citroenfeit: In de Middeleeuwen dacht men dat citroen gif kon tegengaan.",
-  "Limonademop: Wat zegt de citroen tegen de limonade? Jij bent té zoet!",
-  "Citroenfeit: Citroenen bevatten meer suiker dan aardbeien!",
-  "Limonademop: Wat doet een citroen in de sportschool? Zich uitpersen!"
-];
-
-app.get('/verrassing', (req, res) => {
-  if (!req.session.username) return res.redirect('/login');
-  const today = new Date().toISOString().slice(0, 10);
-  const dayIndex = new Date(today).getDate() % verrassingen.length;
-  const verrassing = verrassingen[dayIndex];
-  res.render('verrassing', { verrassing });
-});
-
-// Dynamische routes
-app.get('/*', (req, res) => {
-  const parts = req.path.split('/').filter(Boolean);
-  const filePath = path.join(__dirname, 'views', ...parts) + '.ejs';
-
-  fs.access(filePath, fs.constants.F_OK, (err) => {
-    if (!err) return res.render(parts.join('/'));
-    const folderPath = path.join(__dirname, 'views', ...parts, 'index.ejs');
-    fs.access(folderPath, fs.constants.F_OK, (folderErr) => {
-      if (!folderErr) return res.render(path.join(parts.join('/'), 'index'));
-      res.status(404).render('404');
-    });
-  });
-});
-
-// Fallback
-app.use((req, res) => res.status(404).render('404'));
 
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => console.log(`Server draait op http://localhost:${PORT}`));
+server.listen(PORT, () => {
+  console.log(`Server gestart op poort ${PORT}`);
+});
