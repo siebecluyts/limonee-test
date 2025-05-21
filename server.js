@@ -53,6 +53,7 @@ const MSG_FILE = "data/messages.json";
 // Init bestanden als ze niet bestaan
 if (!fs.existsSync(USERS_FILE)) fs.writeFileSync(USERS_FILE, "{}");
 if (!fs.existsSync(MSG_FILE)) fs.writeFileSync(MSG_FILE, "{}");
+if (!fs.existsSync(bannedUsersPath)) fs.writeFileSync(bannedUsersPath, "[]");
 
 // Helpers
 function readUsers() {
@@ -71,13 +72,21 @@ function writeMessages(data) {
   fs.writeFileSync(MSG_FILE, JSON.stringify(data, null, 2));
 }
 
+// Middleware om te checken of je admin bent (SiebeCluyts)
+function checkAdmin(req, res, next) {
+  if (req.session.username === "SiebeCluyts") {
+    next();
+  } else {
+    res.status(403).send("Forbidden: Alleen voor admin");
+  }
+}
+
 // Routes
 
 // Home
 app.get('/', (req, res) => {
   res.render('index');
 });
-
 
 app.get("/register", (req, res) => {
   res.render("register", { error: null });
@@ -89,6 +98,11 @@ app.post("/register", async (req, res) => {
 
   if (users[username]) {
     return res.render("register", { error: "Gebruiker bestaat al." });
+  }
+
+  const bannedUsers = getBannedUsers();
+  if (bannedUsers.includes(username)) {
+    return res.render("register", { error: "Je bent verbannen en kunt niet registreren." });
   }
 
   const hash = await bcrypt.hash(password, 10);
@@ -109,6 +123,11 @@ app.post("/login", async (req, res) => {
   const user = users[username];
 
   if (!user) return res.render("login", { error: "Gebruiker bestaat niet." });
+
+  const bannedUsers = getBannedUsers();
+  if (bannedUsers.includes(username)) {
+    return res.render("login", { error: "Je bent verbannen en kunt niet inloggen." });
+  }
 
   const valid = await bcrypt.compare(password, user.password);
   if (!valid) return res.render("login", { error: "Wachtwoord incorrect." });
@@ -272,7 +291,7 @@ const verrassingen = [
 ];
 
 app.get('/verrassing', (req, res) => {
-  if (!req.session.user) return res.redirect('/login');
+  if (!req.session.username) return res.redirect('/login');
 
   // Selecteer een verrassing per dag
   const today = new Date().toISOString().slice(0, 10); // bv. "2025-05-15"
@@ -280,6 +299,29 @@ app.get('/verrassing', (req, res) => {
   const verrassing = verrassingen[dayIndex];
 
   res.render('verrassing', { verrassing });
+});
+
+// Admin routes: banlist bekijken en gebruiker bannen (alleen SiebeCluyts)
+
+app.get("/admin/banlist", checkAdmin, (req, res) => {
+  const bannedUsers = getBannedUsers();
+  res.render("banlist", { bannedUsers });
+});
+
+app.post("/admin/banlist", checkAdmin, (req, res) => {
+  const { username } = req.body;
+  if (!username) return res.redirect("/admin/banlist");
+
+  let bannedUsers = getBannedUsers();
+  if (!bannedUsers.includes(username)) {
+    bannedUsers.push(username);
+    saveBannedUsers(bannedUsers);
+
+    // Optioneel: gebruiker meteen uitloggen door sessie verwijderen
+    // of bij volgende login blokkeren (je checkt dat al bij login/registratie)
+  }
+
+  res.redirect("/admin/banlist");
 });
 
 // Dynamische route
