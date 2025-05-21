@@ -27,9 +27,7 @@ app.use((req, res, next) => {
 
 const USERS_FILE = path.join(__dirname, 'users.json');
 const MESSAGES_FILE = path.join(__dirname, 'messages.json');
-const BANNED_FILE = path.join(__dirname, 'banned.json');
 
-// Helpers
 function readJSON(file, fallback) {
   try {
     if (!fs.existsSync(file)) return fallback;
@@ -43,15 +41,10 @@ function readJSON(file, fallback) {
 function saveJSON(file, data) {
   fs.writeFileSync(file, JSON.stringify(data, null, 2));
 }
-
 const readUsers = () => readJSON(USERS_FILE, []);
 const saveUsers = (data) => saveJSON(USERS_FILE, data);
 const readMessages = () => readJSON(MESSAGES_FILE, []);
 const saveMessages = (data) => saveJSON(MESSAGES_FILE, data);
-const readBanned = () => readJSON(BANNED_FILE, []);
-const saveBanned = (data) => saveJSON(BANNED_FILE, data);
-
-// --- Routes ---
 
 // Home
 app.get('/', (req, res) => res.render('index'));
@@ -74,9 +67,6 @@ app.get('/login', (req, res) => res.render('login'));
 
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
-  const banned = readBanned();
-  if (banned.includes(username)) return res.send("Je bent geblokkeerd.");
-
   const users = readUsers();
   const user = users.find(u => u.username === username);
   if (!user) return res.send("Gebruiker niet gevonden");
@@ -94,13 +84,8 @@ app.get('/dashboard', (req, res) => {
 
   const users = readUsers();
   const me = users.find(u => u.username === req.session.username);
-  if (!me) return res.redirect('/login');
-
-  // Check of admin
-  const isSiebe = me.username === 'SiebeCluyts';
-
-  // Nieuw bericht telling
   const messages = readMessages();
+
   const newMessageCounts = {};
   me.friends.forEach(friend => {
     const unread = messages.filter(m => m.from === friend && m.to === me.username);
@@ -112,84 +97,140 @@ app.get('/dashboard', (req, res) => {
     friends: me.friends,
     requests: me.requests,
     error: null,
-    newMessageCounts,
-    isSiebe
+    newMessageCounts
   });
 });
 
-// Admin: Gebruikerslijst bekijken en bewerken (alleen SiebeCluyts)
-app.get('/userslist', (req, res) => {
-  if (req.session.username !== 'SiebeCluyts') return res.status(403).send('Geen toegang');
-
+// Friend requests
+app.post('/friend-request', (req, res) => {
+  const { receiver } = req.body;
+  const sender = req.session.username;
   const users = readUsers();
-  res.render('userslist', { users });
+  const me = users.find(u => u.username === sender);
+  const target = users.find(u => u.username === receiver);
+
+  if (!target || sender === receiver) {
+    return res.render('dashboard', {
+      username: me.username,
+      friends: me.friends,
+      requests: me.requests,
+      error: "Gebruiker bestaat niet."
+    });
+  }
+
+  if (!target.requests.includes(sender) && !target.friends.includes(sender)) {
+    target.requests.push(sender);
+    saveUsers(users);
+  }
+
+  res.redirect('/dashboard');
 });
 
-// Admin: Gebruiker bewerken (wachtwoord en vrienden)
-app.post('/userslist/edit', async (req, res) => {
-  if (req.session.username !== 'SiebeCluyts') return res.status(403).send('Geen toegang');
-
-  const { username, newPassword, friendsCSV } = req.body;
+app.post('/accept-friend', (req, res) => {
+  const { sender } = req.body;
+  const receiver = req.session.username;
   const users = readUsers();
-  const user = users.find(u => u.username === username);
-  if (!user) return res.status(404).send('Gebruiker niet gevonden');
+  const me = users.find(u => u.username === receiver);
+  const other = users.find(u => u.username === sender);
 
-  if (newPassword && newPassword.trim() !== '') {
-    user.password = await bcrypt.hash(newPassword, 10);
-  }
-  // Vrienden updaten (CSV naar array)
-  if (friendsCSV !== undefined) {
-    user.friends = friendsCSV.split(',').map(f => f.trim()).filter(f => f.length > 0 && f !== username);
-  }
+  if (!other || !me.requests.includes(sender)) return res.send("Verzoek niet gevonden");
+
+  me.requests = me.requests.filter(r => r !== sender);
+  if (!me.friends.includes(sender)) me.friends.push(sender);
+  if (!other.friends.includes(receiver)) other.friends.push(receiver);
 
   saveUsers(users);
-  res.redirect('/userslist');
+  res.redirect('/dashboard');
 });
 
-// Admin: Banlijst bekijken (alleen SiebeCluyts)
-app.get('/banlist', (req, res) => {
-  if (req.session.username !== 'SiebeCluyts') return res.status(403).send('Geen toegang');
-
-  const banned = readBanned();
-  res.render('banlist', { banned });
+app.post('/decline-friend', (req, res) => {
+  const { sender } = req.body;
+  const me = req.session.username;
+  const users = readUsers();
+  const user = users.find(u => u.username === me);
+  user.requests = user.requests.filter(r => r !== sender);
+  saveUsers(users);
+  res.redirect('/dashboard');
 });
 
-// Admin: User bannen
-app.post('/banlist/ban', (req, res) => {
-  if (req.session.username !== 'SiebeCluyts') return res.status(403).send('Geen toegang');
+// Chat
+app.get('/chat/:friend', (req, res) => {
+  const me = req.session.username;
+  const { friend } = req.params;
+  const users = readUsers();
+  const user = users.find(u => u.username === me);
+  if (!user.friends.includes(friend)) return res.send("Geen toegang");
 
-  const { username } = req.body;
-  if (!username) return res.redirect('/banlist');
+  const messages = readMessages().filter(
+    m => (m.from === me && m.to === friend) || (m.from === friend && m.to === me)
+  );
 
-  const banned = readBanned();
-  if (!banned.includes(username)) {
-    banned.push(username);
-    saveBanned(banned);
-  }
-  res.redirect('/banlist');
+  res.render('chat', { friend, messages });
 });
 
-// Admin: User unbannen
-app.post('/banlist/unban', (req, res) => {
-  if (req.session.username !== 'SiebeCluyts') return res.status(403).send('Geen toegang');
+io.on('connection', socket => {
+  socket.on('join', username => {
+    socket.join(username);
+  });
 
-  const { username } = req.body;
-  if (!username) return res.redirect('/banlist');
-
-  let banned = readBanned();
-  banned = banned.filter(u => u !== username);
-  saveBanned(banned);
-  res.redirect('/banlist');
+  socket.on('send-message', data => {
+    const { from, to, text } = data;
+    const messages = readMessages();
+    const message = { from, to, text, time: new Date().toISOString() };
+    messages.push(message);
+    saveMessages(messages);
+    io.to(to).emit('receive-message', message);
+    io.to(from).emit('receive-message', message);
+  });
 });
 
-// Friend requests, accept, decline (zoals eerder)
-// ... (je huidige code, ongewijzigd)
+app.get('/messages/:friend', (req, res) => {
+  const me = req.session.username;
+  const friend = req.params.friend;
+  const messages = readMessages().filter(
+    m => (m.from === me && m.to === friend) || (m.from === friend && m.to === me)
+  );
+  const html = messages.map(m =>
+    `<p><strong>${m.from}:</strong> ${m.text} <small>(${new Date(m.time).toLocaleTimeString()})</small></p>`
+  ).join('');
+  res.send(html);
+});
 
-// Chat routes, socket.io (zoals eerder)
-// ... (je huidige code, ongewijzigd)
+// Verrassing
+const verrassingen = [
+  "Citroenfeit: Citroenen drijven omdat ze een dikke schil met luchtzakjes hebben.",
+  "Limonademop: Waarom hield de limonade een speech? Omdat hij bruisend was!",
+  "Citroenfeit: In de Middeleeuwen dacht men dat citroen gif kon tegengaan.",
+  "Limonademop: Wat zegt de citroen tegen de limonade? Jij bent té zoet!",
+  "Citroenfeit: Citroenen bevatten meer suiker dan aardbeien!",
+  "Limonademop: Wat doet een citroen in de sportschool? Zich uitpersen!"
+];
 
-// Verrassing, dynamische routes, fallback
-// ... (je huidige code, ongewijzigd)
+app.get('/verrassing', (req, res) => {
+  if (!req.session.username) return res.redirect('/login');
+  const today = new Date().toISOString().slice(0, 10);
+  const dayIndex = new Date(today).getDate() % verrassingen.length;
+  const verrassing = verrassingen[dayIndex];
+  res.render('verrassing', { verrassing });
+});
+
+// Dynamische routes
+app.get('/*', (req, res) => {
+  const parts = req.path.split('/').filter(Boolean);
+  const filePath = path.join(__dirname, 'views', ...parts) + '.ejs';
+
+  fs.access(filePath, fs.constants.F_OK, (err) => {
+    if (!err) return res.render(parts.join('/'));
+    const folderPath = path.join(__dirname, 'views', ...parts, 'index.ejs');
+    fs.access(folderPath, fs.constants.F_OK, (folderErr) => {
+      if (!folderErr) return res.render(path.join(parts.join('/'), 'index'));
+      res.status(404).render('404');
+    });
+  });
+});
+
+// Fallback
+app.use((req, res) => res.status(404).render('404'));
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => console.log(`Server draait op http://localhost:${PORT}`));
