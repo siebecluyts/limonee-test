@@ -52,6 +52,16 @@ const saveMessages = (data) => saveJSON(MESSAGES_FILE, data);
 // Home
 app.get('/', (req, res) => res.render('index'));
 
+app.get('/logout', (req, res) => {
+  req.session.destroy(err => {
+    if (err) {
+      console.error('Fout bij uitloggen:', err);
+      return res.send("Er is iets fout gegaan bij het uitloggen.");
+    }
+    res.redirect('/login');
+  });
+});
+
 // Registratie
 app.get('/register', (req, res) => res.render('register'));
 
