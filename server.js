@@ -38,7 +38,7 @@ app.use((req, res, next) => {
   next();
 });
 
-const USERS_FILE = path.join(__dirname, 'users.json');
+const USERS_FILE = path.join(__dirname, 'data', 'users.json');
 const MESSAGES_FILE = path.join(__dirname, 'messages.json');
 
 function readJSON(file, fallback) {
