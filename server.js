@@ -10,9 +10,11 @@ const server = http.createServer(app);
 const { Server } = require('socket.io');
 const io = new Server(server);
 
-// Multer configuratie voor uploads in /public/uploads
+// Uploads folder aanmaken
 const uploadDir = path.join(__dirname, 'public', 'uploads');
 if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+
+// Multer opslagconfiguratie
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, uploadDir),
   filename: (req, file, cb) => {
@@ -51,6 +53,7 @@ function readJSON(file, fallback) {
     return fallback;
   }
 }
+
 function saveJSON(file, data) {
   fs.writeFileSync(file, JSON.stringify(data, null, 2));
 }
@@ -60,39 +63,23 @@ const saveUsers = (data) => saveJSON(USERS_FILE, data);
 const readMessages = () => readJSON(MESSAGES_FILE, []);
 const saveMessages = (data) => saveJSON(MESSAGES_FILE, data);
 
-// Routes: Home, Login, Register, Logout, Dashboard, etc. (idem aan jouw code)
-// Voor kortheid laat ik die hier weg; focus ligt op chat + upload.
+// Routes
+app.get('/', (req, res) => res.render('index'));
 
-// Chat pagina GET
-// Homepagina
-app.get('/', (req, res) => {
-  res.render('index');
-});
+app.get('/register', (req, res) => res.render('register'));
 
-// Registratiepagina
-app.get('/register', (req, res) => {
-  res.render('register');
-});
-
-// Registratie POST
 app.post('/register', async (req, res) => {
   const { username, password } = req.body;
   const users = readUsers();
-  if (users.find(u => u.username === username)) {
-    return res.send("Gebruiker bestaat al");
-  }
+  if (users.find(u => u.username === username)) return res.send("Gebruiker bestaat al");
   const hashed = await bcrypt.hash(password, 10);
   users.push({ username, password: hashed, friends: [], requests: [] });
   saveUsers(users);
   res.redirect('/login');
 });
 
-// Loginpagina
-app.get('/login', (req, res) => {
-  res.render('login');
-});
+app.get('/login', (req, res) => res.render('login'));
 
-// Login POST
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
   const users = readUsers();
@@ -104,20 +91,16 @@ app.post('/login', async (req, res) => {
   res.redirect('/dashboard');
 });
 
-// Dashboardpagina (alleen voor ingelogde gebruikers)
 app.get('/dashboard', (req, res) => {
   if (!req.session.username) return res.redirect('/login');
   const users = readUsers();
   const me = users.find(u => u.username === req.session.username);
-
-  // Ongelezen berichten tellen
   const messages = readMessages();
   const newMessageCounts = {};
   me.friends.forEach(friend => {
     const unread = messages.filter(m => m.from === friend && m.to === me.username);
     newMessageCounts[friend] = unread.length;
   });
-
   res.render('dashboard', {
     username: me.username,
     friends: me.friends,
@@ -127,7 +110,6 @@ app.get('/dashboard', (req, res) => {
   });
 });
 
-// Vriendschapsverzoek sturen
 app.post('/friend-request', (req, res) => {
   const { receiver } = req.body;
   const sender = req.session.username;
@@ -152,7 +134,6 @@ app.post('/friend-request', (req, res) => {
   res.redirect('/dashboard');
 });
 
-// Vriendschapsverzoek accepteren
 app.post('/accept-friend', (req, res) => {
   const { sender } = req.body;
   const receiver = req.session.username;
@@ -172,7 +153,6 @@ app.post('/accept-friend', (req, res) => {
   res.redirect('/dashboard');
 });
 
-// Vriendschapsverzoek afwijzen
 app.post('/decline-friend', (req, res) => {
   const { sender } = req.body;
   const me = req.session.username;
@@ -183,7 +163,6 @@ app.post('/decline-friend', (req, res) => {
   res.redirect('/dashboard');
 });
 
-// Chatpagina tussen jou en een vriend
 app.get('/chat/:friend', (req, res) => {
   const me = req.session.username;
   const { friend } = req.params;
@@ -194,11 +173,9 @@ app.get('/chat/:friend', (req, res) => {
   const messages = readMessages().filter(
     m => (m.from === me && m.to === friend) || (m.from === friend && m.to === me)
   );
-
   res.render('chat', { friend, messages });
 });
 
-// Berichten ophalen (fallback)
 app.get('/messages/:friend', (req, res) => {
   const me = req.session.username;
   const friend = req.params.friend;
@@ -206,20 +183,18 @@ app.get('/messages/:friend', (req, res) => {
     m => (m.from === me && m.to === friend) || (m.from === friend && m.to === me)
   );
   const html = messages.map(m =>
-    `<p><strong>${m.from}:</strong> ${m.text} <small>(${new Date(m.time).toLocaleTimeString()})</small></p>`
+    `<p><strong>${m.from}:</strong> ${m.text || `<a href="${m.file}" target="_blank">Bestand</a>`} 
+    <small>(${new Date(m.time).toLocaleTimeString()})</small></p>`
   ).join('');
   res.send(html);
 });
 
-// Logout
 app.get('/logout', (req, res) => {
   req.session.destroy(() => res.redirect('/'));
 });
 
-// Dagelijkse verrassing (ingelogd)
 app.get('/verrassing', (req, res) => {
   if (!req.session.username) return res.redirect('/login');
-
   const verrassingen = [
     "Citroenfeit: Citroenen drijven omdat ze een dikke schil met luchtzakjes hebben.",
     "Limonademop: Waarom hield de limonade een speech? Omdat hij bruisend was!",
@@ -228,13 +203,11 @@ app.get('/verrassing', (req, res) => {
     "Citroenfeit: Citroenen bevatten meer suiker dan aardbeien!",
     "Limonademop: Wat doet een citroen in de sportschool? Zich uitpersen!"
   ];
-
   const today = new Date().getDate();
   const verrassing = verrassingen[today % verrassingen.length];
   res.render('verrassing', { verrassing });
 });
 
-// Dynamische pagina's (controle op bestaan van EJS-bestand of index.ejs)
 app.get('/*', (req, res) => {
   const urlPath = req.path;
   const parts = urlPath.split('/').filter(Boolean);
@@ -256,12 +229,7 @@ app.get('/*', (req, res) => {
   });
 });
 
-// 404 fallback
-app.use((req, res) => {
-  res.status(404).render('404');
-});
-
-// Socket.IO voor real-time chat
+// Socket.IO
 io.on('connection', socket => {
   socket.on('join', username => {
     socket.join(username);
@@ -270,15 +238,24 @@ io.on('connection', socket => {
   socket.on('send-message', data => {
     const { from, to, text, file } = data;
     const messages = readMessages();
-    const message = { from, to, time: new Date().toISOString() };
+    const message = {
+      from,
+      to,
+      time: new Date().toISOString()
+    };
     if (text) message.text = text;
     if (file) message.file = file;
+
     messages.push(message);
     saveMessages(messages);
+
     io.to(to).emit('receive-message', message);
     io.to(from).emit('receive-message', message);
   });
 });
 
+// Start server
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => console.log(`Server draait op http://localhost:${PORT}`));
+server.listen(PORT, () => {
+  console.log(`Server draait op http://localhost:${PORT}`);
+});
