@@ -24,6 +24,7 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
+// EJS en middleware
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(express.static('public'));
@@ -40,9 +41,11 @@ app.use((req, res, next) => {
   next();
 });
 
+// Bestandspaden
 const USERS_FILE = path.join(__dirname, 'data', 'users.json');
 const MESSAGES_FILE = path.join(__dirname, 'messages.json');
 
+// JSON helpers
 function readJSON(file, fallback) {
   try {
     if (!fs.existsSync(file)) return fallback;
@@ -54,14 +57,13 @@ function readJSON(file, fallback) {
   }
 }
 
-const saveUsers = (users) => {
+function saveJSON(file, data) {
   try {
-    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
-    console.log('Users opgeslagen in:', USERS_FILE);
+    fs.writeFileSync(file, JSON.stringify(data, null, 2));
   } catch (err) {
-    console.error('Fout bij opslaan gebruikers:', err);
+    console.error(`Fout bij opslaan van ${file}:`, err);
   }
-};
+}
 
 const readUsers = () => readJSON(USERS_FILE, []);
 const saveUsers = (data) => saveJSON(USERS_FILE, data);
@@ -213,6 +215,12 @@ app.get('/verrassing', (req, res) => {
   res.render('verrassing', { verrassing });
 });
 
+// Upload route voor bestanden (optioneel gebruiken)
+app.post('/upload', upload.single('file'), (req, res) => {
+  res.send({ file: `/uploads/${req.file.filename}` });
+});
+
+// Dynamische route naar elke .ejs pagina
 app.get('/*', (req, res) => {
   const urlPath = req.path;
   const parts = urlPath.split('/').filter(Boolean);
@@ -259,7 +267,7 @@ io.on('connection', socket => {
   });
 });
 
-// Start server
+// Server starten
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log(`Server draait op http://localhost:${PORT}`);
