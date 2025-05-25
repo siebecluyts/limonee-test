@@ -9,16 +9,13 @@
   <%- include('partials/header') %>
 
   <div class="container">
-    <h2>Account aanmaken</h2>
-    <form method="POST" action="/register">
-      <label for="username">Gebruikersnaam:</label><br>
-      <input type="text" id="username" name="username" required><br><br>
-
-      <label for="password">Wachtwoord:</label><br>
-      <input type="password" id="password" name="password" required><br><br>
-
-      <button type="submit">Registreer</button>
-    </form>
+<h2>Registreren</h2>
+<% if (error) { %><p style="color:red"><%= error %></p><% } %>
+<form method="POST">
+  Gebruikersnaam: <input name="username" required><br>
+  Wachtwoord: <input type="password" name="password" required><br>
+  <button type="submit">Registreer</button>
+</form>
 
     <p>Heb je al een account? <a href="/login">Log hier in</a></p>
   </div>
