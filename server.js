@@ -54,9 +54,14 @@ function readJSON(file, fallback) {
   }
 }
 
-function saveJSON(file, data) {
-  fs.writeFileSync(file, JSON.stringify(data, null, 2));
-}
+const saveUsers = (users) => {
+  try {
+    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
+    console.log('Users opgeslagen in:', USERS_FILE);
+  } catch (err) {
+    console.error('Fout bij opslaan gebruikers:', err);
+  }
+};
 
 const readUsers = () => readJSON(USERS_FILE, []);
 const saveUsers = (data) => saveJSON(USERS_FILE, data);
