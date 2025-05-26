@@ -1,3 +1,4 @@
+// server.js
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
@@ -10,7 +11,7 @@ const server = http.createServer(app);
 const { Server } = require('socket.io');
 const io = new Server(server);
 
-// Uploads folder aanmaken
+// Upload folder aanmaken indien niet bestaat
 const uploadDir = path.join(__dirname, 'public', 'uploads');
 if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 
@@ -220,7 +221,7 @@ app.post('/upload', upload.single('file'), (req, res) => {
   res.send({ file: `/uploads/${req.file.filename}` });
 });
 
-// Dynamische route naar elke .ejs pagina
+// Dynamische route naar elke .ejs pagina (optioneel, voor overige pagina's)
 app.get('/*', (req, res) => {
   const urlPath = req.path;
   const parts = urlPath.split('/').filter(Boolean);
