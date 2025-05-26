@@ -2,9 +2,10 @@
   "name": "my-project",
   "version": "1.0.0",
   "main": "server.js",
-  "scripts": {
-    "start": "node server.js"
-  },
+"scripts": {
+  "start": "node server.js",
+  "postinstall": "npm rebuild bcrypt --build-from-source"
+},
   "dependencies": {
     "bcrypt": "^5.1.0",
     "bcryptjs": "^3.0.2",
