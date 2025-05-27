@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <title>Gebruikersreviews</title>
+  <style>
+    body { font-family: Arial; background: #f5f5f5; padding: 2rem; }
+    .review { background: #fff; margin-bottom: 1rem; padding: 1rem; border-radius: 8px; box-shadow: 0 0 5px #ccc; }
+    .stars { color: gold; }
+    form { background: white; padding: 1rem; border-radius: 10px; box-shadow: 0 0 8px rgba(0,0,0,0.1); margin-top: 2rem; }
+    input, select, textarea { width: 100%; padding: 0.5rem; margin-top: 0.5rem; margin-bottom: 1rem; }
+    button { background: #ffcc00; border: none; padding: 0.7rem 1.2rem; border-radius: 6px; cursor: pointer; }
+  </style>
+</head>
+<body>
+
+  <h1>Gebruikersreviews</h1>
+
+  <% reviews.forEach(review => { %>
+    <div class="review">
+      <strong><%= review.name %></strong><br />
+      <div class="stars"><%= '★'.repeat(review.rating) + '☆'.repeat(5 - review.rating) %></div>
+      <p><%= review.message %></p>
+    </div>
+  <% }) %>
+
+  <form action="/reviews" method="POST">
+    <h2>Laat een review achter</h2>
+    <label>Naam</label>
+    <input type="text" name="name" required>
+
+    <label>Beoordeling (1–5 sterren)</label>
+    <select name="rating" required>
+      <option value="">Kies een score</option>
+      <option value="5">★★★★★</option>
+      <option value="4">★★★★☆</option>
+      <option value="3">★★★☆☆</option>
+      <option value="2">★★☆☆☆</option>
+      <option value="1">★☆☆☆☆</option>
+    </select>
+
+    <label>Bericht</label>
+    <textarea name="message" rows="4" required></textarea>
+
+    <button type="submit">Verstuur review</button>
+  </form>
+
+</body>
+</html>
