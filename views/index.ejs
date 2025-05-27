@@ -28,6 +28,51 @@
       sizes="16x16"
       href="https://cdn.glitch.global/638bdc36-d676-479e-8f39-ff81bc2e3bb1/contact%2Fimages%2Ffavicon-16x16.png?v=1735472049971"
     />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 2rem;
+      background: #f9f9f9;
+    }
+
+    form {
+      max-width: 500px;
+      margin: auto;
+      background: white;
+      padding: 1.5rem;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      text-align: center;
+      color: #333;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 0.8rem;
+      margin-top: 0.5rem;
+      margin-bottom: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+
+    button {
+      background-color: #ffcc00;
+      color: #333;
+      padding: 0.8rem 1.2rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      width: 100%;
+      font-weight: bold;
+    }
+
+    button:hover {
+      background-color: #ffdb4d;
+    }
+  </style>
     <link rel="manifest" href="/site.webmanifest" />
 <meta name="google-site-verification" content="Wg2BlEk7f_vVa7RNWlAX-hNk3foujJUhcQXEbaPspOE" />
     <meta name="msvalidate.01" content="DB1FB07C10E03B70BA6544D54607890A" />
@@ -67,18 +112,27 @@
   action="https://formspree.io/f/xgvaedve"
   method="POST"
 >
-      <input required type="text" name="name" placeholder="name">
-            <input required type="email" name="email" placeholder="email">
-      <select name="rating" placeholder="rating">
-  <option value="1" name="1">1</option>
-  <option value="2" name="2">2</option>
-  <option value="3" name="3">3</option>
-  <option value="4" name="4">4</option>
-  <option value="5" name="5">5</option>
-</select>
-      <textarea name="revieuw" placeholder="Review"></textarea>
-        <button onclick="submitreview()" type="submit">Stuur</button>
-    </form>
+    <label for="name">Naam</label>
+    <input type="text" id="name" name="name" required>
+    <label for="name">Email</label>
+    <input type="email" id="email" name="email" required>
+
+    <label for="rating">Beoordeling</label>
+    <select id="rating" name="rating" required>
+      <option value="">Kies een score</option>
+      <option value="5">★★★★★ - Uitstekend</option>
+      <option value="4">★★★★☆ - Goed</option>
+      <option value="3">★★★☆☆ - Gemiddeld</option>
+      <option value="2">★★☆☆☆ - Matig</option>
+      <option value="1">★☆☆☆☆ - Slecht</option>
+    </select>
+
+    <label for="message">Je bericht</label>
+    <textarea id="message" name="message" rows="4" required></textarea>
+
+    <button type="submit">Verstuur review</button>
+  </form>
+
     <br>
 <h2>Je badges</h2>
 <div id="badges"></div>
