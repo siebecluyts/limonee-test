@@ -5,171 +5,122 @@
     <link rel="stylesheet" href="../../styles.css" />
     <meta charset="UTF-8" />
     <meta name="description" content="Drink de beste Limonee!" />
-    <meta
-      name="keywords"
-      content="Limonade, limonee, limone, lekker, zoet, fris"
-    />
+    <meta name="keywords" content="Limonade, limonee, limone, lekker, zoet, fris" />
     <meta name="author" content="limonee" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link
-      rel="apple-touch-icon"
-      sizes="180x180"
-      href="https://cdn.glitch.global/638bdc36-d676-479e-8f39-ff81bc2e3bb1/contact%2Fimages%2Fapple-touch-icon.png?v=1735472049644"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="32x32"
-      href="https://cdn.glitch.global/638bdc36-d676-479e-8f39-ff81bc2e3bb1/contact%2Fimages%2Ffavicon-32x32.png?v=1735472050279"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="16x16"
-      href="https://cdn.glitch.global/638bdc36-d676-479e-8f39-ff81bc2e3bb1/contact%2Fimages%2Ffavicon-16x16.png?v=1735472049971"
-    />
+    <link rel="apple-touch-icon" sizes="180x180" href="https://cdn.glitch.global/638bdc36-d676-479e-8f39-ff81bc2e3bb1/contact%2Fimages%2Fapple-touch-icon.png?v=1735472049644" />
+    <link rel="icon" type="image/png" sizes="32x32" href="https://cdn.glitch.global/638bdc36-d676-479e-8f39-ff81bc2e3bb1/contact%2Fimages%2Ffavicon-32x32.png?v=1735472050279" />
+    <link rel="icon" type="image/png" sizes="16x16" href="https://cdn.glitch.global/638bdc36-d676-479e-8f39-ff81bc2e3bb1/contact%2Fimages%2Ffavicon-16x16.png?v=1735472049971" />
     <link rel="manifest" href="/site.webmanifest" />
   </head>
   <body>
     <%- include('../../partials/header') %>
-      <h2>Personen in ons team</h2>
-          <input type="text" id="searchInput" placeholder="Zoek personen..." />
-          <p id="noResults" style="display: none; color: red;">Nothing found.</p>
-      <div class="personen"></div>
-      <a class="Persoon1" href="/about/personen/ReindertJanssens/">
-        <h3 id="h34-1">
-          <img
-            height="100"
-            width="170"
-            src="https://cdn.glitch.global/638bdc36-d676-479e-8f39-ff81bc2e3bb1/ReindertJanssens.jpeg?v=1735839472037"
-          />Reindert Janssens
-        </h3>
-            <div id="custom-menu">
-        <ul>
-            <li onclick="location.href='/';">Home</li>
-        </ul>
+
+    <h2>Personen in ons team</h2>
+    <input type="text" id="searchInput" placeholder="Zoek personen..." />
+    <p id="noResults" style="display: none; color: red;">Geen resultaten gevonden.</p>
+
+    <div class="personen">
+
+      <!-- Persoon 1 -->
+      <div class="persoon">
+        <a class="Persoon" href="/about/personen/ReindertJanssens/">
+          <h3>
+            <img src="https://cdn.glitch.global/638bdc36-d676-479e-8f39-ff81bc2e3bb1/ReindertJanssens.jpeg?v=1735839472037" height="100" width="170" />
+            Reindert Janssens
+          </h3>
+        </a>
+        <p>
+          Reindert Janssens is ooit eens begonnen met limonade te maken. Toen hij vertelde over hoe goed het was aan zijn vrienden, bedachten ze om een kraampje te gaan maken om de limonade te verkopen. Reindert vond het een geweldig idee en begon meteen met een naam te bedenken. Na lange tijd besloot hij om voor "Limonee" te gaan. Toen begon hij meteen met een businessplan te schrijven en het recept op te slaan. Zijn vrienden helpten mee met alles. "We moeten het gewoon eens proberen" is zijn antwoord op de vraag waarom hij dit doet. Hij had ook de slogan voor het kraampje gemaakt. Fris of zoet, het smaakt altijd goed!
+          <a href="/about/personen/ReindertJanssens/">Lees meer.</a>
+        </p>
+      </div>
+
+      <!-- Persoon 2 -->
+      <div class="persoon">
+        <a class="Persoon" href="/about/personen/SiebeCluyts/">
+          <h3>
+            <img src="https://cdn.glitch.global/638bdc36-d676-479e-8f39-ff81bc2e3bb1/1708256244.jpg?v=1735589691930" width="140" height="100" />
+            Siebe Cluyts
+          </h3>
+        </a>
+        <p>
+          Siebe Cluyts is een van de beste vrienden van Reindert en is een van de co-oprichters van Limonee. Hij was mee met het voorstellen van het idee en hielp mee met heel veel. Siebe stond bekend van zijn programeren en besloot een website voor Limonee te maken. Hij maakte ook een spelletje voor de website.
+          <a href="/about/personen/SiebeCluyts/">Lees meer.</a>
+        </p>
+      </div>
+
+      <!-- Persoon 3 -->
+      <div class="persoon">
+        <a class="Persoon" href="/about/personen/LodewijkVandueren/">
+          <h3>
+            <img src="https://cdn.glitch.global/638bdc36-d676-479e-8f39-ff81bc2e3bb1/imgpsh_fullsize_anim.png?v=1735631749397" height="100" width="120" />
+            Lodewijk Vandueren
+          </h3>
+        </a>
+        <p>
+          Lodewijk Vandueren is een van de oprichters van Limonee en een goede vriend van Reindert. Hij komt soms naar het kraampje om te helpen met de verkoop.
+          <a href="/about/personen/LodewijkVandueren/">Lees meer.</a>
+        </p>
+      </div>
+
+      <!-- Persoon 4 -->
+      <div class="persoon">
+        <a class="Persoon" href="/about/personen/TijlCluyts/">
+          <h3>
+            <img src="https://cdn.glitch.global/638bdc36-d676-479e-8f39-ff81bc2e3bb1/TijlCluyts.jpeg?v=1736075033031" width="100" height="120" />
+            Tijl Cluyts
+          </h3>
+        </a>
+        <p>
+          Tijl Cluyts is de jongere broer van Siebe Cluyts. Tijl helpt vooral mee met het maken en verkopen van de limonade.
+          <a href="/about/personen/TijlCluyts/">Lees meer.</a>
+        </p>
+      </div>
+
+      <!-- Persoon 5 -->
+      <div class="persoon">
+        <a class="Persoon" href="/about/personen/ArntJanssens/">
+          <h3>
+            <img src="https://cdn.glitch.global/638bdc36-d676-479e-8f39-ff81bc2e3bb1/ArntJanssens.jpeg?v=1737142535027" height="150" width="130" />
+            Arnt Janssens
+          </h3>
+        </a>
+        <p>
+          Arnt Janssens is de jongere broer van Reindert Janssens. Arnt helpt vooral mee met het maken en verkopen van de limonade.
+          <a href="/about/personen/ArntJanssens/">Lees meer.</a>
+        </p>
+      </div>
+
     </div>
-      </a>
-      <p id="par4-1">
-        Reindert Janssens is ooit eens begonnen met limonade te maken. Toen hij
-        vertelde over hoe goed het was aan zijn vrienden, bedachten ze om een
-        kraampje te gaan maken om de limonade te verkopen. Reindert vond het een
-        geweldig idee en begon meteen met een naam te bedenken. Na lange tijd
-        besloot hij om voor "Limonee" te gaan. Toen begon hij meteen met een
-        businessplan te schrijven en het recept op te slaan. Zijn vrienden
-        helpten mee met alles. "We moeten het gewoon eens proberen" is zijn
-        antwoord op de vraag waarom hij dit doet. Hij had ook de slogan voor het
-        kraampje gemaakt. Fris of zoet, het smaakt altijd goed!
-        <a href="/about/personen/ReindertJanssens/">Lees meer.</a>
-      </p>
-      <br />
-      <a class="Persoon" href="/about/personen/SiebeCluyts/">
-        <h3>
-          <img
-            src="https://cdn.glitch.global/638bdc36-d676-479e-8f39-ff81bc2e3bb1/1708256244.jpg?v=1735589691930"
-            width="140"
-            height="100"
-          />Siebe Cluyts
-        </h3>
-      </a>
-      <p>
-        Siebe Cluyts is een van de beste vrienden van Reindert en is een van de
-        co-oprichters van Limonee. Hij was mee met het voorstellen van het idee
-        en hielp mee met heel veel. Siebe stond bekend van zijn programeren en
-        besloot een website voor Limonee te maken. Hij maakte ook een spelletje
-        voor de website. <a href="/about/personen/SiebeCluyts/">Lees meer.</a>
-      </p>
-      <br />
-      <a class="Persoon" href="/about/personen/LodewijkVandueren/">
-        <h3>
-          <img
-            src="https://cdn.glitch.global/638bdc36-d676-479e-8f39-ff81bc2e3bb1/imgpsh_fullsize_anim.png?v=1735631749397"
-            height="100"
-            width="120"
-          />Lodewijk Vandueren
-        </h3>
-      </a>
-      <p>
-        Lodewijk Vandueren is een van de oprichters van Limonee en een goede
-        vriend van Reindert. Hij komt soms naar het kraampje om te helpen met de verkoop.
-        <a href="/about/personen/LodewijkVandueren/">Lees meer.</a>
-      </p>
-      <br />
-      <a class="Persoon" href="/about/personen/TijlCluyts/">
-        <h3>
-          <img
-            src="https://cdn.glitch.global/638bdc36-d676-479e-8f39-ff81bc2e3bb1/TijlCluyts.jpeg?v=1736075033031"
-            width="100"
-            height="120"
-          />
-          Tijl Cluyts
-        </h3>
-      </a>
-      <p>
-        Tijl Cluyts is de jongere broer van Siebe Cluyts. Tijl helpt vooral mee
-        met het maken en verkopen van de limonade.<a
-          href="/about/personen/TijlCluyts/"
-          >Lees meer.</a
-        >
-      </p>
-      <br />
-      <a class="Persoon" href="/about/personen/ArntJanssens/">
-        <h3>
-          <img
-            src="https://cdn.glitch.global/638bdc36-d676-479e-8f39-ff81bc2e3bb1/ArntJanssens.jpeg?v=1737142535027"
-            height="150"
-            width="130"
-          />
-          Arnt Janssens
-        </h3>
-      </a>
-      <p>
-        Arnt Janssens is de jongere broer van Reindert Janssens. Arnt helpt
-        vooral mee met het maken en verkopen van de limonade.<a
-          href="/about/personen/ArntJanssens/"
-          >Lees meer.</a
-        >
-      </p>
-    </div>
-    <br />
-    <br />
-    <br />
+
+    <br><br><br>
 
     <script src="../../script.js"></script>
+    <script>
+      const searchInput = document.getElementById("searchInput");
+      const personen = document.querySelectorAll(".persoon");
+      const noResults = document.getElementById("noResults");
+
+      searchInput.addEventListener("input", function () {
+        const filter = this.value.toLowerCase();
+        let found = false;
+
+        personen.forEach(persoon => {
+          const text = persoon.textContent.toLowerCase();
+          if (text.includes(filter)) {
+            persoon.style.display = "";
+            found = true;
+          } else {
+            persoon.style.display = "none";
+          }
+        });
+
+        noResults.style.display = found ? "none" : "block";
+      });
+    </script>
+
     <script src="https://formspree.io/js/formbutton-v1.min.js" defer></script>
-<script>
-  const searchInput = document.getElementById("searchInput");
-  const personen = document.querySelectorAll(".personen > .Persoon");
-
-  searchInput.addEventListener("input", function () {
-    const filter = this.value.toLowerCase();
-    let found = false;
-
-    personen.forEach(persoon => {
-      const naam = persoon.textContent.toLowerCase();
-      const beschrijving = persoon.nextElementSibling;
-
-      if (naam.includes(filter)) {
-        persoon.style.display = "";
-        if (beschrijving && beschrijving.tagName === "P") {
-          beschrijving.style.display = "";
-        }
-        found = true;
-      } else {
-        persoon.style.display = "none";
-        if (beschrijving && beschrijving.tagName === "P") {
-          beschrijving.style.display = "none";
-        }
-      }
-    });
-
-    const noResults = document.getElementById("noResults");
-    if (noResults) {
-      noResults.style.display = found ? "none" : "block";
-    }
-  });
-</script>
-
+    <%- include('../../partials/footer') %>
   </body>
-  <%- include('../../partials/footer') %>
 </html>
