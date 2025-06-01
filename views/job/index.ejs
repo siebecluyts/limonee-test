@@ -1,1 +1,77 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Limonee - job</title>
+        <link rel="stylesheet" href="../styles.css">
+        <meta charset="UTF-8">
+        <meta name="description" content="Drink de beste Limonee!">
+        <meta name="keywords" content="Limonade, limonee, limone, lekker, zoet, fris">
+        <meta name="author" content="limonee">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="apple-touch-icon" sizes="180x180" href="https://cdn.glitch.global/638bdc36-d676-479e-8f39-ff81bc2e3bb1/contact%2Fimages%2Fapple-touch-icon.png?v=1735472049644">
+<link rel="icon" type="image/png" sizes="32x32" href="https://cdn.glitch.global/638bdc36-d676-479e-8f39-ff81bc2e3bb1/contact%2Fimages%2Ffavicon-32x32.png?v=1735472050279">
+<link rel="icon" type="image/png" sizes="16x16" href="https://cdn.glitch.global/638bdc36-d676-479e-8f39-ff81bc2e3bb1/contact%2Fimages%2Ffavicon-16x16.png?v=1735472049971">
+<link rel="manifest" href="/site.webmanifest">
+    </head>
+    <body>
+   <%- include('../partials/header') %>
+<form action="https://formspree.io/f/xwpoggqg" method="POST">
+<label> Je naam: <input type="text" name="name"></label>
+<label> Je email: <input type="email" name="email"></label>
+  <h2>Wat wil je doen binnen het team?</h2>
+  <label>
+    <input type="radio" name="functie" value="IT" onclick="toonVragen('it')" required> IT
+  </label>
+  <label>
+    <input type="radio" name="functie" value="Medewerker" onclick="toonVragen('medewerker')"> Medewerker
+  </label>
 
+  <!-- Vragen voor IT -->
+  <div id="vragen-it" style="display:none; margin-top: 20px;">
+    <label>
+      Wat is jouw ervaring met websites maken?<br>
+      <textarea name="ervaring_website" required></textarea>
+    </label><br><br>
+    <label>
+      Ken je HTML, CSS of JavaScript? Licht toe.<br>
+      <textarea name="kennis_webtalen" required></textarea>
+    </label>
+  </div>
+
+  <!-- Vragen voor Medewerker -->
+  <div id="vragen-medewerker" style="display:none; margin-top: 20px;">
+    <label>
+      Een klant is boos want ze vindt de limonade niet lekker. Wat doe je?<br>
+      <textarea name="klantreactie" required></textarea>
+    </label><br><br>
+    <label>
+      Hoe zou jij een klant helpen die lang moet wachten?<br>
+      <textarea name="wachtende_klant" required></textarea>
+    </label>
+  </div>
+    <label>
+     Vertel wat over jezelf.<br>
+      <textarea name="jezelf" required></textarea>
+    </label>
+    <label>
+     Waarom denk je dat jij kan worden gekozen om mee te werken bij Limonee.<br>
+      <textarea name="waarom" required></textarea>
+    </label>
+  <br>
+  <button type="submit">Verzenden</button>
+</form>
+
+<script>
+function toonVragen(functie) {
+  document.getElementById("vragen-it").style.display = functie === "it" ? "block" : "none";
+  document.getElementById("vragen-medewerker").style.display = functie === "medewerker" ? "block" : "none";
+}
+</script>
+
+        </div>
+      <br><br><br>
+        <script src="../script.js"></script>
+      <script src="https://formspree.io/js/formbutton-v1.min.js" defer></script>
+    </body>
+ <%- include('../partials/footer') %>
+</html>
