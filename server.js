@@ -12,7 +12,14 @@ const { Server } = require('socket.io');
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+
+let pool;
+try {
+  pool = new Pool({ connectionString: process.env.DATABASE_URL });
+  pool.connect().then(() => console.log("✅ Verbonden met PostgreSQL"));
+} catch (err) {
+  console.error("❌ Kan niet verbinden met PostgreSQL:", err.message);
+}
 
 const uploadDir = path.join(__dirname, 'public', 'uploads');
 if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
@@ -26,7 +33,6 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// View engine
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(express.static('public'));
@@ -43,13 +49,11 @@ app.use((req, res, next) => {
   next();
 });
 
-// --- ROUTES ---
-
 app.get('/', (req, res) => res.render('index'));
-
 app.get('/register', (req, res) => res.render('register'));
 
 app.post('/register', async (req, res) => {
+  if (!pool) return res.send("Database niet beschikbaar");
   const { username, password } = req.body;
   const hashed = await bcrypt.hash(password, 10);
   const exists = await pool.query("SELECT * FROM users WHERE username = $1", [username]);
@@ -61,6 +65,7 @@ app.post('/register', async (req, res) => {
 app.get('/login', (req, res) => res.render('login'));
 
 app.post('/login', async (req, res) => {
+  if (!pool) return res.send("Database niet beschikbaar");
   const { username, password } = req.body;
   const result = await pool.query("SELECT * FROM users WHERE username = $1", [username]);
   if (result.rows.length === 0) return res.send("Gebruiker niet gevonden");
@@ -73,7 +78,10 @@ app.post('/login', async (req, res) => {
 
 app.get('/dashboard', async (req, res) => {
   if (!req.session.username) return res.redirect('/login');
+  if (!pool) return res.send("Database niet beschikbaar");
+
   const me = (await pool.query("SELECT * FROM users WHERE username = $1", [req.session.username])).rows[0];
+
   const friends = (await pool.query(`
     SELECT u.username FROM users u
     JOIN friendships f ON (f.user1 = u.username OR f.user2 = u.username)
@@ -101,6 +109,7 @@ app.get('/dashboard', async (req, res) => {
 });
 
 app.post('/friend-request', async (req, res) => {
+  if (!pool) return res.redirect('/dashboard');
   const sender = req.session.username;
   const receiver = req.body.receiver;
   if (sender === receiver) return res.redirect('/dashboard');
@@ -108,13 +117,8 @@ app.post('/friend-request', async (req, res) => {
   const exists = await pool.query("SELECT * FROM users WHERE username = $1", [receiver]);
   if (exists.rows.length === 0) return res.redirect('/dashboard');
 
-  const already = await pool.query(`
-    SELECT * FROM friend_requests WHERE sender = $1 AND receiver = $2
-  `, [sender, receiver]);
-
-  const alreadyFriends = await pool.query(`
-    SELECT * FROM friendships WHERE (user1 = $1 AND user2 = $2) OR (user1 = $2 AND user2 = $1)
-  `, [sender, receiver]);
+  const already = await pool.query("SELECT * FROM friend_requests WHERE sender = $1 AND receiver = $2", [sender, receiver]);
+  const alreadyFriends = await pool.query("SELECT * FROM friendships WHERE (user1 = $1 AND user2 = $2) OR (user1 = $2 AND user2 = $1)", [sender, receiver]);
 
   if (already.rows.length === 0 && alreadyFriends.rows.length === 0) {
     await pool.query("INSERT INTO friend_requests (sender, receiver) VALUES ($1, $2)", [sender, receiver]);
@@ -124,6 +128,7 @@ app.post('/friend-request', async (req, res) => {
 });
 
 app.post('/accept-friend', async (req, res) => {
+  if (!pool) return res.redirect('/dashboard');
   const receiver = req.session.username;
   const sender = req.body.sender;
 
@@ -134,6 +139,7 @@ app.post('/accept-friend', async (req, res) => {
 });
 
 app.post('/decline-friend', async (req, res) => {
+  if (!pool) return res.redirect('/dashboard');
   const receiver = req.session.username;
   const sender = req.body.sender;
   await pool.query("DELETE FROM friend_requests WHERE sender = $1 AND receiver = $2", [sender, receiver]);
@@ -141,6 +147,7 @@ app.post('/decline-friend', async (req, res) => {
 });
 
 app.get('/chat/:friend', async (req, res) => {
+  if (!pool) return res.send("Database niet beschikbaar");
   const me = req.session.username;
   const friend = req.params.friend;
 
@@ -161,6 +168,7 @@ app.get('/chat/:friend', async (req, res) => {
 });
 
 app.get('/messages/:friend', async (req, res) => {
+  if (!pool) return res.send("Database niet beschikbaar");
   const me = req.session.username;
   const friend = req.params.friend;
 
@@ -213,13 +221,14 @@ app.get('/*', (req, res) => {
   });
 });
 
-// Socket.IO
+// --- Socket.IO ---
 io.on('connection', socket => {
   socket.on('join', username => {
     socket.join(username);
   });
 
   socket.on('send-message', async data => {
+    if (!pool) return;
     const { from, to, text, file } = data;
     await pool.query(`
       INSERT INTO messages (from_user, to_user, text, file, time)
@@ -239,6 +248,5 @@ io.on('connection', socket => {
   });
 });
 
-// Server starten
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => console.log(`Server draait op http://localhost:${PORT}`));
+server.listen(PORT, () => console.log(`🚀 Server draait op http://localhost:${PORT}`));
