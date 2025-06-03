@@ -13,14 +13,6 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-let pool;
-try {
-  pool = new Pool({ connectionString: process.env.DATABASE_URL });
-  pool.connect().then(() => console.log("✅ Verbonden met PostgreSQL"));
-} catch (err) {
-  console.error("❌ Kan niet verbinden met PostgreSQL:", err.message);
-}
-
 const uploadDir = path.join(__dirname, 'public', 'uploads');
 if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 
