@@ -19,7 +19,6 @@
     <li><a href="/planning/">Planning</a></li>
     <li><a href="/contact/bestelling/">Bestellen</a></li>
     <li><a href="/smaken/">Onze smaken</a></li>
-    <li><a href="/verrassing" style="margin-left: 10px;">🎁 Verrassing</a></li>
   </ul>
 
   <!-- Subscribe Button -->
@@ -29,20 +28,6 @@
     <ul>
       <li onclick="location.href='/'">Home</li>
     </ul>
-  </div>
-
-  <div>
-    <% if (user) { %>
-      <div style="position: relative; display: inline-block;">
-        <a href="/dashboard" style="text-decoration: none; font-weight: bold;">
-          👤 <%= user %>
-        </a>
-        <a href="/logout" style="margin-left: 10px;">(Uitloggen)</a>
-      </div>
-    <% } else { %>
-      <a href="/login">Inloggen</a>
-      <a href="/register" style="margin-left: 10px;">Registreren</a>
-    <% } %>
   </div>
 
   <div class="notification">
