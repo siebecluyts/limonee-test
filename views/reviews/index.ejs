@@ -15,14 +15,20 @@
 <body>
 
   <h1>Gebruikersreviews</h1>
+<h1>Reviews</h1>
 
+<ul>
   <% reviews.forEach(review => { %>
-    <div class="review">
-      <strong><%= review.name %></strong><br />
-      <div class="stars"><%= '★'.repeat(review.rating) + '☆'.repeat(5 - review.rating) %></div>
-      <p><%= review.message %></p>
-    </div>
+    <li>
+      <strong><%= review.gebruiker %></strong><br>
+      <% for(let i = 0; i < review.rating; i++) { %>
+        ⭐
+      <% } %>
+      <br>
+      <p><%= review.tekst %></p>
+    </li>
   <% }) %>
+</ul>
 
 </body>
 </html>
