@@ -13,6 +13,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
+// Upload map
 const uploadDir = path.join(__dirname, 'public', 'uploads');
 if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 
@@ -25,10 +26,12 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
+// Instellingen
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
 app.use(session({
   secret: process.env.SESSION_SECRET || 'geheim',
@@ -36,13 +39,19 @@ app.use(session({
   saveUninitialized: false
 }));
 
+// Middleware: sessie beschikbaar maken in views
 app.use((req, res, next) => {
   res.locals.user = req.session.username || null;
   next();
 });
 
+// Routes
 app.get('/', (req, res) => res.render('index'));
 app.get('/register', (req, res) => res.render('register'));
+app.get('/login', (req, res) => res.render('login'));
+app.get('/logout', (req, res) => {
+  req.session.destroy(() => res.redirect('/'));
+});
 
 app.post('/register', async (req, res) => {
   if (!pool) return res.send("Database niet beschikbaar");
@@ -53,8 +62,6 @@ app.post('/register', async (req, res) => {
   await pool.query("INSERT INTO users (username, password) VALUES ($1, $2)", [username, hashed]);
   res.redirect('/login');
 });
-
-app.get('/login', (req, res) => res.render('login'));
 
 app.post('/login', async (req, res) => {
   if (!pool) return res.send("Database niet beschikbaar");
@@ -73,15 +80,12 @@ app.get('/dashboard', async (req, res) => {
   if (!pool) return res.send("Database niet beschikbaar");
 
   const me = (await pool.query("SELECT * FROM users WHERE username = $1", [req.session.username])).rows[0];
-
   const friends = (await pool.query(`
     SELECT u.username FROM users u
     JOIN friendships f ON (f.user1 = u.username OR f.user2 = u.username)
     WHERE (f.user1 = $1 OR f.user2 = $1) AND u.username != $1
   `, [me.username])).rows.map(r => r.username);
-
   const requests = (await pool.query("SELECT sender FROM friend_requests WHERE receiver = $1", [me.username])).rows.map(r => r.sender);
-
   const messages = await pool.query(`
     SELECT from_user, COUNT(*) AS count FROM messages
     WHERE to_user = $1
@@ -107,12 +111,10 @@ app.post('/friend-request', async (req, res) => {
   if (sender === receiver) return res.redirect('/dashboard');
 
   const exists = await pool.query("SELECT * FROM users WHERE username = $1", [receiver]);
-  if (exists.rows.length === 0) return res.redirect('/dashboard');
-
   const already = await pool.query("SELECT * FROM friend_requests WHERE sender = $1 AND receiver = $2", [sender, receiver]);
   const alreadyFriends = await pool.query("SELECT * FROM friendships WHERE (user1 = $1 AND user2 = $2) OR (user1 = $2 AND user2 = $1)", [sender, receiver]);
 
-  if (already.rows.length === 0 && alreadyFriends.rows.length === 0) {
+  if (exists.rows.length > 0 && already.rows.length === 0 && alreadyFriends.rows.length === 0) {
     await pool.query("INSERT INTO friend_requests (sender, receiver) VALUES ($1, $2)", [sender, receiver]);
   }
 
@@ -120,18 +122,14 @@ app.post('/friend-request', async (req, res) => {
 });
 
 app.post('/accept-friend', async (req, res) => {
-  if (!pool) return res.redirect('/dashboard');
   const receiver = req.session.username;
   const sender = req.body.sender;
-
   await pool.query("DELETE FROM friend_requests WHERE sender = $1 AND receiver = $2", [sender, receiver]);
   await pool.query("INSERT INTO friendships (user1, user2) VALUES ($1, $2)", [sender, receiver]);
-
   res.redirect('/dashboard');
 });
 
 app.post('/decline-friend', async (req, res) => {
-  if (!pool) return res.redirect('/dashboard');
   const receiver = req.session.username;
   const sender = req.body.sender;
   await pool.query("DELETE FROM friend_requests WHERE sender = $1 AND receiver = $2", [sender, receiver]);
@@ -139,16 +137,15 @@ app.post('/decline-friend', async (req, res) => {
 });
 
 app.get('/chat/:friend', async (req, res) => {
-  if (!pool) return res.send("Database niet beschikbaar");
   const me = req.session.username;
   const friend = req.params.friend;
 
-  const friends = await pool.query(`
+  const friendship = await pool.query(`
     SELECT * FROM friendships WHERE 
     (user1 = $1 AND user2 = $2) OR (user1 = $2 AND user2 = $1)
   `, [me, friend]);
 
-  if (friends.rows.length === 0) return res.send("Geen toegang");
+  if (friendship.rows.length === 0) return res.send("Geen toegang");
 
   const messages = await pool.query(`
     SELECT * FROM messages
@@ -160,7 +157,6 @@ app.get('/chat/:friend', async (req, res) => {
 });
 
 app.get('/messages/:friend', async (req, res) => {
-  if (!pool) return res.send("Database niet beschikbaar");
   const me = req.session.username;
   const friend = req.params.friend;
 
@@ -177,8 +173,8 @@ app.get('/messages/:friend', async (req, res) => {
   res.send(html);
 });
 
-app.get('/logout', (req, res) => {
-  req.session.destroy(() => res.redirect('/'));
+app.post('/upload', upload.single('file'), (req, res) => {
+  res.send({ file: `/uploads/${req.file.filename}` });
 });
 
 app.get('/verrassing', (req, res) => {
@@ -196,10 +192,7 @@ app.get('/verrassing', (req, res) => {
   res.render('verrassing', { verrassing });
 });
 
-app.post('/upload', upload.single('file'), (req, res) => {
-  res.send({ file: `/uploads/${req.file.filename}` });
-});
-
+// Dynamische pagina’s (zoals /pagina or /map/index)
 app.get('/*', (req, res) => {
   const parts = req.path.split('/').filter(Boolean);
   let viewPath = path.join(__dirname, 'views', ...parts) + '.ejs';
@@ -213,14 +206,11 @@ app.get('/*', (req, res) => {
   });
 });
 
-// --- Socket.IO ---
+// Socket.IO
 io.on('connection', socket => {
-  socket.on('join', username => {
-    socket.join(username);
-  });
+  socket.on('join', username => socket.join(username));
 
   socket.on('send-message', async data => {
-    if (!pool) return;
     const { from, to, text, file } = data;
     await pool.query(`
       INSERT INTO messages (from_user, to_user, text, file, time)
@@ -240,5 +230,6 @@ io.on('connection', socket => {
   });
 });
 
+// Start server
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => console.log(`🚀 Server draait op http://localhost:${PORT}`));
