@@ -13,7 +13,6 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-// Upload map
 const uploadDir = path.join(__dirname, 'public', 'uploads');
 if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 
@@ -26,7 +25,6 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// Instellingen
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(express.static('public'));
@@ -39,13 +37,12 @@ app.use(session({
   saveUninitialized: false
 }));
 
-// Middleware: sessie beschikbaar maken in views
 app.use((req, res, next) => {
   res.locals.user = req.session.username || null;
   next();
 });
 
-// Routes
+// Home en auth
 app.get('/', (req, res) => res.render('index'));
 app.get('/register', (req, res) => res.render('register'));
 app.get('/login', (req, res) => res.render('login'));
@@ -54,7 +51,6 @@ app.get('/logout', (req, res) => {
 });
 
 app.post('/register', async (req, res) => {
-  if (!pool) return res.send("Database niet beschikbaar");
   const { username, password } = req.body;
   const hashed = await bcrypt.hash(password, 10);
   const exists = await pool.query("SELECT * FROM users WHERE username = $1", [username]);
@@ -64,21 +60,18 @@ app.post('/register', async (req, res) => {
 });
 
 app.post('/login', async (req, res) => {
-  if (!pool) return res.send("Database niet beschikbaar");
   const { username, password } = req.body;
   const result = await pool.query("SELECT * FROM users WHERE username = $1", [username]);
   if (result.rows.length === 0) return res.send("Gebruiker niet gevonden");
-  const user = result.rows[0];
-  const match = await bcrypt.compare(password, user.password);
+  const match = await bcrypt.compare(password, result.rows[0].password);
   if (!match) return res.send("Wachtwoord onjuist");
   req.session.username = username;
   res.redirect('/dashboard');
 });
 
+// Dashboard
 app.get('/dashboard', async (req, res) => {
   if (!req.session.username) return res.redirect('/login');
-  if (!pool) return res.send("Database niet beschikbaar");
-
   const me = (await pool.query("SELECT * FROM users WHERE username = $1", [req.session.username])).rows[0];
   const friends = (await pool.query(`
     SELECT u.username FROM users u
@@ -104,23 +97,19 @@ app.get('/dashboard', async (req, res) => {
   });
 });
 
+// Vriendschapsroutes
 app.post('/friend-request', async (req, res) => {
-  if (!pool) return res.redirect('/dashboard');
   const sender = req.session.username;
   const receiver = req.body.receiver;
   if (sender === receiver) return res.redirect('/dashboard');
-
   const exists = await pool.query("SELECT * FROM users WHERE username = $1", [receiver]);
   const already = await pool.query("SELECT * FROM friend_requests WHERE sender = $1 AND receiver = $2", [sender, receiver]);
   const alreadyFriends = await pool.query("SELECT * FROM friendships WHERE (user1 = $1 AND user2 = $2) OR (user1 = $2 AND user2 = $1)", [sender, receiver]);
-
   if (exists.rows.length > 0 && already.rows.length === 0 && alreadyFriends.rows.length === 0) {
     await pool.query("INSERT INTO friend_requests (sender, receiver) VALUES ($1, $2)", [sender, receiver]);
   }
-
   res.redirect('/dashboard');
 });
-
 app.post('/accept-friend', async (req, res) => {
   const receiver = req.session.username;
   const sender = req.body.sender;
@@ -128,7 +117,6 @@ app.post('/accept-friend', async (req, res) => {
   await pool.query("INSERT INTO friendships (user1, user2) VALUES ($1, $2)", [sender, receiver]);
   res.redirect('/dashboard');
 });
-
 app.post('/decline-friend', async (req, res) => {
   const receiver = req.session.username;
   const sender = req.body.sender;
@@ -136,36 +124,31 @@ app.post('/decline-friend', async (req, res) => {
   res.redirect('/dashboard');
 });
 
+// Chat
 app.get('/chat/:friend', async (req, res) => {
   const me = req.session.username;
   const friend = req.params.friend;
-
   const friendship = await pool.query(`
     SELECT * FROM friendships WHERE 
     (user1 = $1 AND user2 = $2) OR (user1 = $2 AND user2 = $1)
   `, [me, friend]);
-
   if (friendship.rows.length === 0) return res.send("Geen toegang");
-
   const messages = await pool.query(`
     SELECT * FROM messages
     WHERE (from_user = $1 AND to_user = $2) OR (from_user = $2 AND to_user = $1)
     ORDER BY time ASC
   `, [me, friend]);
-
   res.render('chat', { friend, messages: messages.rows });
 });
 
 app.get('/messages/:friend', async (req, res) => {
   const me = req.session.username;
   const friend = req.params.friend;
-
   const messages = await pool.query(`
     SELECT * FROM messages
     WHERE (from_user = $1 AND to_user = $2) OR (from_user = $2 AND to_user = $1)
     ORDER BY time ASC
   `, [me, friend]);
-
   const html = messages.rows.map(m =>
     `<p><strong>${m.from_user}:</strong> ${m.text || `<a href="${m.file}" target="_blank">Bestand</a>`} 
      <small>(${new Date(m.time).toLocaleTimeString()})</small></p>`
@@ -173,10 +156,12 @@ app.get('/messages/:friend', async (req, res) => {
   res.send(html);
 });
 
+// Upload
 app.post('/upload', upload.single('file'), (req, res) => {
   res.send({ file: `/uploads/${req.file.filename}` });
 });
 
+// Verrassing
 app.get('/verrassing', (req, res) => {
   if (!req.session.username) return res.redirect('/login');
   const verrassingen = [
@@ -192,44 +177,28 @@ app.get('/verrassing', (req, res) => {
   res.render('verrassing', { verrassing });
 });
 
-// Dynamische pagina’s (zoals /pagina or /map/index)
+// 🔥 Reviews
+app.get('/reviews', async (req, res) => {
+  const result = await pool.query("SELECT * FROM reviews ORDER BY id DESC");
+  res.render('reviews/index', { reviews: result.rows });
+});
+app.post('/reviews', async (req, res) => {
+  const { name, rating, message } = req.body;
+  await pool.query("INSERT INTO reviews (name, rating, message) VALUES ($1, $2, $3)", [name, rating, message]);
+  res.redirect('/reviews');
+});
+
+// Catch-all voor dynamische pagina's
 app.get('/*', (req, res) => {
   const parts = req.path.split('/').filter(Boolean);
   let viewPath = path.join(__dirname, 'views', ...parts) + '.ejs';
-
-  fs.access(viewPath, fs.constants.F_OK, err => {
-    if (!err) return res.render(parts.join('/'));
-    fs.access(path.join(__dirname, 'views', ...parts, 'index.ejs'), fs.constants.F_OK, folderErr => {
-      if (!folderErr) return res.render(path.join(parts.join('/'), 'index'));
-      res.status(404).render('404');
-    });
-  });
+  if (fs.existsSync(viewPath)) {
+    res.render(parts.join('/'));
+  } else {
+    res.status(404).send("Pagina niet gevonden");
+  }
 });
 
-// Socket.IO
-io.on('connection', socket => {
-  socket.on('join', username => socket.join(username));
-
-  socket.on('send-message', async data => {
-    const { from, to, text, file } = data;
-    await pool.query(`
-      INSERT INTO messages (from_user, to_user, text, file, time)
-      VALUES ($1, $2, $3, $4, NOW())
-    `, [from, to, text || null, file || null]);
-
-    const message = {
-      from_user: from,
-      to_user: to,
-      text,
-      file,
-      time: new Date().toISOString()
-    };
-
-    io.to(to).emit('receive-message', message);
-    io.to(from).emit('receive-message', message);
-  });
-});
-
-// Start server
+// Start
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => console.log(`🚀 Server draait op http://localhost:${PORT}`));
+server.listen(PORT, () => console.log(`Server gestart op http://localhost:${PORT}`));
