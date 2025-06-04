@@ -24,26 +24,5 @@
     </div>
   <% }) %>
 
-  <form action="/reviews" method="POST">
-    <h2>Laat een review achter</h2>
-    <label>Naam</label>
-    <input type="text" name="name" required>
-
-    <label>Beoordeling (1–5 sterren)</label>
-    <select name="rating" required>
-      <option value="">Kies een score</option>
-      <option value="5">★★★★★</option>
-      <option value="4">★★★★☆</option>
-      <option value="3">★★★☆☆</option>
-      <option value="2">★★☆☆☆</option>
-      <option value="1">★☆☆☆☆</option>
-    </select>
-
-    <label>Bericht</label>
-    <textarea name="message" rows="4" required></textarea>
-
-    <button type="submit">Verstuur review</button>
-  </form>
-
 </body>
 </html>
