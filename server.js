@@ -1,7 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const path = require('path');
-const pool = require("./db");
+const pool = require("./db");  // jouw PostgreSQL pool
 const session = require('express-session');
 const bcrypt = require('bcryptjs');
 const multer = require('multer');
@@ -41,6 +41,8 @@ app.use((req, res, next) => {
   res.locals.user = req.session.username || null;
   next();
 });
+
+// --- Routes ---
 
 // Home en auth
 app.get('/', (req, res) => res.render('index'));
@@ -177,15 +179,48 @@ app.get('/verrassing', (req, res) => {
   res.render('verrassing', { verrassing });
 });
 
-// 🔥 Reviews
-app.get('/reviews', async (req, res) => {
-  const result = await pool.query("SELECT * FROM reviews ORDER BY id DESC");
-  res.render('reviews/index', { reviews: result.rows });
+// --- Reviews via JSON bestand ---
+const reviewsFile = path.join(__dirname, 'data', 'reviews.json');
+
+app.get('/reviews', (req, res) => {
+  fs.readFile(reviewsFile, 'utf8', (err, data) => {
+    if (err) {
+      console.error(err);
+      return res.render('reviews/index', { reviews: [] });
+    }
+    let reviews = [];
+    try {
+      reviews = JSON.parse(data);
+    } catch (e) {
+      reviews = [];
+    }
+    reviews.sort((a, b) => b.id - a.id);
+    res.render('reviews/index', { reviews });
+  });
 });
-app.post('/reviews', async (req, res) => {
+
+app.post('/reviews', (req, res) => {
   const { name, rating, message } = req.body;
-  await pool.query("INSERT INTO reviews (name, rating, message) VALUES ($1, $2, $3)", [name, rating, message]);
-  res.redirect('/reviews');
+  fs.readFile(reviewsFile, 'utf8', (err, data) => {
+    let reviews = [];
+    if (!err) {
+      try {
+        reviews = JSON.parse(data);
+      } catch {}
+    }
+    const newReview = {
+      id: reviews.length > 0 ? reviews[reviews.length - 1].id + 1 : 1,
+      name,
+      rating,
+      message,
+      date: new Date().toISOString()
+    };
+    reviews.push(newReview);
+    fs.writeFile(reviewsFile, JSON.stringify(reviews, null, 2), err => {
+      if (err) console.error(err);
+      res.redirect('/reviews');
+    });
+  });
 });
 
 // Catch-all voor dynamische pagina's
