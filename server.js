@@ -52,6 +52,17 @@ app.get('/logout', (req, res) => {
   req.session.destroy(() => res.redirect('/'));
 });
 
+// Catch-all voor dynamische pagina's
+app.get('/*', (req, res) => {
+  const parts = req.path.split('/').filter(Boolean);
+  let viewPath = path.join(__dirname, 'views', ...parts) + '.ejs';
+  if (fs.existsSync(viewPath)) {
+    res.render(parts.join('/'));
+  } else {
+    res.status(404).send("Pagina niet gevonden");
+  }
+});
+
 app.post('/register', async (req, res) => {
   const { username, password } = req.body;
   const hashed = await bcrypt.hash(password, 10);
