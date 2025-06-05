@@ -1,7 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const path = require('path');
-const pool = require("./db");
+const pool = require("./db"); // PostgreSQL connection
 const session = require('express-session');
 const bcrypt = require('bcryptjs');
 const multer = require('multer');
@@ -41,6 +41,30 @@ app.use((req, res, next) => {
   res.locals.user = req.session.username || null;
   next();
 });
+
+// Helpers voor reviews JSON
+const reviewsFile = path.join(__dirname, 'data', 'reviews.json');
+
+function readReviews() {
+  if (!fs.existsSync(reviewsFile)) return [];
+  try {
+    const data = fs.readFileSync(reviewsFile, 'utf-8');
+    return JSON.parse(data);
+  } catch (err) {
+    console.error("Fout bij lezen reviews.json:", err);
+    return [];
+  }
+}
+
+function saveReviews(reviews) {
+  try {
+    fs.writeFileSync(reviewsFile, JSON.stringify(reviews, null, 2));
+  } catch (err) {
+    console.error("Fout bij schrijven reviews.json:", err);
+  }
+}
+
+// --- Routes ---
 
 // Home en auth
 app.get('/', (req, res) => res.render('index'));
@@ -191,28 +215,61 @@ app.get('/verrassing', (req, res) => {
   res.render('verrassing', { verrassing });
 });
 
-// Reviews
-app.get('/reviews', async (req, res) => {
-  const result = await pool.query("SELECT * FROM reviews ORDER BY id DESC");
-  res.render('reviews/index', { reviews: result.rows });
+// Reviews met JSON-bestand
+app.get('/reviews', (req, res) => {
+  const reviews = readReviews();
+  res.render('reviews/index', { reviews });
 });
-app.post('/reviews', async (req, res) => {
+app.post('/reviews', (req, res) => {
   const { name, rating, message } = req.body;
-  await pool.query("INSERT INTO reviews (name, rating, message) VALUES ($1, $2, $3)", [name, rating, message]);
+  if (!name || !rating || !message) return res.status(400).send("Alle velden zijn verplicht");
+  const reviews = readReviews();
+  reviews.unshift({
+    id: Date.now(),
+    name,
+    rating: Number(rating),
+    message,
+    time: new Date().toISOString()
+  });
+  saveReviews(reviews);
   res.redirect('/reviews');
 });
 
-// Dynamische pagina's
+// Catch-all route voor andere pagina's
 app.get('/*', (req, res) => {
-  const parts = req.path.split('/').filter(Boolean);
-  const viewPath = path.join(__dirname, 'views', ...parts) + '.ejs';
-  if (fs.existsSync(viewPath)) {
-    res.render(parts.join('/'));
-  } else {
-    res.status(404).send("Pagina niet gevonden");
-  }
+  let viewName = req.path === '/' ? 'index' : req.path.slice(1);
+  res.render(viewName, (err, html) => {
+    if (err) return res.status(404).send("Pagina niet gevonden");
+    res.send(html);
+  });
 });
 
-// Start server
+// Socket.IO chat
+io.use((socket, next) => {
+  const sessionID = socket.handshake.auth.sessionID;
+  if (!sessionID) return next(new Error("Geen sessie"));
+  // Je zou hier ook de sessie kunnen checken in een store als je wil
+  next();
+});
+
+io.on('connection', (socket) => {
+  console.log('Nieuwe Socket.IO verbinding:', socket.id);
+
+  socket.on('joinRoom', ({ user, friend }) => {
+    const roomName = [user, friend].sort().join('_');
+    socket.join(roomName);
+  });
+
+  socket.on('sendMessage', async ({ from, to, text }) => {
+    const roomName = [from, to].sort().join('_');
+    const time = new Date().toISOString();
+    await pool.query(
+      `INSERT INTO messages (from_user, to_user, text, time) VALUES ($1, $2, $3, $4)`,
+      [from, to, text, time]
+    );
+    io.to(roomName).emit('message', { from, text, time });
+  });
+});
+
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => console.log(`Server gestart op http://localhost:${PORT}`));
+server.listen(PORT, () => console.log(`Server draait op poort ${PORT}`));
