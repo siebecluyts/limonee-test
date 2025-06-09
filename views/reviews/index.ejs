@@ -20,6 +20,7 @@
         </h2>
  <ul>
   <% reviews.forEach(review => { %>
+<div class="review">
     <li>
       <strong><%= review.gebruiker %></strong><br>
       <% for(let i = 0; i < review.rating; i++) { %>
@@ -28,6 +29,7 @@
       <br>
       <p><%= review.tekst %></p>
     </li>
+</div>
   <% }) %>
 </ul>
         </div>
