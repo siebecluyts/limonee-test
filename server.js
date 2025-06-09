@@ -42,9 +42,8 @@ app.use((req, res, next) => {
   next();
 });
 
-// Helpers voor reviews JSON
+// Reviews JSON-bestand helpers
 const reviewsFile = path.join(__dirname, 'data', 'reviews.json');
-
 function readReviews() {
   if (!fs.existsSync(reviewsFile)) return [];
   try {
@@ -55,7 +54,6 @@ function readReviews() {
     return [];
   }
 }
-
 function saveReviews(reviews) {
   try {
     fs.writeFileSync(reviewsFile, JSON.stringify(reviews, null, 2));
@@ -66,7 +64,6 @@ function saveReviews(reviews) {
 
 // --- Routes ---
 
-// Home en auth
 app.get('/', (req, res) => res.render('index'));
 app.get('/register', (req, res) => res.render('register'));
 app.get('/login', (req, res) => res.render('login'));
@@ -93,29 +90,23 @@ app.post('/login', async (req, res) => {
   res.redirect('/dashboard');
 });
 
-// Dashboard
 app.get('/dashboard', async (req, res) => {
   if (!req.session.username) return res.redirect('/login');
   const me = (await pool.query("SELECT * FROM users WHERE username = $1", [req.session.username])).rows[0];
-
   const friendsResult = await pool.query(`
     SELECT u.username FROM users u
     JOIN friendships f ON (f.user1 = u.username OR f.user2 = u.username)
     WHERE (f.user1 = $1 OR f.user2 = $1) AND u.username != $1
   `, [me.username]);
   const friends = friendsResult.rows.map(r => r.username);
-
   const requests = (await pool.query("SELECT sender FROM friend_requests WHERE receiver = $1", [me.username])).rows.map(r => r.sender);
-
   const messages = await pool.query(`
     SELECT from_user, COUNT(*) AS count FROM messages
     WHERE to_user = $1
     GROUP BY from_user
   `, [me.username]);
-
   const newMessageCounts = {};
   messages.rows.forEach(m => newMessageCounts[m.from_user] = m.count);
-
   res.render('dashboard', {
     username: me.username,
     friends,
@@ -125,16 +116,13 @@ app.get('/dashboard', async (req, res) => {
   });
 });
 
-// Vriendschapsroutes
 app.post('/friend-request', async (req, res) => {
   const sender = req.session.username;
   const receiver = req.body.receiver;
   if (sender === receiver) return res.redirect('/dashboard');
-
   const exists = await pool.query("SELECT * FROM users WHERE username = $1", [receiver]);
   const already = await pool.query("SELECT * FROM friend_requests WHERE sender = $1 AND receiver = $2", [sender, receiver]);
   const alreadyFriends = await pool.query("SELECT * FROM friendships WHERE (user1 = $1 AND user2 = $2) OR (user1 = $2 AND user2 = $1)", [sender, receiver]);
-
   if (exists.rows.length > 0 && already.rows.length === 0 && alreadyFriends.rows.length === 0) {
     await pool.query("INSERT INTO friend_requests (sender, receiver) VALUES ($1, $2)", [sender, receiver]);
   }
@@ -156,37 +144,30 @@ app.post('/decline-friend', async (req, res) => {
   res.redirect('/dashboard');
 });
 
-// Chat
 app.get('/chat/:friend', async (req, res) => {
   const me = req.session.username;
   const friend = req.params.friend;
-
   const friendship = await pool.query(`
     SELECT * FROM friendships WHERE 
     (user1 = $1 AND user2 = $2) OR (user1 = $2 AND user2 = $1)
   `, [me, friend]);
-
   if (friendship.rows.length === 0) return res.send("Geen toegang");
-
   const messages = await pool.query(`
     SELECT * FROM messages
     WHERE (from_user = $1 AND to_user = $2) OR (from_user = $2 AND to_user = $1)
     ORDER BY time ASC
   `, [me, friend]);
-
   res.render('chat', { friend, messages: messages.rows });
 });
 
 app.get('/messages/:friend', async (req, res) => {
   const me = req.session.username;
   const friend = req.params.friend;
-
   const messages = await pool.query(`
     SELECT * FROM messages
     WHERE (from_user = $1 AND to_user = $2) OR (from_user = $2 AND to_user = $1)
     ORDER BY time ASC
   `, [me, friend]);
-
   const html = messages.rows.map(m =>
     `<p><strong>${m.from_user}:</strong> ${m.text || `<a href="${m.file}" target="_blank">Bestand</a>`} 
      <small>(${new Date(m.time).toLocaleTimeString()})</small></p>`
@@ -194,12 +175,10 @@ app.get('/messages/:friend', async (req, res) => {
   res.send(html);
 });
 
-// Upload
 app.post('/upload', upload.single('file'), (req, res) => {
   res.send({ file: `/uploads/${req.file.filename}` });
 });
 
-// Verrassing
 app.get('/verrassing', (req, res) => {
   if (!req.session.username) return res.redirect('/login');
   const verrassingen = [
@@ -215,11 +194,11 @@ app.get('/verrassing', (req, res) => {
   res.render('verrassing', { verrassing });
 });
 
-// Reviews met JSON-bestand
 app.get('/reviews', (req, res) => {
   const reviews = readReviews();
   res.render('reviews/index', { reviews });
 });
+
 app.post('/reviews', (req, res) => {
   const { name, rating, message } = req.body;
   if (!name || !rating || !message) return res.status(400).send("Alle velden zijn verplicht");
@@ -235,7 +214,6 @@ app.post('/reviews', (req, res) => {
   res.redirect('/reviews');
 });
 
-// Catch-all route voor andere pagina's
 app.get('/*', (req, res) => {
   let viewName = req.path === '/' ? 'index' : req.path.slice(1);
   res.render(viewName, (err, html) => {
@@ -244,32 +222,33 @@ app.get('/*', (req, res) => {
   });
 });
 
-// Socket.IO chat
+// Socket.IO authenticatie en events
 io.use((socket, next) => {
-  const sessionID = socket.handshake.auth.sessionID;
-  if (!sessionID) return next(new Error("Geen sessie"));
-  // Je zou hier ook de sessie kunnen checken in een store als je wil
+  const username = socket.handshake.auth.username;
+  if (!username) return next(new Error("Geen gebruikersnaam opgegeven"));
+  socket.username = username;
   next();
 });
 
 io.on('connection', (socket) => {
-  console.log('Nieuwe Socket.IO verbinding:', socket.id);
-
-  socket.on('joinRoom', ({ user, friend }) => {
-    const roomName = [user, friend].sort().join('_');
-    socket.join(roomName);
-  });
-
-  socket.on('sendMessage', async ({ from, to, text }) => {
-    const roomName = [from, to].sort().join('_');
-    const time = new Date().toISOString();
-    await pool.query(
-      `INSERT INTO messages (from_user, to_user, text, time) VALUES ($1, $2, $3, $4)`,
-      [from, to, text, time]
-    );
-    io.to(roomName).emit('message', { from, text, time });
+  console.log(`${socket.username} verbonden`);
+  socket.on('private message', async ({ content, to, file }) => {
+    await pool.query(`
+      INSERT INTO messages (from_user, to_user, text, file, time)
+      VALUES ($1, $2, $3, $4, NOW())
+    `, [socket.username, to, content || null, file || null]);
+    for (const [id, s] of io.of("/").sockets) {
+      if (s.username === to) {
+        s.emit("private message", {
+          from: socket.username,
+          content,
+          file,
+          time: new Date().toISOString()
+        });
+      }
+    }
   });
 });
 
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => console.log(`Server draait op poort ${PORT}`));
+server.listen(PORT, () => console.log(`Server gestart op poort ${PORT}`));
