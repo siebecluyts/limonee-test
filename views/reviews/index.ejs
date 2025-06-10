@@ -19,18 +19,17 @@
             Reviews
         </h2>
  <ul>
+<div class="review-container">
   <% reviews.forEach(review => { %>
-<div class="review">
-    <li>
+    <div class="review">
       <strong><%= review.gebruiker %></strong><br>
-      <% for(let i = 0; i < review.rating; i++) { %>
-        ⭐
-      <% } %>
+      <% for(let i = 0; i < review.rating; i++) { %>⭐<% } %>
       <br>
       <p><%= review.tekst %></p>
-    </li>
-</div>
+    </div>
   <% }) %>
+</div>
+
 </ul>
       <br><br><br>
         <script src="../script.js"></script>
