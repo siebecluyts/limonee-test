@@ -170,10 +170,11 @@ ul.agenda li.closed {
 .reviews {
     border: 2px solid black;
     border-radius: 12px;
-    padding: 5px;
-    text-align: center;
-    width: 300px;
-    height: 170px;
+    padding: 10px;
+    margin: 15px auto;
+    width: 80%;
+    background-color: #fff8e1;
+    text-align: left;
 }
 
 /* Parallax Backgrounds */
@@ -188,6 +189,7 @@ ul.agenda li.closed {
     font-weight: bold;
     text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
 }
+
 
 #fruit {
     background: url('https://cdn.glitch.global/638bdc36-d676-479e-8f39-ff81bc2e3bb1/fruit.png?v=1742719804775') center/cover fixed;
