@@ -64,6 +64,10 @@ function saveReviews(reviews) {
 
 // --- Routes ---
 
+app.get('/reviews/send', (req, res) => {
+  res.render('reviews/send/index');
+});
+
 app.get('/', (req, res) => res.render('index'));
 app.get('/register', (req, res) => res.render('register'));
 app.get('/login', (req, res) => res.render('login'));
@@ -217,12 +221,12 @@ app.post('/reviews', (req, res) => {
 app.get('/*', (req, res) => {
   let viewPath = req.path === '/' ? 'index' : req.path.slice(1);
 
-  // Eerst proberen: views/<pad>.ejs
+  // Probeer eerst bv. views/reviews/send.ejs
   res.render(viewPath, (err, html) => {
     if (!err) return res.send(html);
 
-    // Als dat faalt, probeer views/<pad>/index.ejs
-    res.render(path.join(viewPath, 'index'), (err2, html2) => {
+    // Zo niet, probeer bv. views/reviews/send/index.ejs
+    res.render(`${viewPath}/index`, (err2, html2) => {
       if (err2) return res.status(404).send("Pagina niet gevonden");
       res.send(html2);
     });
