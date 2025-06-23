@@ -218,14 +218,10 @@ app.post('/reviews', (req, res) => {
   res.redirect('/reviews');
 });
 
-app.get('/*', (req, res) => {
-  let viewPath = req.path === '/' ? 'index' : req.path.slice(1);
-
-  // Probeer eerst bv. views/reviews/send.ejs
+app.get(/^\/(?!.*\.(ejs|json|js|css|png|jpg|jpeg|ico|webmanifest|svg|woff|ttf)$).*$/, (req, res) => {
+  const viewPath = req.path === '/' ? 'index' : req.path.slice(1);
   res.render(viewPath, (err, html) => {
     if (!err) return res.send(html);
-
-    // Zo niet, probeer bv. views/reviews/send/index.ejs
     res.render(`${viewPath}/index`, (err2, html2) => {
       if (err2) return res.status(404).send("Pagina niet gevonden");
       res.send(html2);
