@@ -215,10 +215,17 @@ app.post('/reviews', (req, res) => {
 });
 
 app.get('/*', (req, res) => {
-  let viewName = req.path === '/' ? 'index' : req.path.slice(1);
-  res.render(viewName, (err, html) => {
-    if (err) return res.status(404).send("Pagina niet gevonden");
-    res.send(html);
+  let viewPath = req.path === '/' ? 'index' : req.path.slice(1);
+
+  // Eerst proberen: views/<pad>.ejs
+  res.render(viewPath, (err, html) => {
+    if (!err) return res.send(html);
+
+    // Als dat faalt, probeer views/<pad>/index.ejs
+    res.render(path.join(viewPath, 'index'), (err2, html2) => {
+      if (err2) return res.status(404).send("Pagina niet gevonden");
+      res.send(html2);
+    });
   });
 });
 
