@@ -23,7 +23,10 @@
     <input type="radio" name="functie" value="IT" onclick="toonVragen('it')" required> IT
   </label>
   <label>
-    <input type="radio" name="functie" value="Medewerker" onclick="toonVragen('medewerker')"> Medewerker
+    <input true type="radio" name="functie" value="Medewerker" onclick="toonVragen('medewerker')"> Medewerker
+  </label>
+    <label>
+    <input type="radio" name="functie" value="customer service" onclick="toonVragen('customerservice')"> customer service
   </label>
 
   <!-- Vragen voor IT -->
@@ -49,13 +52,28 @@
       <textarea name="wachtende_klant" required></textarea>
     </label>
   </div>
+  <div id="vragen-customer service" style="display:none; margin-top: 20px;">
+    <label>
+      Hoe zou jij reageren op een bestelling van een klant?
+      <br>
+      <textarea name="hoe bestelling" required></textarea>
+    </label><br><br>
+    <label>
+      Een klant stuurdt een bose mail over hoe haar glas niet vol genoeg was. Wat doe je?<br>
+      <textarea name="boosklant" required></textarea>
+    </label>
+  </div>
     <label>
      Vertel wat over jezelf.<br>
       <textarea name="jezelf" required></textarea>
-    </label>
+    </label><br>
     <label>
      Waarom denk je dat jij kan worden gekozen om mee te werken bij Limonee.<br>
       <textarea name="waarom" required></textarea>
+    </label>
+        <label>
+     Wat zou jij gaarg bij limonee willen doen?<br>
+      <textarea name="wat" required></textarea>
     </label>
   <br>
   <button type="submit">Verzenden</button>

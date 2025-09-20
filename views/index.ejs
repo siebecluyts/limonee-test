@@ -67,6 +67,11 @@
 <meta name="msvalidate.01" content="C3314543FD705D537B06BA0584B64B7A" />
   </head>
   <body>
+      <div class="notification">
+    <p>Lekkere frisse limonade!</p>
+    <button onclick="goToPage()">Bestel hier!</button>
+    <button onclick="closeNotification()">X</button>
+  </div>
   <%- include('partials/header') %>
       <h2>Limonee</h2>
       <h3 id="h3-home">Onze limonade</h3>
@@ -170,7 +175,45 @@ function submitReview() {
   }
 }
 </script>
+<div id="cookie-popup" style="
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: white;
+  border: 1px solid #ccc;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  z-index: 9999;
+  display: none;
+">
+  <p>Wij gebruiken cookies om Limonee beter te maken 🍋</p>
+  <button id="accept-cookies">Accepteren</button>
+  <button id="reject-cookies">Afwijzen</button>
+</div>
 
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const popup = document.getElementById("cookie-popup");
+    const accepted = localStorage.getItem("cookiesAccepted");
+
+    // Alleen tonen als gebruiker nog niet geaccepteerd heeft
+    if (!accepted) {
+      popup.style.display = "block";
+    }
+
+    document.getElementById("accept-cookies").addEventListener("click", () => {
+      localStorage.setItem("cookiesAccepted", "true");
+      popup.style.display = "none";
+    });
+
+    document.getElementById("reject-cookies").addEventListener("click", () => {
+      // Geen opslag → blijft terugkomen bij reload
+      popup.style.display = "none";
+    });
+  });
+</script>
 
     <br>
     <br>
