@@ -196,20 +196,19 @@ function submitReview() {
 <script>
   document.addEventListener("DOMContentLoaded", function() {
     const popup = document.getElementById("cookie-popup");
-    const accepted = localStorage.getItem("cookiesAccepted");
 
-    // Alleen tonen als gebruiker nog niet geaccepteerd heeft
-    if (!accepted) {
-      popup.style.display = "block";
+    // Check of gebruiker al heeft geaccepteerd
+    if (localStorage.getItem("cookiesAccepted") !== "true") {
+      popup.style.display = "block"; // Toon popup als er niets staat
     }
 
     document.getElementById("accept-cookies").addEventListener("click", () => {
-      localStorage.setItem("cookiesAccepted", "true");
+      localStorage.setItem("cookiesAccepted", "true"); // Enkel bij accepteren
       popup.style.display = "none";
     });
 
     document.getElementById("reject-cookies").addEventListener("click", () => {
-      // Geen opslag → blijft terugkomen bij reload
+      // Geen opslag bij afwijzen → popup komt bij volgende reload terug
       popup.style.display = "none";
     });
   });
