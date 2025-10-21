@@ -15,18 +15,19 @@
     </head>
     <body>
    <%- include('../partials/header') %>
-<form action="https://formspree.io/f/xwpoggqg" method="POST">
+<form action="https://formsubmit.co/info@limonee.be" method="POST">
 <label> Je naam: <input type="text" name="name"></label>
-<label> Je email: <input type="email" name="email"></label>
+<label> Je email: <input type="email" name="email" placeholder="Email Address"></label>
+<input type="hidden" name="_next" value="https://limonee.be/">
   <h2>Wat wil je doen binnen het team?</h2>
   <label>
     <input type="radio" name="functie" value="IT" onclick="toonVragen('it')" required> IT
   </label>
   <label>
-    <input true type="radio" name="functie" value="Medewerker" onclick="toonVragen('medewerker')"> Medewerker
+    <input true type="radio" name="functie" value="Medewerker" onclick="toonVragen('medewerker')" checked> Medewerker
   </label>
     <label>
-    <input type="radio" name="functie" value="customer service" onclick="toonVragen('customerservice')"> customer service
+    <input type="radio" name="functie" value="customer-service" onclick="toonVragen('customerservice')"> customer service
   </label>
 
   <!-- Vragen voor IT -->
@@ -63,6 +64,24 @@
       <textarea name="boosklant" required></textarea>
     </label>
   </div>
+    <!-- Vragen voor customer service -->
+  <div id="vragen-service" style="display:none; margin-top: 20px;">
+    <label>
+      Wat is jouw ervaring bij het helpen van klanten?<br>
+      <textarea name="ervaring_helpen" required></textarea>
+    </label><br><br>
+    <label>
+      Hoe zou jij een klant die niet weet hoe ze moet bestellen helpen?<br>
+      <textarea name="Helpen_bestellen" required></textarea>
+    </label><br><br>
+    <label>
+      Hoe zou jij reageren op dezze mail: <div class="photo-gallery">
+<a href="https://github.com/siebecluyts/limonee-test/blob/main/uploads/photos/klacht.jpg?raw=true"><img src="https://github.com/siebecluyts/limonee-test/blob/main/uploads/photos/klacht.jpg?raw=true" width="310" height="400"></a><br>
+</div>?<br>
+      <textarea name="email" required></textarea>
+    </label>
+  </div>
+
     <label>
      Vertel wat over jezelf.<br>
       <textarea name="jezelf" required></textarea>
@@ -83,6 +102,7 @@
 function toonVragen(functie) {
   document.getElementById("vragen-it").style.display = functie === "it" ? "block" : "none";
   document.getElementById("vragen-medewerker").style.display = functie === "medewerker" ? "block" : "none";
+    document.getElementById("vragen-service").style.display = functie === "customer-service" ? "block" : "none";
 }
 </script>
 
