@@ -27,9 +27,9 @@
     <input true type="radio" name="functie" value="Medewerker" onclick="toonVragen('medewerker')" checked> Medewerker
   </label>
     <label>
-    <input type="radio" name="functie" value="customer-service" onclick="toonVragen('customerservice')"> customer service
+    <input type="radio" name="functie" value="customerservice" onclick="toonVragen('customerservice')"> customer service
   </label>
-
+<br>
   <!-- Vragen voor IT -->
   <div id="vragen-it" style="display:none; margin-top: 20px;">
     <label>
@@ -102,7 +102,7 @@
 function toonVragen(functie) {
   document.getElementById("vragen-it").style.display = functie === "it" ? "block" : "none";
   document.getElementById("vragen-medewerker").style.display = functie === "medewerker" ? "block" : "none";
-    document.getElementById("vragen-service").style.display = functie === "customer-service" ? "block" : "none";
+    document.getElementById("vragen-service").style.display = functie === "customerservice" ? "block" : "none";
 }
 </script>
 
