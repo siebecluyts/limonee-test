@@ -64,21 +64,51 @@ window.addEventListener('scroll', function() {
     document.getElementById('fruit').style.backgroundPositionY = -(scrolled * 0.3) + 'px';
     document.getElementById('ice').style.backgroundPositionY = -(scrolled * 0.5) + 'px';
 });
+document.addEventListener("DOMContentLoaded", function() {
+    const popup = document.getElementById("cookie-popup");
+    
+    // Controleer of de gebruiker al heeft geaccepteerd
+    if (localStorage.getItem("cookiesAccepted") !== "true") {
+        popup.style.display = "block"; // Toon popup als cookies niet zijn geaccepteerd
+    }
+
+    document.getElementById("accept-cookies").addEventListener("click", () => {
+        localStorage.setItem("cookiesAccepted", "true"); // Bewaar acceptatie
+        popup.style.display = "none"; // Sluit popup
+    });
+
+    document.getElementById("reject-cookies").addEventListener("click", () => {
+        popup.style.display = "none"; // Sluit popup bij weigeren
+    });
+});
+
 function goToPage() {
-  window.location.href = "/contact/bestelling/"; // Replace with the URL you want to redirect to
+    // Controleer of cookies zijn geaccepteerd voordat je redirect
+    if (localStorage.getItem("cookiesAccepted") === "true") {
+        window.location.href = "/contact/bestelling/"; // Vervang door de gewenste URL
+    }
 }
 
 function closeNotification() {
-  const notification = document.querySelector('.notification');
-  
-  // Trigger slide-out animation
-  notification.style.animation = 'slideOutRight 1s ease-out forwards';
-  
-  // Remove the notification from the screen after animation ends
-  notification.addEventListener('animationend', () => {
-    notification.style.display = 'none';
-  });
+    const notification = document.querySelector('.notification');
+
+    // Trigger slide-out animatie
+    notification.style.animation = 'slideOutRight 1s ease-out forwards';
+
+    // Verwijder de notificatie na animatie
+    notification.addEventListener('animationend', () => {
+        notification.style.display = 'none';
+    });
 }
+
+// Voeg hier een event listener toe voor de knoppen die de notificatie sluiten
+document.querySelectorAll('.your-button-class').forEach(button => {
+    button.addEventListener('click', () => {
+        if (localStorage.getItem("cookiesAccepted") === "true") {
+            closeNotification(); // Sluit notificatie als cookies zijn geaccepteerd
+        }
+    });
+});
 //cup maker
 let cupElement = document.getElementById("cup");
 let textFont = "Arial";
